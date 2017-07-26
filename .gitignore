@@ -1,0 +1,11 @@
+.vs/
+node_modules/
+tools/
+dist/
+nuget-build/
+[Bb]in/
+[Oo]bj/
+
+package-lock.json
+
+src/LogsExplorer.Server/index.html

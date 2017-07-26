@@ -1,0 +1,255 @@
+html {
+    box-sizing: border-box;
+    font-family: sans-serif;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -ms-overflow-style: scrollbar;
+    -webkit-tap-highlight-color: transparent;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+article,
+aside,
+dialog,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section {
+    display: block;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: normal;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    min-height: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+html,
+body,
+.view {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #222;
+    text-rendering: optimizeLegibility;
+}
+
+.header {
+    min-width: 900px;
+    position: fixed;
+    background-color: #007acc;
+    color: white;
+    width: 100%;
+    height: 35px;
+    padding-left: 25px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    z-index: 5;
+}
+
+.view {
+    padding-top: 35px;
+    position: absolute;
+    min-width: 900px;
+}
+
+.events {
+    background-color: white;
+    padding-right: 320px;
+    height: 100%;
+}
+
+.side-bar {
+    background-color: #005b99;
+    color: white;
+    width: 320px;
+    position: absolute;
+    right: 0;
+    height: calc(100% - 34px);
+    z-index: 2;
+    margin-top: -1px;
+    border-top: 1px solid #004c80;
+    padding: 5px 0 40px;
+    -webkit-transition: background-color .3s;
+    transition: background-color .3s;
+}
+
+.filter-bar {
+    background-color: #f7f7f7;
+    position: fixed;
+    height: 75px;
+    width: 100%;
+    padding-right: 320px;
+    z-index: 1;
+    min-width: 900px;
+}
+
+.filter-bar textarea {
+    resize: none;
+    font-family: consolas;
+}
+
+.stream-view {
+    height: 100%;
+    padding-top: 80px;
+    -webkit-transition: padding-top .3s ease;
+    transition: padding-top .3s ease;
+}
+
+.stream-view .content {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    height: 100%;
+    overflow-y: scroll;
+    position: relative;
+    background-color: white;
+}
+
+.event {
+    width: 100%;
+    clear: both;
+    cursor: pointer;
+}
+
+.event.expanded {
+    background-color: #e5f5ff;
+    margin-left: -4px;
+    padding: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-bottom: 5px;
+    padding-top: 2px;
+    margin-bottom: 2px;
+    overflow-wrap: break-word;
+}
+
+.event.expanded.level-error,
+.event.expanded.level-critical,
+.event.expanded.level-fatal {
+    background-color: #fff1f0;
+}
+
+.event.expanded.level-warning {
+    background-color: #fff3e2;
+}
+
+.event.expanded.level-information {
+    background-color: #e5f5ff;
+}
+
+.event.expanded.level-trace,
+.event.expanded.level-debug {
+    background-color: #f7f7f7;
+}
+
+.event .timestamp {
+    float: left;
+    width: 165px;
+    color: #222;
+    padding-left: 5px;
+    font-size: 12px;
+    height: 18px;
+    margin-bottom: 2px;
+}
+
+.event .description {
+    padding-left: 170px;
+}
+
+.event .description .message {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.event .exception {
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 9pt;
+    overflow: auto;
+    color: white;
+    margin-top: 5px;
+    padding: 2px;
+    background-color: #bb312f;
+}
+
+.level-indicator {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 4.5px;
+    margin-right: 5px;
+    background-color: white;
+}
+
+.level-indicator.level-error,
+.level-indicator.level-critical,
+.level-indicator.level-fatal {
+    background-color: #e03836;
+}
+
+.level-indicator.level-warning {
+    background-color: #f9c019;
+}
+
+.level-indicator.level-information {
+    background-color: #007acc;
+}
+
+.level-indicator.level-trace,
+.level-indicator.level-debug {
+    background-color: lightgray;
+}
+
+.event-properties {
+    margin-top: 5px;
+}
+
+.event-properties .property {
+    width: 100%;
+}
+
+.event-properties .property .property-name {
+    font-family: monospace;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    color: #222;
+    width: 200px;
+    float: left;
+    white-space: nowrap;
+}
+
+.event-properties .property .property-value {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #222;
+    font-size: 13px;
+    margin-left: 245px;
+}
