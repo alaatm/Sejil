@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Configuration;
 using Serilog.Extensions.Logging;
 
 namespace sample
@@ -23,16 +24,17 @@ namespace sample
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureLogging((context, logging) =>
                 {
-                    logging.AddSerilog(CreateSerilogLogger("logs.db"));
+                    logging.AddSerilog(CreateSerilogLogger("logs.db", context.Configuration));
                 })
                 .UseStartup<Startup>()
                 .Build();
 
-        private static Serilog.Core.Logger CreateSerilogLogger(string sqliteDbPath)
+        private static Serilog.Core.Logger CreateSerilogLogger(string sqliteDbPath, IConfiguration configuration = null)
             => new LoggerConfiguration()
-                .Enrich.FromLogContext()
+                .ReadFrom.Configuration(configuration)
+                /*.Enrich.FromLogContext()
                 .MinimumLevel.Debug()
-                .WriteTo.LogsExplorer(sqliteDbPath)
+                .WriteTo.LogsExplorer(sqliteDbPath)*/
                 .CreateLogger();
     }
 
