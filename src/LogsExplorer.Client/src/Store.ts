@@ -28,12 +28,7 @@ export default class Store {
             ? `${this.rootUrl}/events?page=${this.page}&startingTs=${this.startingTimestamp}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
-        const defaultFilter = `RequestPath not like '%${this.rootUrl}%' && Path not like '%${this.rootUrl}%'`;
-        const filter = this.filterText
-            ? `${defaultFilter} && (${this.filterText})`
-            : defaultFilter;
-
-        const json = await this.http.post(url, filter);
+        const json = await this.http.post(url, this.filterText);
         const events = JSON.parse(json) as IEventEntry[];
 
         if (!this.startingTimestamp && events.length) {
