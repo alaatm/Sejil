@@ -5,7 +5,7 @@ namespace LogsExplorer.Server
 {
     public class LogEntry
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string Message { get; set; }
         public string MessageTemplate { get; set; }
         public string Level { get; set; }

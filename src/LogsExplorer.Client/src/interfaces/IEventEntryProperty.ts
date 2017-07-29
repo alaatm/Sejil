@@ -2,6 +2,6 @@
 export default interface IEventEntryProperty {
     id: number;
     logId: string;
-    key: string;
+    name: string;
     value: string;
 }

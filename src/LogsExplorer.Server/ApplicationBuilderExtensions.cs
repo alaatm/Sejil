@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,24 +11,28 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Serilog;
-using Serilog.Sinks.MSSqlServer;
 using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using LogsExplorer.Server.Logging.Sinks;
 
 namespace LogsExplorer.Server
 {
     public static class ApplicationBuilderExtensions
     {
+        public static string Url;
+
         private const int _pageSize = 100;
         private static JsonSerializerSettings camelCaseSerializerSetting = new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() };
-        private static string logsHtml = GetEmbeddedResource("LogsExplorer.Server.index.html");
-
-        private static ILogsExplorerOptions _options;
+        private static string logsHtml = Helpers.GetEmbeddedResource("LogsExplorer.Server.index.html");
 
         public static IApplicationBuilder UseLogsExplorer(this IApplicationBuilder app, string url)
         {
-            _options = app.ApplicationServices.GetService(typeof(ILogsExplorerOptions)) as ILogsExplorerOptions;
+            Url = url;
+            if (!Url.StartsWith("/"))
+            {
+                Url = "/" + Url;
+            }
 
             app.UseRouter(routes =>
             {
@@ -43,11 +47,13 @@ namespace LogsExplorer.Server
                     var filter = await GetRequestBodyAsync(context.Request);
                     Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                     DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
-                    var sql = GetSql(_options.LogsTableName, _options.LogsPropertiesTableName, page == 0 ? 1 : page, startingTs, filter);
+                    var sql = GetSql(page == 0 ? 1 : page, startingTs, filter);
 
-                    using (var conn = new SqlConnection(_options.ConnectionString))
+                    using (var conn = new SqliteConnection($"DataSource={LogsExplorerSink.SqliteDbPath}"))
                     {
-                        var lookup = new Dictionary<Guid, LogEntry>();
+                        await conn.OpenAsync().ConfigureAwait(false);
+                        var lookup = new Dictionary<string, LogEntry>();
+
                         var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
                             {
                                 LogEntry logEntry;
@@ -64,10 +70,13 @@ namespace LogsExplorer.Server
                                 return logEntry;
 
                             }).ToList();
+
                         var resultList = lookup.Values;
 
                         context.Response.ContentType = "application/json";
                         await context.Response.WriteAsync(JsonConvert.SerializeObject(resultList, camelCaseSerializerSetting));
+
+                        conn.Close();
                     }
                 });
 
@@ -91,26 +100,24 @@ namespace LogsExplorer.Server
             if (request.ContentLength > 0)
             {
                 var buffer = new byte[(int)request.ContentLength];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length);
+                await request.Body.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                 return Encoding.Default.GetString(buffer);
             }
 
             return null;
         }
 
-        private static string GetSql(string tableName, string propertiesTableName, int page, DateTime startingTs, string filter)
+        private static string GetSql(int page, DateTime startingTs, string filter)
         {
             var sql = $@"select l.*, p.* from 
                         (
-                            select * from {tableName} 
-                            #TIMESTAMP_WHERE_CLAUSE#
+                            select * from log
                             #FILTER_WHERE_CLAUSE#
                             order by timestamp desc
-                            offset {(page - 1) * _pageSize} rows
-                            fetch next {_pageSize} rows only
+                            limit {_pageSize} offset {(page - 1) * _pageSize}
                         ) l
-                        join {propertiesTableName} p on l.id = p.logid
-                        order by l.timestamp desc, p.[key]";
+                        join log_property p on l.id = p.log_id
+                        order by l.timestamp desc, p.name";
 
             sql = sql.Replace("#TIMESTAMP_WHERE_CLAUSE#", startingTs == default(DateTime)
                 ? ""
@@ -124,15 +131,15 @@ namespace LogsExplorer.Server
             {
                 if (startingTs == default(DateTime))
                 {
-                    return sql.Replace("#FILTER_WHERE_CLAUSE#", $"where {BuildPredicate(propertiesTableName, filter)}");
+                    return sql.Replace("#FILTER_WHERE_CLAUSE#", $"where {BuildPredicate(filter)}");
                 }
                 else
                 {
-                    return sql.Replace("#FILTER_WHERE_CLAUSE#", $"and {BuildPredicate(propertiesTableName, filter)}");
+                    return sql.Replace("#FILTER_WHERE_CLAUSE#", $"and {BuildPredicate(filter)}");
                 }
             }
         }
-        private static string BuildPredicate(string propertiesTableName, string filterQuery)
+        private static string BuildPredicate(string filterQuery)
         {
             var sb = new StringBuilder();
             BuildPredicateCore(filterQuery, sb);
@@ -160,14 +167,14 @@ namespace LogsExplorer.Server
                             split = Regex.Split(query, @"(.+)\s*(&&|\|\|)\s*(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
                             if (split.Length != 3)
                             {
-                                // key = value
-                                // key != value
-                                // key like 'value'
-                                // key not like 'value'
+                                // name = value
+                                // name != value
+                                // name like 'value'
+                                // name not like 'value'
                                 split = Regex.Split(query, @"(\w+)(=|!=|\s*like\s*|\s*not like\s*)(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
                                 if (split.Length == 3)
                                 {
-                                    sql.AppendFormat("id {0} (select logid from " + propertiesTableName + " where [key]='{1}' and [value] {2} {3})",
+                                    sql.AppendFormat("id {0} (select log_id from log_property where name='{1}' and value {2} {3})",
                                         GetInclusionOperator(split[1].Trim()), split[0], NegateIfNonInclusion(split[1].Trim()), EnsureQuotes(split[2]));
                                 }
                                 else if (split.Length == 1)
@@ -175,7 +182,7 @@ namespace LogsExplorer.Server
                                     // If we get here, then we received just a string. We will search the message column, exception column and all props for matches
                                     sql.AppendFormat(
                                         "(message like '%{0}%' or exception like '%{0}%' or " +
-                                        "id in (select logid from " + propertiesTableName + " where [value] like '%{0}%'))",
+                                        "id in (select log_id from log_property where value like '%{0}%'))",
                                         split[0].Trim());
                                 }
                                 else
@@ -258,16 +265,5 @@ namespace LogsExplorer.Server
             => value[0] != '\'' && value[value.Length - 1] != '\''
                 ? $"'{value}'"
                 : value;
-
-        private static string GetEmbeddedResource(string name)
-        {
-            using (var stream = typeof(ApplicationBuilderExtensions).Assembly.GetManifestResourceStream(name))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
     }
 }
