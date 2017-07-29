@@ -76,32 +76,29 @@ Task("CopyEmbeddedHtml")
 	System.IO.File.WriteAllText(System.IO.Path.Combine(SERVER_DIR, "index.html"), html);
 });
 
-Task("Restore")
+Task("Build")
 	.Does(() =>
 {
-	DotNetCoreRestore(SERVER_DIR);
-	DotNetCoreRestore(SAMPLE_DIR);
+	DotNetCoreRestore(".");
+	DotNetCoreBuild(".", new DotNetCoreBuildSettings
+	{
+		Configuration = configuration,
+	});
 });
 
 Task("Pack")
 	.IsDependentOn("Clean")
 	.IsDependentOn("ClientBuild")
 	.IsDependentOn("CopyEmbeddedHtml")
-	.IsDependentOn("Restore")
+	.IsDependentOn("Build")
 	.Does(() =>
 {
 	DotNetCorePack(SERVER_DIR, new DotNetCorePackSettings 
 	{ 
 		Configuration = configuration,
-		OutputDirectory = Directory(_packFolder)
+		OutputDirectory = Directory(_packFolder),
+		NoBuild = true
 	});
-});
-
-Task("BuildSample")
-	.IsDependentOn("Restore")
-	.Does(() =>
-{
-	DotNetCoreBuild(SAMPLE_DIR);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -109,8 +106,7 @@ Task("BuildSample")
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
-    .IsDependentOn("Pack")
-    .IsDependentOn("BuildSample");
+    .IsDependentOn("Pack");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
