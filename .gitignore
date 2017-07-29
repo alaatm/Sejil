@@ -5,7 +5,10 @@ dist/
 nuget-build/
 [Bb]in/
 [Oo]bj/
+**/*/wwwroot/lib
 
 package-lock.json
+
+.DS_Store
 
 src/LogsExplorer.Server/index.html
