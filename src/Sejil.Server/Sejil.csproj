@@ -3,29 +3,49 @@
   <PropertyGroup>
     <Description>View and filter your ASP.net core log events right from your app </Description>
     <Authors>Alaa Masoud</Authors>
-
     <PackageId>Sejil</PackageId>
     <PackageTags>sejil;logging;structured</PackageTags>
     <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
     <VersionPrefix>1.0.0-beta1</VersionPrefix>
     <AssemblyName>Sejil</AssemblyName>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>NETSTANDARD16</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+
+
   <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.5.0" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
+    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="1.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0-*" />
-    <PackageReference Include="Serilog" Version="2.5.1-*" />
-    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.0-*" />
-    <PackageReference Include="Dapper" Version="1.50.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <Compile Remove="RouteBuilderExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

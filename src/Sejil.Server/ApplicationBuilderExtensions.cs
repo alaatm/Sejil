@@ -128,7 +128,7 @@ namespace Sejil
             {
                 var buffer = new byte[(int)request.ContentLength];
                 await request.Body.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
-                return Encoding.Default.GetString(buffer);
+                return Encoding.UTF8.GetString(buffer);
             }
 
             return null;

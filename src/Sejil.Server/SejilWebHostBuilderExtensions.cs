@@ -8,14 +8,18 @@ using Sejil;
 
 namespace Microsoft.AspNetCore.Hosting
 {
-    public static class WebHostBuilderExtensions
+    public static class SejilWebHostBuilderExtensions
     {
         public static IWebHostBuilder AddSejil(this IWebHostBuilder builder, string uri, LogLevel minLogLevel)
         {
             var settings = new SejilSettings(uri, MapSerilogLogLevel(minLogLevel));
 
             return builder
+            #if NETSTANDARD16
+                .ConfigureLogging((logging) => logging.AddSerilog(CreateLogger(settings)))
+            #elif NETSTANDARD20
                 .ConfigureLogging((_, logging) => logging.AddSerilog(CreateLogger(settings)))
+            #endif
                 .ConfigureServices(services => services.AddSingleton(settings));
         }
 

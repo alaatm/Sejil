@@ -1,0 +1,26 @@
+version: '1.0.0-beta1'
+image: Visual Studio 2017
+
+branches:
+  only:
+  - master
+
+environment:
+  CLI_CHANNEL: release/2.0.0
+  CLI_VERSION: 2.0.0-preview2-006497
+
+init:
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
+
+install:
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+  - ps: Invoke-WebRequest -Uri "https://github.com/dotnet/cli/blob/release/2.0.0-preview2/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
+  - ps: '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Channel $env:CLI_CHANNEL -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
+  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
+build_script:
+  - ps: ./build.ps1
+
+test_script: off

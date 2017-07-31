@@ -10,7 +10,19 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
 
 2. Adding code
 
-    Add highlted code below in your program.cs
+    For ASP.net Core 1.x.x:
+
+    <pre>
+    public static void Main(string[] args)
+    {
+        var host = new WebHostBuilder()
+            <b>.AddSejil("/logs", LogLevel.Debug)</b>
+            .UseKestrel()
+        ...
+    }
+    </pre>
+
+    For ASP.net core 2.x.x:
 
     <pre>
     public static IWebHost BuildWebHost(string[] args) =>
