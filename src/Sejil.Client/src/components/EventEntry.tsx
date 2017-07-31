@@ -1,10 +1,10 @@
 import * as React from 'react';
 import dateFormat from '../dateFormat';
 import EventEntryProperties from './EventEntryProperties';
-import IEventEntry from '../interfaces/IEventEntry';
+import ILogEntry from '../interfaces/ILogEntry';
 
 interface IProps {
-    entry: IEventEntry;
+    entry: ILogEntry;
 }
 
 interface IState {

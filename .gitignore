@@ -10,4 +10,4 @@ package-lock.json
 
 .DS_Store
 
-src/LogsExplorer.Server/index.html
+src/Sejil/index.html

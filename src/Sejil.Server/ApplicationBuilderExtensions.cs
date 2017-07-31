@@ -14,19 +14,19 @@ using Serilog;
 using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
-using LogsExplorer.Server.Logging.Sinks;
+using Sejil.Logging.Sinks;
 
-namespace LogsExplorer.Server
+namespace Sejil
 {
     public static class ApplicationBuilderExtensions
     {
         private const int _pageSize = 100;
         private static JsonSerializerSettings camelCaseSerializerSetting = new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() };
-        private static string logsHtml = Helpers.GetEmbeddedResource("LogsExplorer.Server.index.html");
+        private static string logsHtml = Helpers.GetEmbeddedResource("Sejil.index.html");
 
-        public static IApplicationBuilder UseLogsExplorer(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
         {
-            var settings = app.ApplicationServices.GetService(typeof(LogsExplorerSettings)) as LogsExplorerSettings;
+            var settings = app.ApplicationServices.GetService(typeof(SejilSettings)) as SejilSettings;
             var url = settings.Uri.Substring(1); // Skip the '/'
             var connectionString = $"DataSource={settings.SqliteDbPath}";
 
@@ -108,7 +108,7 @@ namespace LogsExplorer.Server
                 routes.MapPost($"{url}/min-log-level", async context =>
                 {
                     var minLogLevel = await GetRequestBodyAsync(context.Request);
-                    if (settings.LoggingLevelSwitch.TrySetMinimumLogLevel(minLogLevel))
+                    if (settings.TrySetMinimumLogLevel(minLogLevel))
                     {
                         context.Response.StatusCode = StatusCodes.Status200OK;
                         await context.Response.WriteAsync("");

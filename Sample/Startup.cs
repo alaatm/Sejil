@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using LogsExplorer.Server;
+using Sejil;
 using Microsoft.AspNetCore.Http;
 
 namespace sample
@@ -40,7 +40,7 @@ namespace sample
 
             app.UseStaticFiles();
 
-            app.UseLogsExplorer();
+            app.UseSejil();
 
             app.UseMvc(routes =>
             {

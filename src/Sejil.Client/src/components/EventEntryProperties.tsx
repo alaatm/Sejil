@@ -1,8 +1,8 @@
 import * as React from 'react';
-import IEventEntryProperty from '../interfaces/IEventEntryProperty';
+import ILogEntryProperty from '../interfaces/ILogEntryProperty';
 
 interface IProps {
-    props: IEventEntryProperty[];
+    props: ILogEntryProperty[];
 }
 
 export default class EventEntry extends React.Component<IProps, {}> {

@@ -28,7 +28,7 @@ export default class FilterBar extends React.Component<IProps, {}> {
 
     @action updateFilterText(e: React.ChangeEvent<HTMLInputElement>) {
         const store = this.props.store || new Store();
-        store.filterText = e.target.value;
+        store.queryText = e.target.value;
     }
 
     render() {
@@ -40,7 +40,7 @@ export default class FilterBar extends React.Component<IProps, {}> {
                 <TextArea
                     spellCheck={false}
                     rows={3}
-                    value={store.filterText}
+                    value={store.queryText}
                     onKeyDown={this.onKeyDown}
                     onChange={this.updateFilterText} />
             </div>

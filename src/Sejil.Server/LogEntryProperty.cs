@@ -1,6 +1,6 @@
 using System;
 
-namespace LogsExplorer.Server
+namespace Sejil
 {
     public class LogEntryProperty
     {

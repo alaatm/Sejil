@@ -2,16 +2,16 @@ namespace Serilog
 {
     using System;
     using System.IO;
-    using LogsExplorer.Server;
-    using LogsExplorer.Server.Logging.Sinks;
+    using Sejil;
+    using Sejil.Logging.Sinks;
     using Serilog.Configuration;
     using Serilog.Debugging;
     using Serilog.Events;
 
     /// <summary>
-    ///     Adds the WriteTo.LogsExplorer() extension method to <see cref="LoggerConfiguration" />.
+    ///     Adds the WriteTo.Sejil() extension method to <see cref="LoggerConfiguration" />.
     /// </summary>
-    internal static class LoggerSinkConfigurationExtensions
+    internal static class LoggerConfigurationExtensions
     {
         /// <summary>
         ///     Adds a sink that writes log events to a SQLite database.
@@ -20,9 +20,9 @@ namespace Serilog
         /// <param name="sqliteDbPath">The path of SQLite db.</param>
         /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration LogsExplorer(
+        public static LoggerConfiguration Sejil(
             this LoggerSinkConfiguration loggerConfiguration,
-            LogsExplorerSettings settings,
+            SejilSettings settings,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             try

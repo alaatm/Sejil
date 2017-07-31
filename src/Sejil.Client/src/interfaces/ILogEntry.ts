@@ -1,6 +1,6 @@
-import IEventEntryProperty from './IEventEntryProperty';
+import ILogEntryProperty from './ILogEntryProperty';
 
-export default interface IEventEntry {
+export default interface ILogEntry {
     id: string;
     message: string;
     messageTemplate: string;
@@ -9,5 +9,5 @@ export default interface IEventEntry {
     exception: string | null;
     sourceContext: string;
     requestId: string;
-    properties: IEventEntryProperty[];
+    properties: ILogEntryProperty[];
 }

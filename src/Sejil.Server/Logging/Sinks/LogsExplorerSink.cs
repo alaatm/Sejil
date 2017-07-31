@@ -9,7 +9,7 @@ using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 
-namespace LogsExplorer.Server.Logging.Sinks
+namespace Sejil.Logging.Sinks
 {
     internal class LogsExplorerSink : PeriodicBatchingSink
     {
@@ -19,7 +19,7 @@ namespace LogsExplorer.Server.Logging.Sinks
         private readonly string _connectionString;
         private readonly string _uri;
 
-        public LogsExplorerSink(LogsExplorerSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
+        public LogsExplorerSink(SejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
             _connectionString = $"DataSource={settings.SqliteDbPath}";
             _uri = settings.Uri;
@@ -130,7 +130,7 @@ namespace LogsExplorer.Server.Logging.Sinks
             using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-                var sql = Helpers.GetEmbeddedResource("LogsExplorer.Server.db.sql");
+                var sql = Helpers.GetEmbeddedResource("Sejil.db.sql");
                 var cmd = new SqliteCommand(sql, conn);
                 cmd.ExecuteNonQuery();
             }

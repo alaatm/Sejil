@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace LogsExplorer.Server
+namespace Sejil
 {
     public static class Helpers
     {

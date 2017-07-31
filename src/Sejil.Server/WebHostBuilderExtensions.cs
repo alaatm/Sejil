@@ -4,26 +4,26 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
-using LogsExplorer.Server;
+using Sejil;
 
 namespace Microsoft.AspNetCore.Hosting
 {
     public static class WebHostBuilderExtensions
     {
-        public static IWebHostBuilder AddLogsExplorer(this IWebHostBuilder builder, string uri, LogLevel minLogLevel)
+        public static IWebHostBuilder AddSejil(this IWebHostBuilder builder, string uri, LogLevel minLogLevel)
         {
-            var settings = new LogsExplorerSettings(uri, MapSerilogLogLevel(minLogLevel));
+            var settings = new SejilSettings(uri, MapSerilogLogLevel(minLogLevel));
 
             return builder
                 .ConfigureLogging((_, logging) => logging.AddSerilog(CreateLogger(settings)))
                 .ConfigureServices(services => services.AddSingleton(settings));
         }
 
-        private static Serilog.Core.Logger CreateLogger(LogsExplorerSettings settings)
+        private static Serilog.Core.Logger CreateLogger(SejilSettings settings)
             => new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.ControlledBy(settings.LoggingLevelSwitch)
-                .WriteTo.LogsExplorer(settings)
+                .WriteTo.Sejil(settings)
                 .CreateLogger();
 
         private static LogEventLevel MapSerilogLogLevel(LogLevel logLevel)

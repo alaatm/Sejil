@@ -1,12 +1,12 @@
 import { runInAction, observable, action } from 'mobx';
 import { HttpClient } from './HttpClient';
-import IEventEntry from './interfaces/IEventEntry';
-import IFilter from './interfaces/IFilter';
+import ILogEntry from './interfaces/ILogEntry';
+import ILogQuery from './interfaces/ILogQuery';
 
 export default class Store {
-    @observable logEntries: IEventEntry[] = [];
-    @observable filters: IFilter[] = [];
-    @observable filterText = '';
+    @observable logEntries: ILogEntry[] = [];
+    @observable queries: ILogQuery[] = [];
+    @observable queryText = '';
     private http = new HttpClient();
     private page = 1;
     private startingTimestamp: string | undefined = undefined;
@@ -14,7 +14,7 @@ export default class Store {
 
     constructor() {
         this.loadEvents();
-        this.loadFilters();
+        this.loadQueries();
     }
 
     @action public async filterEvents() {
@@ -28,8 +28,8 @@ export default class Store {
             ? `${this.rootUrl}/events?page=${this.page}&startingTs=${this.startingTimestamp}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
-        const json = await this.http.post(url, this.filterText);
-        const events = JSON.parse(json) as IEventEntry[];
+        const json = await this.http.post(url, this.queryText);
+        const events = JSON.parse(json) as ILogEntry[];
 
         if (!this.startingTimestamp && events.length) {
             this.startingTimestamp = events[0].timestamp;
@@ -45,24 +45,24 @@ export default class Store {
         });
     }
 
-    @action public async saveFilter(name: string, filter: string) {
-        await this.http.post(`${this.rootUrl}/filter?name=${name}`, filter);
-        runInAction('save filter',
+    @action public async saveQuery(name: string, query: string) {
+        await this.http.post(`${this.rootUrl}/log-query`, JSON.stringify({ name, query }));
+        runInAction('save query',
             () => {
-                this.filters.push({
+                this.queries.push({
                     name,
-                    filter,
+                    query,
                 });
             });
     }
 
-    @action public async loadFilters() {
-        const json = await this.http.get(`${this.rootUrl}/filters`);
-        const filters = JSON.parse(json) as IFilter[];
+    @action public async loadQueries() {
+        const json = await this.http.get(`${this.rootUrl}/log-queries`);
+        const queries = JSON.parse(json) as ILogQuery[];
 
-        if (filters.length) {
-            runInAction('load filters',
-                () => { this.filters = filters; });
+        if (queries.length) {
+            runInAction('load queries',
+                () => { this.queries = queries; });
         }
     }
 }

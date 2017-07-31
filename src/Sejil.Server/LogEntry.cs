@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LogsExplorer.Server
+namespace Sejil
 {
     public class LogEntry
     {

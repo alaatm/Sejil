@@ -22,7 +22,7 @@ namespace sample
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .AddLogsExplorer("/logs", LogLevel.Debug)
+                .AddSejil("/logs", LogLevel.Debug)
                 .UseStartup<Startup>()
                 .Build();
     }

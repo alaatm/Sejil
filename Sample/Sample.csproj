@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\LogsExplorer.Server\LogsExplorer.Server.csproj" />
+    <ProjectReference Include="..\src\Sejil.Server\Sejil.csproj" />
   </ItemGroup>
 
 </Project>

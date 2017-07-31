@@ -1,9 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>View and filter your ASP.net core log events right from your app </Description>
+    <Authors>Alaa Masoud</Authors>
+
+    <PackageId>Sejil</PackageId>
+    <PackageTags>sejil;logging;structured</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionPrefix>1.0.0-beta1</VersionPrefix>
-    <AssemblyName>LogsExplorer</AssemblyName>
+    <AssemblyName>Sejil</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

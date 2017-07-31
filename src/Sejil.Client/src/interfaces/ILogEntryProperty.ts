@@ -1,5 +1,5 @@
 
-export default interface IEventEntryProperty {
+export default interface ILogEntryProperty {
     id: number;
     logId: string;
     name: string;

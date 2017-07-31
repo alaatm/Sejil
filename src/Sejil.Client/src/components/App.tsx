@@ -12,7 +12,7 @@ export default class App extends React.Component<{}, {}> {
             <Provider store={new Store()}>
                 <div>
                     <div className="header">
-                        Logs Explorer
+                        Sejil
                     </div>
                     <div className="view">
                         <div className="events">

@@ -14,8 +14,8 @@ var configuration = Argument("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 // Define directories.
-const string CLIENT_DIR = "./src/LogsExplorer.Client";
-const string SERVER_DIR = "./src/LogsExplorer.Server";
+const string CLIENT_DIR = "./src/Sejil.Client";
+const string SERVER_DIR = "./src/Sejil.Server";
 const string SAMPLE_DIR = "./Sample";
 
 var _packFolder = "./nuget-build/";
@@ -53,11 +53,11 @@ Task("Clean")
 Task("ClientBuild")
 	.Does(() =>
 {
-	// ./src/LogsExplorer.Client/> npm install
+	// ./src/Sejil.Client/> npm install
 	Npm.FromPath(CLIENT_DIR).Install();
-	// ./src/LogsExplorer.Client/> webpack
+	// ./src/Sejil.Client/> webpack
 	Webpack.FromPath(CLIENT_DIR).Local();
-	// ./src/LogsExplorer.Client/> gulp
+	// ./src/Sejil.Client/> gulp
 	Gulp.FromPath(CLIENT_DIR).Local();
 });
 
