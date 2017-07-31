@@ -6,7 +6,7 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
 
 1. Installing package
 
-`Install-Package Sejil`
+    `Install-Package Sejil`
 
 2. Adding code
 
