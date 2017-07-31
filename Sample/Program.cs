@@ -22,25 +22,8 @@ namespace sample
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging((context, logging) =>
-                {
-                    logging.AddSerilog(CreateSerilogLogger("logs.db", context.Configuration));
-                })
+                .AddLogsExplorer("/logs", LogLevel.Debug)
                 .UseStartup<Startup>()
                 .Build();
-
-        private static Serilog.Core.Logger CreateSerilogLogger(string sqliteDbPath, IConfiguration configuration = null)
-            => new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                /*.Enrich.FromLogContext()
-                .MinimumLevel.Debug()
-                .WriteTo.LogsExplorer(sqliteDbPath)*/
-                .CreateLogger();
-    }
-
-    public static class LoggingBuilderExtensions
-    {
-        public static ILoggingBuilder AddSerilog(this ILoggingBuilder logging, Serilog.Core.Logger logger = null, bool dispose = false)
-            => logging.AddProvider(new SerilogLoggerProvider(logger, dispose));
     }
 }

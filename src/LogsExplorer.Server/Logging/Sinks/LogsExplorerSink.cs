@@ -13,14 +13,17 @@ namespace LogsExplorer.Server.Logging.Sinks
 {
     internal class LogsExplorerSink : PeriodicBatchingSink
     {
-        private static int _defaultBatchSizeLimit = 100;
-        private static TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(10);
+        private static int _defaultBatchSizeLimit = 50;
+        private static TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
 
-        public static string SqliteDbPath;
+        private readonly string _connectionString;
+        private readonly string _uri;
 
-        public LogsExplorerSink(string sqliteDbPath) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
+        public LogsExplorerSink(LogsExplorerSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
-            SqliteDbPath = sqliteDbPath;
+            _connectionString = $"DataSource={settings.SqliteDbPath}";
+            _uri = settings.Uri;
+
             InitializeDatabase();
         }
 
@@ -28,7 +31,7 @@ namespace LogsExplorer.Server.Logging.Sinks
         {
             try
             {
-                using (var conn = new SqliteConnection($"DataSource={SqliteDbPath}"))
+                using (var conn = new SqliteConnection(_connectionString))
                 {
                     await conn.OpenAsync().ConfigureAwait(false);
                     using (var tran = conn.BeginTransaction())
@@ -38,8 +41,8 @@ namespace LogsExplorer.Server.Logging.Sinks
                         {
                             foreach (var logEvent in events)
                             {
-                                if (logEvent.Properties.Any(p => p.Value != null && 
-                                    p.Value.ToString().Contains(ApplicationBuilderExtensions.Url)))
+                                if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") && 
+                                    p.Value.ToString().Contains(_uri)))
                                 {
                                     continue;
                                 }
@@ -71,7 +74,7 @@ namespace LogsExplorer.Server.Logging.Sinks
             cmd.Parameters["@message_template"].Value = log.MessageTemplate.Text;
             cmd.Parameters["@level"].Value = log.Level.ToString();
             cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
-            cmd.Parameters["@exception"].Value = log.Exception?.ToString() ?? String.Empty;
+            cmd.Parameters["@exception"].Value = log.Exception?.ToString() ?? (object)DBNull.Value;
 
             await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
             return id;
@@ -81,7 +84,7 @@ namespace LogsExplorer.Server.Logging.Sinks
         {
             cmd.Parameters["@log_id"].Value = logId;
             cmd.Parameters["@name"].Value = property.Key;
-            cmd.Parameters["@value"].Value = StripStringQuotes(property.Value?.ToString() ?? String.Empty);
+            cmd.Parameters["@value"].Value = StripStringQuotes(property.Value?.ToString()) ?? (object)DBNull.Value;
             await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
@@ -93,6 +96,7 @@ namespace LogsExplorer.Server.Logging.Sinks
             var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
             cmd.CommandType = CommandType.Text;
+            cmd.Transaction = tran;
 
             cmd.Parameters.Add(new SqliteParameter("@id", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@message", DbType.String));
@@ -100,7 +104,6 @@ namespace LogsExplorer.Server.Logging.Sinks
             cmd.Parameters.Add(new SqliteParameter("@level", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@timestamp", DbType.DateTime2));
             cmd.Parameters.Add(new SqliteParameter("@exception", DbType.String));
-            cmd.Transaction = tran;
 
             return cmd;
         }
@@ -113,18 +116,18 @@ namespace LogsExplorer.Server.Logging.Sinks
             var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
             cmd.CommandType = CommandType.Text;
+            cmd.Transaction = tran;
 
             cmd.Parameters.Add(new SqliteParameter("@log_id", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@name", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@value", DbType.String));
-            cmd.Transaction = tran;
 
             return cmd;
         }
 
         private void InitializeDatabase()
         {
-            using (var conn = new SqliteConnection($"DataSource={SqliteDbPath}"))
+            using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
                 var sql = Helpers.GetEmbeddedResource("LogsExplorer.Server.db.sql");
@@ -134,7 +137,7 @@ namespace LogsExplorer.Server.Logging.Sinks
         }
 
         private string StripStringQuotes(string value)
-            => (value.Length > 0 && value[0] == '"' && value[value.Length - 1] == '"')
+            => (value?.Length > 0 && value[0] == '"' && value[value.Length - 1] == '"')
                 ? value.Substring(1, value.Length - 2)
                 : value;
     }

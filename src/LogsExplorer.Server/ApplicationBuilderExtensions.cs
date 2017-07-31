@@ -20,19 +20,15 @@ namespace LogsExplorer.Server
 {
     public static class ApplicationBuilderExtensions
     {
-        public static string Url;
-
         private const int _pageSize = 100;
         private static JsonSerializerSettings camelCaseSerializerSetting = new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() };
         private static string logsHtml = Helpers.GetEmbeddedResource("LogsExplorer.Server.index.html");
 
-        public static IApplicationBuilder UseLogsExplorer(this IApplicationBuilder app, string url)
+        public static IApplicationBuilder UseLogsExplorer(this IApplicationBuilder app)
         {
-            Url = url;
-            if (!Url.StartsWith("/"))
-            {
-                Url = "/" + Url;
-            }
+            var settings = app.ApplicationServices.GetService(typeof(LogsExplorerSettings)) as LogsExplorerSettings;
+            var url = settings.Uri.Substring(1); // Skip the '/'
+            var connectionString = $"DataSource={settings.SqliteDbPath}";
 
             app.UseRouter(routes =>
             {
@@ -49,7 +45,7 @@ namespace LogsExplorer.Server
                     DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
                     var sql = GetSql(page == 0 ? 1 : page, startingTs, filter);
 
-                    using (var conn = new SqliteConnection($"DataSource={LogsExplorerSink.SqliteDbPath}"))
+                    using (var conn = new SqliteConnection(connectionString))
                     {
                         await conn.OpenAsync().ConfigureAwait(false);
                         var lookup = new Dictionary<string, LogEntry>();
@@ -80,15 +76,46 @@ namespace LogsExplorer.Server
                     }
                 });
 
-                routes.MapPost($"{url}/filter", async context =>
+                routes.MapPost($"{url}/log-query", async context =>
                 {
-                    var filter = await GetRequestBodyAsync(context.Request);
-                    var filterName = context.Request.Query["name"].FirstOrDefault();
+                    var logQuery = JsonConvert.DeserializeObject<LogQuery>(await GetRequestBodyAsync(context.Request));
+                    using (var conn = new SqliteConnection(connectionString))
+                    {
+                        await conn.OpenAsync().ConfigureAwait(false);
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            cmd.CommandText = "INSERT INTO log_query (name, query) VALUES (@name, @query);";
+                            cmd.CommandType = CommandType.Text;
+                            cmd.Parameters.AddWithValue("@name", logQuery.Name);
+                            cmd.Parameters.AddWithValue("@query", logQuery.Query);
+                            await cmd.ExecuteNonQueryAsync();
+                        }
+                    }
                 });
 
-                routes.MapGet($"{url}/filters", async context =>
+                routes.MapGet($"{url}/log-queries", async context =>
                 {
-                    await context.Response.WriteAsync("");
+                    using (var conn = new SqliteConnection(connectionString))
+                    {
+                        await conn.OpenAsync().ConfigureAwait(false);
+                        var logQueryList = conn.Query<LogQuery>("select * from log_query");
+
+                        context.Response.ContentType = "application/json";
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, camelCaseSerializerSetting));
+                    }
+                });
+
+                routes.MapPost($"{url}/min-log-level", async context =>
+                {
+                    var minLogLevel = await GetRequestBodyAsync(context.Request);
+                    if (settings.LoggingLevelSwitch.TrySetMinimumLogLevel(minLogLevel))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status200OK;
+                        await context.Response.WriteAsync("");
+                    }
+
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await context.Response.WriteAsync("Invalid log level.");
                 });
             });
 

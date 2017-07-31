@@ -28,3 +28,9 @@ CREATE INDEX IF NOT EXISTS log_property_log_id_idx ON log_property(log_id);
 CREATE INDEX IF NOT EXISTS log_property_name_idx ON log_property(name);
 
 CREATE INDEX IF NOT EXISTS log_property_value_idx ON log_property(value);
+
+CREATE TABLE IF NOT EXISTS log_query(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name VARCHAR(255) NOT NULL,
+	query TEXT NOT NULL
+);

@@ -40,7 +40,7 @@ namespace sample
 
             app.UseStaticFiles();
 
-            app.UseLogsExplorer("logs");
+            app.UseLogsExplorer();
 
             app.UseMvc(routes =>
             {
