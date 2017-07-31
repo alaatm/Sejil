@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3939D1C9-949
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sejil.Server", "src\Sejil.Server\Sejil.csproj", "{5810C901-5B94-4A47-86D6-94D251BF9CD1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{9E8D75B5-B313-4744-A70B-6CB7E60682B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "sample\Sample\Sample.csproj", "{9E8D75B5-B313-4744-A70B-6CB7E60682B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

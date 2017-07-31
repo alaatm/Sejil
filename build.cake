@@ -16,7 +16,6 @@ var configuration = Argument("configuration", "Release");
 // Define directories.
 const string CLIENT_DIR = "./src/Sejil.Client";
 const string SERVER_DIR = "./src/Sejil.Server";
-const string SAMPLE_DIR = "./Sample";
 
 var _packFolder = "./nuget-build/";
 
