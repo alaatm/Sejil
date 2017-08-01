@@ -44,29 +44,6 @@ namespace Sejil
         /// <param name="builder">The <see cref="IRouteBuilder"/>.</param>
         /// <param name="verb">The HTTP verb allowed by the route.</param>
         /// <param name="template">The route template.</param>
-        /// <param name="handler">The route handler.</param>
-        /// <returns>A reference to the <paramref name="builder"/> after this operation has completed.</returns>
-        public static IRouteBuilder MapVerb(
-            this IRouteBuilder builder,
-            string verb,
-            string template,
-            Func<HttpRequest, HttpResponse, RouteData, Task> handler)
-        {
-            RequestDelegate requestDelegate = (httpContext) =>
-            {
-                return handler(httpContext.Request, httpContext.Response, httpContext.GetRouteData());
-            };
-
-            return builder.MapVerb(verb, template, requestDelegate);
-        }
-
-        /// <summary>
-        /// Adds a route to the <see cref="IRouteBuilder"/> that only matches HTTP requests for the given
-        /// <paramref name="verb"/>, <paramref name="template"/>, and <paramref name="handler"/>.
-        /// </summary>
-        /// <param name="builder">The <see cref="IRouteBuilder"/>.</param>
-        /// <param name="verb">The HTTP verb allowed by the route.</param>
-        /// <param name="template">The route template.</param>
         /// <param name="handler">The <see cref="RequestDelegate"/> route handler.</param>
         /// <returns>A reference to the <paramref name="builder"/> after this operation has completed.</returns>
         public static IRouteBuilder MapVerb(
