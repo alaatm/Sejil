@@ -130,7 +130,7 @@ namespace Sejil.Logging.Sinks
             using (var conn = new SqliteConnection(_connectionString))
             {
                 conn.Open();
-                var sql = Helpers.GetEmbeddedResource("Sejil.db.sql");
+                var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
                 var cmd = new SqliteCommand(sql, conn);
                 cmd.ExecuteNonQuery();
             }

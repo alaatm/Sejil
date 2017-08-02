@@ -8,18 +8,8 @@ namespace Serilog
     using Serilog.Debugging;
     using Serilog.Events;
 
-    /// <summary>
-    ///     Adds the WriteTo.Sejil() extension method to <see cref="LoggerConfiguration" />.
-    /// </summary>
     internal static class LoggerConfigurationExtensions
     {
-        /// <summary>
-        ///     Adds a sink that writes log events to a SQLite database.
-        /// </summary>
-        /// <param name="loggerConfiguration">The logger configuration.</param>
-        /// <param name="sqliteDbPath">The path of SQLite db.</param>
-        /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
-        /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
         public static LoggerConfiguration Sejil(
             this LoggerSinkConfiguration loggerConfiguration,
             SejilSettings settings,

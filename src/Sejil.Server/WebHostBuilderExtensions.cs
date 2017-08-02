@@ -8,19 +8,32 @@ using Sejil;
 
 namespace Microsoft.AspNetCore.Hosting
 {
-    public static class SejilWebHostBuilderExtensions
+    public static class WebHostBuilderExtensions
     {
-        public static IWebHostBuilder AddSejil(this IWebHostBuilder builder, string uri, LogLevel minLogLevel)
+        /// <summary>
+        /// Adds Sejil services.
+        /// </summary>
+        /// <param name="builder">The web host builder.</param>
+        /// <param name="url">The URL at which Sejil should be available.</param>
+        /// <param name="minLogLevel">The minimum log level.</param>
+        /// <returns></returns>
+        public static IWebHostBuilder AddSejil(this IWebHostBuilder builder, string url, LogLevel minLogLevel)
         {
-            var settings = new SejilSettings(uri, MapSerilogLogLevel(minLogLevel));
+            var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
 
             return builder
-            #if NETSTANDARD16
+#if NETSTANDARD1_6
                 .ConfigureLogging((logging) => logging.AddSerilog(CreateLogger(settings)))
-            #elif NETSTANDARD20
+#elif NETSTANDARD2_0
                 .ConfigureLogging((_, logging) => logging.AddSerilog(CreateLogger(settings)))
-            #endif
-                .ConfigureServices(services => services.AddSingleton(settings));
+#endif
+                .ConfigureServices(services => 
+                {
+                    services.AddSingleton(settings);
+                    services.AddScoped<ISejilRepository, SejilRepository>();
+                    services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
+                    services.AddScoped<ISejilController, SejilController>();
+                });
         }
 
         private static Serilog.Core.Logger CreateLogger(SejilSettings settings)

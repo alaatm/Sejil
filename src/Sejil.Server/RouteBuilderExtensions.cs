@@ -9,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Sejil
 {
+    /// <summary>
+    /// Polyfills for some of the required methods to support ASP.net core 1.x.x.
+    /// All below methods are taken from ASP.net 2.x.x github repository
+    /// </summary>
     internal static class RouteBuilderExtensions
     {
         /// <summary>
@@ -64,11 +68,6 @@ namespace Sejil
             return builder;
         }
 
-        private static IInlineConstraintResolver GetConstraintResolver(IRouteBuilder builder)
-        {
-            return builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
-        }
-
         /// <summary>
         /// Adds a <see cref="RouterMiddleware"/> middleware to the specified <see cref="IApplicationBuilder"/>
         /// with the <see cref="IRouter"/> built from configured <see cref="IRouteBuilder"/>.
@@ -97,6 +96,11 @@ namespace Sejil
             action(routeBuilder);
 
             return builder.UseRouter(routeBuilder.Build());
+        }
+
+        private static IInlineConstraintResolver GetConstraintResolver(IRouteBuilder builder)
+        {
+            return builder.ServiceProvider.GetRequiredService<IInlineConstraintResolver>();
         }
     }
 }
