@@ -5,10 +5,10 @@ namespace Sejil.Routing.Internal
 {
     public interface ISejilController
     {
-        Task Index(HttpContext context);
-        Task GetEvents(HttpContext context);
-        Task SaveQuery(HttpContext context);
-        Task GetQueries(HttpContext context);
-        Task SetMinimumLogLevel(HttpContext context);
+        Task GetIndexAsync(HttpContext context);
+        Task GetEventsAsync(HttpContext context);
+        Task SaveQueryAsync(HttpContext context);
+        Task GetQueriesAsync(HttpContext context);
+        Task SetMinimumLogLevelAsync(HttpContext context);
     }
 }

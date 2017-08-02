@@ -25,13 +25,13 @@ namespace Sejil.Routing.Internal
             _settings = settings;
         }
 
-        public async Task Index(HttpContext context)
+        public async Task GetIndexAsync(HttpContext context)
         {
             context.Response.ContentType = "text/html";
             await context.Response.WriteAsync(_logsHtml);
         }
 
-        public async Task GetEvents(HttpContext context)
+        public async Task GetEventsAsync(HttpContext context)
         {
             var query = await GetRequestBodyAsync(context.Request);
             Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
@@ -43,10 +43,10 @@ namespace Sejil.Routing.Internal
             await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
         }
 
-        public async Task SaveQuery(HttpContext context)
+        public async Task SaveQueryAsync(HttpContext context)
         {
             var logQuery = JsonConvert.DeserializeObject<LogQuery>(await GetRequestBodyAsync(context.Request));
-            if (await _repository.SaveQuery(logQuery))
+            if (await _repository.SaveQueryAsync(logQuery))
             {
                 context.Response.StatusCode = StatusCodes.Status201Created;
             }
@@ -56,14 +56,14 @@ namespace Sejil.Routing.Internal
             }
         }
 
-        public async Task GetQueries(HttpContext context)
+        public async Task GetQueriesAsync(HttpContext context)
         {
-            var logQueryList = await _repository.GetSavedQueries();
+            var logQueryList = await _repository.GetSavedQueriesAsync();
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
         }
 
-        public async Task SetMinimumLogLevel(HttpContext context)
+        public async Task SetMinimumLogLevelAsync(HttpContext context)
         {
             var minLogLevel = await GetRequestBodyAsync(context.Request);
             if (_settings.TrySetMinimumLogLevel(minLogLevel))

@@ -24,7 +24,7 @@ namespace Sejil.Data.Internal
             _connectionString = $"DataSource={settings.SqliteDbPath}";
         }
 
-        public async Task<bool> SaveQuery(LogQuery logQuery)
+        public async Task<bool> SaveQueryAsync(LogQuery logQuery)
         {
             using (var conn = new SqliteConnection(_connectionString))
             {
@@ -40,7 +40,7 @@ namespace Sejil.Data.Internal
             }
         }
 
-        public async Task<IEnumerable<LogQuery>> GetSavedQueries()
+        public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
         {
             using (var conn = new SqliteConnection(_connectionString))
             {

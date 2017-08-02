@@ -27,31 +27,31 @@ namespace Sejil
                 routes.MapGet(url, async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.Index(context);
+                    await controller.GetIndexAsync(context);
                 });
 
                 routes.MapPost($"{url}/events", async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.GetEvents(context);
+                    await controller.GetEventsAsync(context);
                 });
 
                 routes.MapPost($"{url}/log-query", async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.SaveQuery(context);
+                    await controller.SaveQueryAsync(context);
                 });
 
                 routes.MapGet($"{url}/log-queries", async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.GetQueries(context);
+                    await controller.GetQueriesAsync(context);
                 });
 
                 routes.MapPost($"{url}/min-log-level", async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.SetMinimumLogLevel(context);
+                    await controller.SetMinimumLogLevelAsync(context);
                 });
             });
 
