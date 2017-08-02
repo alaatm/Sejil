@@ -45,7 +45,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0-*" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0-*" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.0-*" />
-    <Compile Remove="RouteBuilderExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

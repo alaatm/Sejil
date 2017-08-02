@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Sejil
+namespace Sejil.Models.Internal
 {
     public class LogQuery
     {

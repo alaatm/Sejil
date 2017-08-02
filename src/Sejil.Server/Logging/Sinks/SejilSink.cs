@@ -8,10 +8,11 @@ using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
+using Sejil.Configuration.Internal;
 
 namespace Sejil.Logging.Sinks
 {
-    internal class LogsExplorerSink : PeriodicBatchingSink
+    internal class SejilSink : PeriodicBatchingSink
     {
         private static int _defaultBatchSizeLimit = 50;
         private static TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
@@ -19,7 +20,7 @@ namespace Sejil.Logging.Sinks
         private readonly string _connectionString;
         private readonly string _uri;
 
-        public LogsExplorerSink(SejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
+        public SejilSink(SejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
             _connectionString = $"DataSource={settings.SqliteDbPath}";
             _uri = settings.Uri;

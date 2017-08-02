@@ -1,6 +1,6 @@
 using System;
 
-namespace Sejil
+namespace Sejil.Models.Internal
 {
     public class LogEntryProperty
     {

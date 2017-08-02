@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sejil.Models.Internal;
 
-namespace Sejil
+namespace Sejil.Data.Internal
 {
     public interface ISejilRepository
     {

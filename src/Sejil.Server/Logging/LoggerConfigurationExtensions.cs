@@ -1,13 +1,14 @@
-namespace Serilog
-{
-    using System;
-    using System.IO;
-    using Sejil;
-    using Sejil.Logging.Sinks;
-    using Serilog.Configuration;
-    using Serilog.Debugging;
-    using Serilog.Events;
+using System;
+using System.IO;
+using Sejil;
+using Sejil.Configuration.Internal;
+using Sejil.Logging.Sinks;
+using Serilog.Configuration;
+using Serilog.Debugging;
+using Serilog.Events;
 
+namespace Serilog.Logging
+{
     internal static class LoggerConfigurationExtensions
     {
         public static LoggerConfiguration Sejil(
@@ -21,7 +22,7 @@ namespace Serilog
                 sqliteDbFile.Directory?.Create();
 
                 return loggerConfiguration.Sink(
-                    new LogsExplorerSink(settings),
+                    new SejilSink(settings),
                     restrictedToMinimumLevel);
             }
             catch (Exception ex)

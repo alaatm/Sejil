@@ -1,3 +1,4 @@
+#if NETSTANDARD1_6
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.Routing.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sejil
+namespace Sejil.Routing
 {
     /// <summary>
     /// Polyfills for some of the required methods to support ASP.net core 1.x.x.
@@ -104,3 +105,4 @@ namespace Sejil
         }
     }
 }
+#endif

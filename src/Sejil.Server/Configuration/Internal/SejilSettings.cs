@@ -1,13 +1,8 @@
-using System;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using Serilog.Events;
 using Serilog.Core;
 using System.IO;
 
-namespace Sejil
+namespace Sejil.Configuration.Internal
 {
     public class SejilSettings
     {

@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using Microsoft.Data.Sqlite;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Sejil.Configuration.Internal;
+using Sejil.Routing.Internal;
+#if NETSTANDARD1_6
+using Sejil.Routing;
+#elif NETSTANDARD2_0
 using Microsoft.AspNetCore.Routing;
-using Serilog;
-using Newtonsoft.Json;
-using System.Text;
-using System.Text.RegularExpressions;
-using Sejil.Logging.Sinks;
+#endif
 
 namespace Sejil
 {

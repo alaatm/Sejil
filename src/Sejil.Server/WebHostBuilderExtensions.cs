@@ -4,7 +4,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
-using Sejil;
+using Serilog.Logging;
+using Sejil.Data.Internal;
+using Sejil.Routing.Internal;
+using Sejil.Configuration.Internal;
 
 namespace Microsoft.AspNetCore.Hosting
 {

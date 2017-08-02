@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sejil
+namespace Sejil.Data.Internal
 {
     public class SejilSqlProvider : ISejilSqlProvider
     {

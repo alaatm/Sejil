@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Sejil.Configuration.Internal;
+using Sejil.Data.Internal;
+using Sejil.Models.Internal;
 
-namespace Sejil
+namespace Sejil.Routing.Internal
 {
     public class SejilController : ISejilController
     {

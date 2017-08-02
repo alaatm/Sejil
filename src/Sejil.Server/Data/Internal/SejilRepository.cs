@@ -7,8 +7,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.Sqlite;
+using Sejil.Configuration.Internal;
+using Sejil.Models.Internal;
 
-namespace Sejil
+namespace Sejil.Data.Internal
 {
     public class SejilRepository: ISejilRepository
     {

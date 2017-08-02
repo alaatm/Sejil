@@ -1,6 +1,6 @@
 using System;
 
-namespace Sejil
+namespace Sejil.Data.Internal
 {
     public interface ISejilSqlProvider
     {

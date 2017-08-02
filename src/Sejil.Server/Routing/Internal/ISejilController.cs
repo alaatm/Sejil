@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Sejil
+namespace Sejil.Routing.Internal
 {
     public interface ISejilController
     {
@@ -9,6 +9,6 @@ namespace Sejil
         Task GetEvents(HttpContext context);
         Task SaveQuery(HttpContext context);
         Task GetQueries(HttpContext context);
-        Task SetMinimumLogLevel(HttpContext context);    
+        Task SetMinimumLogLevel(HttpContext context);
     }
 }
