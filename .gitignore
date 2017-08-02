@@ -11,3 +11,4 @@ package-lock.json
 .DS_Store
 
 src/Sejil.Server/index.html
+coverage/

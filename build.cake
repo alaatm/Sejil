@@ -1,3 +1,5 @@
+#tool nuget:?package=OpenCover
+#tool nuget:?package=ReportGenerator
 #r "cake-tools\Cake.Npm.dll"
 #r "cake-tools\Cake.Webpack.dll"
 #r "cake-tools\Cake.Gulp.dll"
@@ -16,6 +18,7 @@ var configuration = Argument("configuration", "Release");
 // Define directories.
 const string CLIENT_DIR = "./src/Sejil.Client";
 const string SERVER_DIR = "./src/Sejil.Server";
+const string SERVER_TESTS_DIR = "./test/Sejil.Server.Test";
 
 var _packFolder = "./nuget-build/";
 
@@ -85,6 +88,15 @@ Task("Build")
 	});
 });
 
+Task("Test")
+	.Does(() =>
+{
+	DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings 
+	{ 
+		Configuration = configuration,
+	});
+});
+
 Task("Pack")
 	.IsDependentOn("Clean")
 	.IsDependentOn("ClientBuild")
@@ -98,6 +110,37 @@ Task("Pack")
 		OutputDirectory = Directory(_packFolder),
 		NoBuild = true
 	});
+});
+
+Task("CoverageReport")
+	.Does(() =>
+{
+	var reportFileName = System.DateTime.UtcNow.ToString("ddMMMyy-HHmmss") + ".xml";
+
+	var projName = "Sejil.Test";
+	var coverageRootPath = System.IO.Path.Combine(SERVER_TESTS_DIR, "coverage");
+	var coverageXmlFilePath = System.IO.Path.Combine(coverageRootPath, projName + "-" + reportFileName);
+
+	if (!System.IO.Directory.Exists(coverageRootPath)) System.IO.Directory.CreateDirectory(coverageRootPath);
+
+	OpenCover(
+		tool => tool.DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings { 
+			Configuration = configuration, 
+		}),
+		new FilePath(coverageXmlFilePath),
+		new OpenCoverSettings { OldStyle = true }.WithFilter("+[" + projName.Replace(".Test", "") + "*]* -[*.Test]*")
+	);
+
+	ReportGenerator(
+		coverageXmlFilePath, 
+		System.IO.Path.Combine(coverageRootPath, "report"), 
+		new ReportGeneratorSettings { HistoryDirectory = coverageRootPath });
+});
+
+Task("ExportCoverageReport")
+	.IsDependentOn("CoverageReport")
+	.Does(() =>
+{
 });
 
 //////////////////////////////////////////////////////////////////////

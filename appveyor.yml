@@ -28,3 +28,9 @@ install:
 
 build_script:
   - ps: ./build.ps1
+
+test_script:
+  - ps: ./build.ps1 -target Test
+
+on_success:
+  - ps: ./build.ps1 -target ExportCoverageReport
