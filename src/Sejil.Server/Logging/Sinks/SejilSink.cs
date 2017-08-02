@@ -34,7 +34,7 @@ namespace Sejil.Logging.Sinks
             {
                 using (var conn = new SqliteConnection(_connectionString))
                 {
-                    await conn.OpenAsync().ConfigureAwait(false);
+                    await conn.OpenAsync();
                     using (var tran = conn.BeginTransaction())
                     {
                         using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
@@ -77,7 +77,7 @@ namespace Sejil.Logging.Sinks
             cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
             cmd.Parameters["@exception"].Value = log.Exception?.ToString() ?? (object)DBNull.Value;
 
-            await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await cmd.ExecuteNonQueryAsync();
             return id;
         }
 
@@ -86,7 +86,7 @@ namespace Sejil.Logging.Sinks
             cmd.Parameters["@log_id"].Value = logId;
             cmd.Parameters["@name"].Value = property.Key;
             cmd.Parameters["@value"].Value = StripStringQuotes(property.Value?.ToString()) ?? (object)DBNull.Value;
-            await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await cmd.ExecuteNonQueryAsync();
         }
 
         private SqliteCommand CreateLogEntryInsertCommand(SqliteConnection conn, SqliteTransaction tran)

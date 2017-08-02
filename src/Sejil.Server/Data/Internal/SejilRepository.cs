@@ -28,7 +28,7 @@ namespace Sejil.Data.Internal
         {
             using (var conn = new SqliteConnection(_connectionString))
             {
-                await conn.OpenAsync().ConfigureAwait(false);
+                await conn.OpenAsync();
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = _sql.InsertLogQuerySql();
@@ -44,7 +44,7 @@ namespace Sejil.Data.Internal
         {
             using (var conn = new SqliteConnection(_connectionString))
             {
-                await conn.OpenAsync().ConfigureAwait(false);
+                await conn.OpenAsync();
                 return conn.Query<LogQuery>(_sql.GetSavedQueriesSql());
             }
         }
@@ -55,7 +55,7 @@ namespace Sejil.Data.Internal
 
             using (var conn = new SqliteConnection(_connectionString))
             {
-                await conn.OpenAsync().ConfigureAwait(false);
+                await conn.OpenAsync();
                 var lookup = new Dictionary<string, LogEntry>();
 
                 var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>

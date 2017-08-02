@@ -82,7 +82,7 @@ namespace Sejil.Routing.Internal
             if (request.ContentLength > 0)
             {
                 var buffer = new byte[(int)request.ContentLength];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                await request.Body.ReadAsync(buffer, 0, buffer.Length);
                 return Encoding.UTF8.GetString(buffer);
             }
 
