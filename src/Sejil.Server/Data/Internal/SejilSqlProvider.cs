@@ -112,10 +112,6 @@ ORDER BY l.timestamp DESC, p.name";
                                         "id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))",
                                         split[0].Trim());
                                 }
-                                else
-                                {
-                                    throw new Exception("Error parsing filter query.");
-                                }
                             }
                             else
                             {
@@ -172,6 +168,7 @@ ORDER BY l.timestamp DESC, p.name";
                 ? " AND "
                 : op == "||" || op == "or"
                     ? " OR "
+                    // Below condition will never be reached
                     : throw new Exception("Invalid logical operator");
 
         private static string GetInclusionOperator(string op)
@@ -179,6 +176,7 @@ ORDER BY l.timestamp DESC, p.name";
                 ? "IN"
                 : op == "!=" || op == "not like"
                     ? "NOT IN"
+                    // Below condition will never be reached
                     : throw new Exception("Invalid logical operator");
 
         private static string NegateIfNonInclusion(string op)

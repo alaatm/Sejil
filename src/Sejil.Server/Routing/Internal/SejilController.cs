@@ -37,7 +37,7 @@ namespace Sejil.Routing.Internal
             Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
             DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
-            var events = await _repository.GetEventsPageAsync(page, startingTs, query);
+            var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, query);
 
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
