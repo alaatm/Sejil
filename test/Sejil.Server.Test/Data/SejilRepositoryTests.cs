@@ -14,7 +14,6 @@ using System.Linq;
 
 namespace Sejil.Test.Data
 {
-    [Collection("Repository Tests")]
     public class SejilRepositoryTests
     {
         [Fact]
