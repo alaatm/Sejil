@@ -2,19 +2,37 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Sejil.Configuration.Internal;
 
 namespace Sejil.Data.Internal
 {
     public class SejilSqlProvider : ISejilSqlProvider
     {
+        private string[] _nonPropertyColumns;
+
+        public SejilSqlProvider(ISejilSettings settings)
+        {
+            _nonPropertyColumns = settings.NonPropertyColumns;
+        }
+
         public string GetSavedQueriesSql()
             => "SELECT * FROM log_query";
 
         public string InsertLogQuerySql()
-            => "INSERT INTO log_query (name, query) VALUES (@name, @query);";
+            => "INSERT INTO log_query (name, query) VALUES (@name, @query)";
 
         public string GetPagedLogEntriesSql(int page, int pageSize, DateTime startingTimestamp, string query)
         {
+            if (page <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(page), "Argument must be greater than zero.");
+            }
+
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "Argument must be greater than zero.");
+            }
+
             return
 $@"SELECT l.*, p.* from 
 (
@@ -36,11 +54,11 @@ ORDER BY l.timestamp DESC, p.name";
                 String.IsNullOrWhiteSpace(query)
                     ? ""
                     : startingTimestamp == default(DateTime)
-                        ? $"WHERE {BuildPredicate(query)}"
-                        : $"AND {BuildPredicate(query)}";
+                        ? $"WHERE {BuildPredicate(query, _nonPropertyColumns)}"
+                        : $"AND {BuildPredicate(query, _nonPropertyColumns)}";
         }
 
-        private static string BuildPredicate(string filterQuery)
+        private static string BuildPredicate(string filterQuery, string[] nonPropertyColumns)
         {
             var sb = new StringBuilder();
             BuildPredicateCore(filterQuery, sb);
@@ -72,11 +90,19 @@ ORDER BY l.timestamp DESC, p.name";
                                 // name != value
                                 // name like 'value'
                                 // name not like 'value'
-                                split = Regex.Split(query, @"(\w+)(=|!=|\s*like\s*|\s*not like\s*)(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                                split = Regex.Split(query, @"(\w+)\s*(=|!=|\s*like\s*|\s*not like\s*)\s*(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
                                 if (split.Length == 3)
                                 {
-                                    sql.AppendFormat("id {0} (SELECT log_id FROM log_property WHERE name='{1}' AND value {2} {3})",
-                                        GetInclusionOperator(split[1].Trim().ToLower()), split[0], NegateIfNonInclusion(split[1].Trim().ToLower()), EnsureQuotes(split[2]));
+                                    if (nonPropertyColumns.Contains(split[0].ToLower()))
+                                    {
+                                        sql.AppendFormat("{0} {1} {2}",
+                                            split[0], split[1].ToUpper().Trim(), split[2].Trim());
+                                    }
+                                    else
+                                {
+                                        sql.AppendFormat("id {0} (SELECT logId FROM log_property WHERE name = '{1}' AND value {2} {3})",
+                                            GetInclusionOperator(split[1].Trim().ToLower()), split[0], NegateIfNonInclusion(split[1].Trim().ToLower()), EnsureQuotes(split[2].Trim()));
+                                    }
                                 }
                                 else if (split.Length == 1)
                                 {

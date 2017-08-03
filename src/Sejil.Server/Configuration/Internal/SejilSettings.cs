@@ -11,6 +11,8 @@ namespace Sejil.Configuration.Internal
         public string Uri { get; private set; }
         public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
         public string SqliteDbPath { get; private set; }
+        public string[] NonPropertyColumns { get; private set; }
+        public int PageSize { get; private set; }
 
         public SejilSettings(string uri, LogEventLevel minLogLevel)
         {
@@ -21,6 +23,9 @@ namespace Sejil.Configuration.Internal
             };
             var basePath = System.Reflection.Assembly.GetEntryAssembly().Location;
             SqliteDbPath = Path.Combine(Path.GetDirectoryName(basePath), $"LogsExplorer-{UUID}.sqlite");
+
+            NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
+            PageSize = 100;
         }
 
         public bool TrySetMinimumLogLevel(string minLogLevel)
