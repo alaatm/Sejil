@@ -124,7 +124,8 @@ Task("CoverageReport")
 	if (!System.IO.Directory.Exists(coverageRootPath)) System.IO.Directory.CreateDirectory(coverageRootPath);
 
 	OpenCover(
-		tool => tool.DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings { 
+		tool => tool.DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings 
+		{ 
 			Configuration = configuration, 
 		}),
 		new FilePath(coverageXmlFilePath),
@@ -134,13 +135,11 @@ Task("CoverageReport")
 	ReportGenerator(
 		coverageXmlFilePath, 
 		System.IO.Path.Combine(coverageRootPath, "report"), 
-		new ReportGeneratorSettings { HistoryDirectory = coverageRootPath });
-});
-
-Task("ExportCoverageReport")
-	.IsDependentOn("CoverageReport")
-	.Does(() =>
-{
+		new ReportGeneratorSettings 
+		{ 
+			HistoryDirectory = coverageRootPath,
+			ReportTypes = new List<ReportGeneratorReportType> { ReportGeneratorReportType.Html, ReportGeneratorReportType.Badges }
+		});
 });
 
 //////////////////////////////////////////////////////////////////////

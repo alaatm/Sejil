@@ -33,10 +33,20 @@ test_script:
   - ps: ./build.ps1 -target Test
 
 after_test:
-  - ps: ./build.ps1 -target ExportCoverageReport
+  - ps: ./build.ps1 -target CoverageReport
 
 artifacts:
   - path: 'nuget-build\*.nupkg'
     name: Nuget
   - path: 'test\Sejil.Server.Test\coverage\report'
     name: CoverageReport
+
+deploy:
+  - provider: AzureBlob
+    storage_account_name: $(CC_ACCT_NAME)
+    storage_access_key: $(CC_ACCT_KEY)
+    container: $(CC_CONTAINER_NAME)
+    folder: \
+    artifact: CoverageReport
+    unzip: true
+    set_content_type: true
