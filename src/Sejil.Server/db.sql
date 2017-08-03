@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS log(
-	id TEXT PRIMARY KEY,
+	id TEXT NOT NULL PRIMARY KEY,
 	message TEXT NOT NULL,
-	message_template TEXT NOT NULL,
+	messageTemplate TEXT NOT NULL,
 	level VARCHAR(64) NOT NULL,
 	timestamp DATETIME NOT NULL,
 	exception TEXT NULL
@@ -16,21 +16,21 @@ CREATE INDEX IF NOT EXISTS log_timestamp_idx ON log(timestamp);
 CREATE INDEX IF NOT EXISTS log_exception_idx ON log(exception);
 
 CREATE TABLE IF NOT EXISTS log_property(
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	log_id TEXT NOT NULL,
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	logId TEXT NOT NULL,
 	name TEXT NOT NULL,
 	value TEXT NULL,
-	FOREIGN KEY(log_id) REFERENCES log(id)
+	FOREIGN KEY(logId) REFERENCES log(id)
 );
 
-CREATE INDEX IF NOT EXISTS log_property_log_id_idx ON log_property(log_id);
+CREATE INDEX IF NOT EXISTS log_property_logId_idx ON log_property(logId);
 
 CREATE INDEX IF NOT EXISTS log_property_name_idx ON log_property(name);
 
 CREATE INDEX IF NOT EXISTS log_property_value_idx ON log_property(value);
 
 CREATE TABLE IF NOT EXISTS log_query(
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	name VARCHAR(255) NOT NULL,
 	query TEXT NOT NULL
 );

@@ -45,11 +45,11 @@ $@"SELECT l.*, p.* from
 LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name";
 
-            string TimestampWhereClause() => 
+            string TimestampWhereClause() =>
                 startingTimestamp == default(DateTime)
                     ? ""
                     : $@"WHERE timestamp <= '{startingTimestamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
-            
+
             string QueryWhereClause() =>
                 String.IsNullOrWhiteSpace(query)
                     ? ""
@@ -99,7 +99,7 @@ ORDER BY l.timestamp DESC, p.name";
                                             split[0], split[1].ToUpper().Trim(), split[2].Trim());
                                     }
                                     else
-                                {
+                                    {
                                         sql.AppendFormat("id {0} (SELECT logId FROM log_property WHERE name = '{1}' AND value {2} {3})",
                                             GetInclusionOperator(split[1].Trim().ToLower()), split[0], NegateIfNonInclusion(split[1].Trim().ToLower()), EnsureQuotes(split[2].Trim()));
                                     }
@@ -109,7 +109,7 @@ ORDER BY l.timestamp DESC, p.name";
                                     // If we get here, then we received just a string. We will search the message column, exception column and all props for matches
                                     sql.AppendFormat(
                                         "(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR " +
-                                        "id in (SELECT log_id FROM log_property WHERE value LIKE '%{0}%'))",
+                                        "id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))",
                                         split[0].Trim());
                                 }
                                 else
@@ -185,8 +185,8 @@ ORDER BY l.timestamp DESC, p.name";
             => op == "!="
                 ? "="
                 : op == "not like"
-                    ? "like"
-                    : op;
+                    ? "LIKE"
+                    : op.ToUpper();
 
         // "..."  -->  '...'
         //  ...   -->  '...'
