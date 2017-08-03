@@ -12,6 +12,7 @@
     <VersionPrefix>1.0.0-beta1</VersionPrefix>
     <AssemblyName>Sejil</AssemblyName>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
