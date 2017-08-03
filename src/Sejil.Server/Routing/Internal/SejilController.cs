@@ -17,9 +17,9 @@ namespace Sejil.Routing.Internal
         private static string _logsHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
 
         private readonly ISejilRepository _repository;
-        private readonly SejilSettings _settings;
+        private readonly ISejilSettings _settings;
 
-        public SejilController(ISejilRepository repository, SejilSettings settings)
+        public SejilController(ISejilRepository repository, ISejilSettings settings)
         {
             _repository = repository;
             _settings = settings;
@@ -37,7 +37,7 @@ namespace Sejil.Routing.Internal
             Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
             DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
-            var events = await _repository.GetPageAsync(page, startingTs, query);
+            var events = await _repository.GetEventsPageAsync(page, startingTs, query);
 
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));

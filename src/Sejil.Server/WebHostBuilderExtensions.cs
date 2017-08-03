@@ -25,21 +25,17 @@ namespace Microsoft.AspNetCore.Hosting
             var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
 
             return builder
-#if NETSTANDARD1_6
                 .ConfigureLogging((logging) => logging.AddSerilog(CreateLogger(settings)))
-#elif NETSTANDARD2_0
-                .ConfigureLogging((_, logging) => logging.AddSerilog(CreateLogger(settings)))
-#endif
                 .ConfigureServices(services => 
                 {
-                    services.AddSingleton(settings);
+                    services.AddSingleton<ISejilSettings>(settings);
                     services.AddScoped<ISejilRepository, SejilRepository>();
                     services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                     services.AddScoped<ISejilController, SejilController>();
                 });
         }
 
-        private static Serilog.Core.Logger CreateLogger(SejilSettings settings)
+        private static Serilog.Core.Logger CreateLogger(ISejilSettings settings)
             => new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.ControlledBy(settings.LoggingLevelSwitch)

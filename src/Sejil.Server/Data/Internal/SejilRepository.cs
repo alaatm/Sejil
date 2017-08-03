@@ -16,12 +16,13 @@ namespace Sejil.Data.Internal
     {
         private readonly ISejilSqlProvider _sql;
         private readonly string _connectionString;
-        private const int PAGE_SIZE = 100;
+        private readonly int _pageSize;
 
-        public SejilRepository(ISejilSqlProvider sql, SejilSettings settings)
+        public SejilRepository(ISejilSqlProvider sql, ISejilSettings settings)
         {
             _sql = sql;
             _connectionString = $"DataSource={settings.SqliteDbPath}";
+            _pageSize = settings.PageSize;
         }
 
         public async Task<bool> SaveQueryAsync(LogQuery logQuery)
@@ -49,9 +50,9 @@ namespace Sejil.Data.Internal
             }
         }
 
-        public async Task<IEnumerable<LogEntry>> GetPageAsync(int page, DateTime startingTimestamp, string query)
+        public async Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime startingTimestamp, string query)
         {
-            var sql = _sql.GetPagedLogEntriesSql(page == 0 ? 1 : page, PAGE_SIZE, startingTimestamp, query);
+            var sql = _sql.GetPagedLogEntriesSql(page == 0 ? 1 : page, _pageSize, startingTimestamp, query);
 
             using (var conn = new SqliteConnection(_connectionString))
             {

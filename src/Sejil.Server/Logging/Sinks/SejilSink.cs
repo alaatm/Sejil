@@ -20,7 +20,7 @@ namespace Sejil.Logging.Sinks
         private readonly string _connectionString;
         private readonly string _uri;
 
-        public SejilSink(SejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
+        public SejilSink(ISejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
             _connectionString = $"DataSource={settings.SqliteDbPath}";
             _uri = settings.Uri;
@@ -72,7 +72,7 @@ namespace Sejil.Logging.Sinks
 
             cmd.Parameters["@id"].Value = id;
             cmd.Parameters["@message"].Value = log.MessageTemplate.Render(log.Properties);
-            cmd.Parameters["@message_template"].Value = log.MessageTemplate.Text;
+            cmd.Parameters["@messageTemplate"].Value = log.MessageTemplate.Text;
             cmd.Parameters["@level"].Value = log.Level.ToString();
             cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
             cmd.Parameters["@exception"].Value = log.Exception?.ToString() ?? (object)DBNull.Value;
@@ -83,7 +83,7 @@ namespace Sejil.Logging.Sinks
 
         private async Task InsertLogEntryPropertyAsync(SqliteCommand cmd, string logId, KeyValuePair<string, LogEventPropertyValue> property)
         {
-            cmd.Parameters["@log_id"].Value = logId;
+            cmd.Parameters["@logId"].Value = logId;
             cmd.Parameters["@name"].Value = property.Key;
             cmd.Parameters["@value"].Value = StripStringQuotes(property.Value?.ToString()) ?? (object)DBNull.Value;
             await cmd.ExecuteNonQueryAsync();
@@ -91,8 +91,8 @@ namespace Sejil.Logging.Sinks
 
         private SqliteCommand CreateLogEntryInsertCommand(SqliteConnection conn, SqliteTransaction tran)
         {
-            var sql = "INSERT INTO log (id, message, message_template, level, timestamp, exception)" +
-                "VALUES (@id, @message, @message_template, @level, @timestamp, @exception);";
+            var sql = "INSERT INTO log (id, message, messageTemplate, level, timestamp, exception)" +
+                "VALUES (@id, @message, @messageTemplate, @level, @timestamp, @exception);";
 
             var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
@@ -101,7 +101,7 @@ namespace Sejil.Logging.Sinks
 
             cmd.Parameters.Add(new SqliteParameter("@id", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@message", DbType.String));
-            cmd.Parameters.Add(new SqliteParameter("@message_template", DbType.String));
+            cmd.Parameters.Add(new SqliteParameter("@messageTemplate", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@level", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@timestamp", DbType.DateTime2));
             cmd.Parameters.Add(new SqliteParameter("@exception", DbType.String));
@@ -111,15 +111,15 @@ namespace Sejil.Logging.Sinks
 
         private SqliteCommand CreateLogEntryPropertyInsertCommand(SqliteConnection conn, SqliteTransaction tran)
         {
-            var sql = "INSERT INTO log_property (log_id, name, value)" +
-                "VALUES (@log_id, @name, @value);";
+            var sql = "INSERT INTO log_property (logId, name, value)" +
+                "VALUES (@logId, @name, @value);";
 
             var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
             cmd.CommandType = CommandType.Text;
             cmd.Transaction = tran;
 
-            cmd.Parameters.Add(new SqliteParameter("@log_id", DbType.String));
+            cmd.Parameters.Add(new SqliteParameter("@logId", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@name", DbType.String));
             cmd.Parameters.Add(new SqliteParameter("@value", DbType.String));
 

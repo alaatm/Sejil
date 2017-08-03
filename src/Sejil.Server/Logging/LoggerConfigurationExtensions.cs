@@ -13,7 +13,7 @@ namespace Serilog.Logging
     {
         public static LoggerConfiguration Sejil(
             this LoggerSinkConfiguration loggerConfiguration,
-            SejilSettings settings,
+            ISejilSettings settings,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             try
