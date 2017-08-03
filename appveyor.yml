@@ -36,7 +36,7 @@ on_success:
   - ps: ./build.ps1 -target ExportCoverageReport
 
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'nuget-build\*.nupkg'
     name: Nuget
-  - path: '**\test\Sejil.Server.Test\coverage\report'
+  - path: 'test\Sejil.Server.Test\coverage\report'
     name: CoverageReport
