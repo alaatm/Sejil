@@ -30,7 +30,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act
-            var sql = provider.GetSavedQueriesSql();
+            var sql = provider.InsertLogQuerySql();
 
             // Assert
             Assert.Equal("INSERT INTO log_query (name, query) VALUES (@name, @query)", sql);
@@ -44,7 +44,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(0, 1, DateTime.MinValue, null));
-            Assert.Equal("Argument must be greater than zero.", ex.Message);
+            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(-1, 1, DateTime.MinValue, null));
-            Assert.Equal("Argument must be greater than zero.", ex.Message);
+            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, 0, DateTime.MinValue, null));
-            Assert.Equal("Argument must be greater than zero.", ex.Message);
+            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, -1, DateTime.MinValue, null));
-            Assert.Equal("Argument must be greater than zero.", ex.Message);
+            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
         }
 
         [Fact]
