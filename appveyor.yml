@@ -38,3 +38,5 @@ on_success:
 artifacts:
   - path: '**\*.nupkg'
     name: Nuget
+  - path: '**\test\Sejil.Server.Test\coverage\report'
+    name: CoverageReport
