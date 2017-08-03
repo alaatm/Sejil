@@ -6,7 +6,7 @@ namespace Sejil.Configuration.Internal
 {
     public interface ISejilSettings
     {
-        string Uri { get; }
+        string Url { get; }
         LoggingLevelSwitch LoggingLevelSwitch { get; }
         string SqliteDbPath { get; }
         string[] NonPropertyColumns { get; }

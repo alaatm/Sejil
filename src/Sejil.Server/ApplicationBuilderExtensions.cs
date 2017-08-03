@@ -20,7 +20,7 @@ namespace Sejil
         public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
         {
             var settings = app.ApplicationServices.GetService(typeof(ISejilSettings)) as SejilSettings;
-            var url = settings.Uri.Substring(1); // Skip the '/'
+            var url = settings.Url.Substring(1); // Skip the '/'
 
             app.UseRouter(routes =>
             {

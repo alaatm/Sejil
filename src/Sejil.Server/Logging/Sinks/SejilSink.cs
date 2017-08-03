@@ -23,7 +23,7 @@ namespace Sejil.Logging.Sinks
         public SejilSink(ISejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
             _connectionString = $"DataSource={settings.SqliteDbPath}";
-            _uri = settings.Uri;
+            _uri = settings.Url;
 
             InitializeDatabase();
         }
