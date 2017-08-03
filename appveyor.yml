@@ -32,7 +32,7 @@ build_script:
 test_script:
   - ps: ./build.ps1 -target Test
 
-on_success:
+after_test:
   - ps: ./build.ps1 -target ExportCoverageReport
 
 artifacts:
