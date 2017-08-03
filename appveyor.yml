@@ -34,3 +34,8 @@ test_script:
 
 on_success:
   - ps: ./build.ps1 -target ExportCoverageReport
+
+artifacts:
+  - sejil/nuget-build/*.nupkg
+
+deploy:
