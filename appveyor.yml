@@ -36,6 +36,5 @@ on_success:
   - ps: ./build.ps1 -target ExportCoverageReport
 
 artifacts:
-  - sejil/nuget-build/*.nupkg
-
-deploy:
+  - path: '**\*.nupkg'
+    name: Nuget
