@@ -99,11 +99,11 @@ namespace Sejil.Test.Data
             // Assert
             Assert.Equal(3, logs.Count());
             Assert.Equal("6", logs.ElementAt(0).Message);
-            Assert.Null(logs.ElementAt(0).Properties);
+            Assert.Empty(logs.ElementAt(0).Properties);
             Assert.Equal("5", logs.ElementAt(1).Message);
-            Assert.Null(logs.ElementAt(1).Properties);
+            Assert.Empty(logs.ElementAt(1).Properties);
             Assert.Equal("4", logs.ElementAt(2).Message);
-            Assert.Null(logs.ElementAt(2).Properties);
+            Assert.Empty(logs.ElementAt(2).Properties);
         }
 
         [Fact]

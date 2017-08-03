@@ -13,6 +13,6 @@ namespace Sejil.Models.Internal
         public string Exception { get; set; }
         public string SourceContext { get; set; }
         public string RequestId { get; set; }
-        public List<LogEntryProperty> Properties { get; set; }
+        public List<LogEntryProperty> Properties { get; set; } = new List<LogEntryProperty>();
     }
 }

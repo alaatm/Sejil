@@ -67,11 +67,10 @@ namespace Sejil.Data.Internal
                             lookup.Add(l.Id, logEntry = l);
                         }
 
-                        if (logEntry.Properties == null)
+                        if (p != null)
                         {
-                            logEntry.Properties = new List<LogEntryProperty>();
+                            logEntry.Properties.Add(p);
                         }
-                        logEntry.Properties.Add(p);
                         return logEntry;
 
                     }).ToList();
