@@ -42,7 +42,7 @@ $@"SELECT l.*, p.* from
     ORDER BY timestamp DESC
     LIMIT {pageSize} OFFSET {(page - 1) * pageSize}
 ) l
-JOIN log_property p ON l.id = p.log_id
+LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name";
 
             string TimestampWhereClause() => 
