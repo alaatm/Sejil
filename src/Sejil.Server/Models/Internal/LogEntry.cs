@@ -11,8 +11,6 @@ namespace Sejil.Models.Internal
         public string Level { get; set; }
         public DateTime Timestamp { get; set; }
         public string Exception { get; set; }
-        public string SourceContext { get; set; }
-        public string RequestId { get; set; }
         public List<LogEntryProperty> Properties { get; set; } = new List<LogEntryProperty>();
     }
 }
