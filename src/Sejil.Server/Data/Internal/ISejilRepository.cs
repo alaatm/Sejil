@@ -9,6 +9,6 @@ namespace Sejil.Data.Internal
     {
         Task<bool> SaveQueryAsync(LogQuery logQuery);        
         Task<IEnumerable<LogQuery>> GetSavedQueriesAsync();
-        Task<IEnumerable<LogEntry>> GetPageAsync(int page, DateTime startingTimestamp, string query);
+        Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime startingTimestamp, string query);
     }
 }
