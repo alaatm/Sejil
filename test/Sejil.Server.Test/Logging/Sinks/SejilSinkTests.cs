@@ -185,17 +185,19 @@ namespace Sejil.Test.Logging.Sinks
             var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
             var sink = new SejilSinkMock(settingsMoq.Object);
 
-            // Hello, {name}!
+            // Hello, {name}. Your # is {number}
             var tokens = new List<MessageTemplateToken>
             {
                 new TextToken("Hello, ", 0),
                 new PropertyToken("name", "{name}"),
-                new TextToken("!", 13),
+                new TextToken(". Your # is ", 13),
+                new PropertyToken("number", "{number}"),
             };
 
             var properties = new List<LogEventProperty>
             {
-                new LogEventProperty("name", new ScalarValue("world"))
+                new LogEventProperty("name", new ScalarValue("world")),
+                new LogEventProperty("number", new ScalarValue(null))
             };
 
             var messageTemplate = new MessageTemplate(tokens);
@@ -217,26 +219,32 @@ namespace Sejil.Test.Logging.Sinks
             Assert.Equal(2, logEvents.Count());
 
             var logEvent1 = logEvents.FirstOrDefault(p => p.Level == "Information");
-            Assert.Equal("Hello, \"world\"!", logEvent1.Message);
-            Assert.Equal("Hello, {name}!", logEvent1.MessageTemplate);
+            Assert.Equal("Hello, \"world\". Your # is null", logEvent1.Message);
+            Assert.Equal("Hello, {name}. Your # is {number}", logEvent1.MessageTemplate);
             Assert.Equal("Information", logEvent1.Level);
             Assert.Equal(timestamp1, logEvent1.Timestamp);
             Assert.Null(logEvent1.Exception);
-            Assert.Equal(1, logEvent1.Properties.Count());
-            Assert.Equal(logEvent1.Id, logEvent1.Properties.First().LogId);
-            Assert.Equal("name", logEvent1.Properties.First().Name);
-            Assert.Equal("world", logEvent1.Properties.First().Value);
+            Assert.Equal(2, logEvent1.Properties.Count());
+            Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(0).LogId);
+            Assert.Equal("name", logEvent1.Properties.ElementAt(0).Name);
+            Assert.Equal("world", logEvent1.Properties.ElementAt(0).Value);
+            Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(1).LogId);
+            Assert.Equal("number", logEvent1.Properties.ElementAt(1).Name);
+            Assert.Equal("null", logEvent1.Properties.ElementAt(1).Value);
 
             var logEvent2 = logEvents.FirstOrDefault(p => p.Level == "Debug");
-            Assert.Equal("Hello, \"world\"!", logEvent2.Message);
-            Assert.Equal("Hello, {name}!", logEvent2.MessageTemplate);
+            Assert.Equal("Hello, \"world\". Your # is null", logEvent2.Message);
+            Assert.Equal("Hello, {name}. Your # is {number}", logEvent2.MessageTemplate);
             Assert.Equal("Debug", logEvent2.Level);
             Assert.Equal(timestamp2, logEvent2.Timestamp);
             Assert.Equal("System.Exception: error", logEvent2.Exception);
-            Assert.Equal(1, logEvent2.Properties.Count());
-            Assert.Equal(logEvent2.Id, logEvent2.Properties.First().LogId);
-            Assert.Equal("name", logEvent2.Properties.First().Name);
-            Assert.Equal("world", logEvent2.Properties.First().Value);
+            Assert.Equal(2, logEvent2.Properties.Count());
+            Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(0).LogId);
+            Assert.Equal("name", logEvent2.Properties.ElementAt(0).Name);
+            Assert.Equal("world", logEvent2.Properties.ElementAt(0).Value);
+            Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(1).LogId);
+            Assert.Equal("number", logEvent2.Properties.ElementAt(1).Name);
+            Assert.Equal("null", logEvent2.Properties.ElementAt(1).Value);
         }
 
         private IEnumerable<string> GetTables(string db)
