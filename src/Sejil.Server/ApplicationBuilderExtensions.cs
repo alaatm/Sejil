@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Sejil.Configuration.Internal;
 using Sejil.Routing.Internal;
+using Newtonsoft.Json;
+using Sejil.Models.Internal;
 #if NETSTANDARD1_6
 using Sejil.Routing;
 #elif NETSTANDARD2_0
@@ -32,14 +38,21 @@ namespace Sejil
 
                 routes.MapPost($"{url}/events", async context =>
                 {
+                    var query = await GetRequestBodyAsync(context.Request);
+                    Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
+                    var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
+
                     var controller = GetSejilController(context);
-                    await controller.GetEventsAsync(context);
+                    await controller.GetEventsAsync(context, page, dateParsed ? startingTs : (DateTime?)null, query);
                 });
 
                 routes.MapPost($"{url}/log-query", async context =>
                 {
+                    var logQuery = JsonConvert.DeserializeObject<LogQuery>(
+                        await GetRequestBodyAsync(context.Request));
+
                     var controller = GetSejilController(context);
-                    await controller.SaveQueryAsync(context);
+                    await controller.SaveQueryAsync(context, logQuery);
                 });
 
                 routes.MapGet($"{url}/log-queries", async context =>
@@ -50,8 +63,9 @@ namespace Sejil
 
                 routes.MapPost($"{url}/min-log-level", async context =>
                 {
+                    var minLogLevel = await GetRequestBodyAsync(context.Request);
                     var controller = GetSejilController(context);
-                    await controller.SetMinimumLogLevelAsync(context);
+                    await controller.SetMinimumLogLevelAsync(context, minLogLevel);
                 });
             });
 
@@ -60,5 +74,19 @@ namespace Sejil
 
         private static ISejilController GetSejilController(HttpContext context)
             => context.RequestServices.GetService(typeof(ISejilController)) as ISejilController;
+
+        private static async Task<string> GetRequestBodyAsync(HttpRequest request)
+        {
+            // TODO: Remove left side of the OR below and replace 'request.Body.Length' 
+            // with 'request.ContentLength' once test issue is fixed
+            if (request.ContentLength > 0 || request.Body?.Length > 0)
+            {
+                var buffer = new byte[(int)request.Body.Length];
+                await request.Body.ReadAsync(buffer, 0, buffer.Length);
+                return Encoding.UTF8.GetString(buffer);
+            }
+
+            return null;
+        }
     }
 }

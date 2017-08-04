@@ -1,10 +1,7 @@
 using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
@@ -31,21 +28,16 @@ namespace Sejil.Routing.Internal
             await context.Response.WriteAsync(_logsHtml);
         }
 
-        public async Task GetEventsAsync(HttpContext context)
+        public async Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, string query)
         {
-            var query = await GetRequestBodyAsync(context.Request);
-            Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
-            DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
-
             var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, query);
 
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
         }
 
-        public async Task SaveQueryAsync(HttpContext context)
+        public async Task SaveQueryAsync(HttpContext context, LogQuery logQuery)
         {
-            var logQuery = JsonConvert.DeserializeObject<LogQuery>(await GetRequestBodyAsync(context.Request));
             if (await _repository.SaveQueryAsync(logQuery))
             {
                 context.Response.StatusCode = StatusCodes.Status201Created;
@@ -63,9 +55,8 @@ namespace Sejil.Routing.Internal
             await context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
         }
 
-        public async Task SetMinimumLogLevelAsync(HttpContext context)
+        public async Task SetMinimumLogLevelAsync(HttpContext context, string minLogLevel)
         {
-            var minLogLevel = await GetRequestBodyAsync(context.Request);
             if (_settings.TrySetMinimumLogLevel(minLogLevel))
             {
                 context.Response.StatusCode = StatusCodes.Status200OK;
@@ -75,18 +66,6 @@ namespace Sejil.Routing.Internal
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 await context.Response.WriteAsync("Invalid log level.");
             }
-        }
-
-        private static async Task<string> GetRequestBodyAsync(HttpRequest request)
-        {
-            if (request.ContentLength > 0)
-            {
-                var buffer = new byte[(int)request.ContentLength];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length);
-                return Encoding.UTF8.GetString(buffer);
-            }
-
-            return null;
         }
     }
 }
