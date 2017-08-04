@@ -8,6 +8,7 @@ namespace Sejil.Configuration.Internal
     {
         private const string UUID = "59A8F730-6AC5-427A-9492-A3A9EAD9556F";
 
+        public string SejilAppHtml { get; private set; }
         public string Url { get; private set; }
         public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
         public string SqliteDbPath { get; private set; }
@@ -16,6 +17,7 @@ namespace Sejil.Configuration.Internal
 
         public SejilSettings(string uri, LogEventLevel minLogLevel)
         {
+            SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
             Url = uri.StartsWith("/") ? uri : "/" + uri;
             LoggingLevelSwitch = new LoggingLevelSwitch
             {

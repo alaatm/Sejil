@@ -19,6 +19,16 @@ namespace Sejil.Test.Configuration
     public class SejilSettingsTests
     {
         [Fact]
+        public void Ctor_loads_app_html()
+        {
+            // Arrange & act
+            var settings = new SejilSettings("url", LogEventLevel.Debug);
+
+            // Assert
+            Assert.Equal(ResourceHelper.GetEmbeddedResource("Sejil.index.html"), settings.SejilAppHtml);
+        }
+
+        [Fact]
         public void Ctor_save_and_adds_a_leading_slash_to_specified_url_when_missing()
         {
             // Arrange & act

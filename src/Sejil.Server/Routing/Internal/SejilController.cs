@@ -11,8 +11,8 @@ namespace Sejil.Routing.Internal
 {
     public class SejilController : ISejilController
     {
-        private static JsonSerializerSettings _camelCaseSerializerSetting = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
-        private static string _logsHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
+        private static JsonSerializerSettings _camelCaseSerializerSetting = 
+            new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         private readonly ISejilRepository _repository;
         private readonly ISejilSettings _settings;
@@ -26,7 +26,7 @@ namespace Sejil.Routing.Internal
         public async Task GetIndexAsync(HttpContext context)
         {
             context.Response.ContentType = "text/html";
-            await context.Response.WriteAsync(_logsHtml);
+            await context.Response.WriteAsync(_settings.SejilAppHtml);
         }
 
         public async Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, string query)
