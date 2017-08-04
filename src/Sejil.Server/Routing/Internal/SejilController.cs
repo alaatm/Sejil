@@ -39,14 +39,9 @@ namespace Sejil.Routing.Internal
 
         public async Task SaveQueryAsync(HttpContext context, LogQuery logQuery)
         {
-            if (await _repository.SaveQueryAsync(logQuery))
-            {
-                context.Response.StatusCode = StatusCodes.Status201Created;
-            }
-            else
-            {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            }
+            context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
+                ? StatusCodes.Status201Created
+                : StatusCodes.Status500InternalServerError;
         }
 
         public async Task GetQueriesAsync(HttpContext context)
@@ -56,17 +51,11 @@ namespace Sejil.Routing.Internal
             await context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
         }
 
-        public async Task SetMinimumLogLevelAsync(HttpContext context, string minLogLevel)
+        public void SetMinimumLogLevel(HttpContext context, string minLogLevel)
         {
-            if (_settings.TrySetMinimumLogLevel(minLogLevel))
-            {
-                context.Response.StatusCode = StatusCodes.Status200OK;
-            }
-            else
-            {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync("Invalid log level.");
-            }
+            context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
+                ? StatusCodes.Status200OK
+                : StatusCodes.Status400BadRequest;
         }
     }
 }

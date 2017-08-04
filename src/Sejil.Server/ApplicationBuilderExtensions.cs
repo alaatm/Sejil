@@ -65,7 +65,7 @@ namespace Sejil
                 {
                     var minLogLevel = await GetRequestBodyAsync(context.Request);
                     var controller = GetSejilController(context);
-                    await controller.SetMinimumLogLevelAsync(context, minLogLevel);
+                    controller.SetMinimumLogLevel(context, minLogLevel);
                 });
             });
 

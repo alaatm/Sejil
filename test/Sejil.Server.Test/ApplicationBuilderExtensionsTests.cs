@@ -111,7 +111,7 @@ namespace Sejil.Test
             await server.CreateClient().PostAsync(target, content);
 
             // Assert
-            controllerMoq.Verify(p => p.SetMinimumLogLevelAsync(It.IsAny<HttpContext>(), targetMinLogLevel), Times.Once);
+            controllerMoq.Verify(p => p.SetMinimumLogLevel(It.IsAny<HttpContext>(), targetMinLogLevel), Times.Once);
         }
 
         public static IEnumerable<object[]> HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData()
