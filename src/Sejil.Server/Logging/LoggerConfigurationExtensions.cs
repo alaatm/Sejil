@@ -3,11 +3,12 @@ using System.IO;
 using Sejil;
 using Sejil.Configuration.Internal;
 using Sejil.Logging.Sinks;
+using Serilog;
 using Serilog.Configuration;
 using Serilog.Debugging;
 using Serilog.Events;
 
-namespace Serilog.Logging
+namespace Sejil.Logging
 {
     internal static class LoggerConfigurationExtensions
     {
