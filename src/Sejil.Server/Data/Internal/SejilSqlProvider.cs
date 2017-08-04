@@ -21,7 +21,7 @@ namespace Sejil.Data.Internal
         public string InsertLogQuerySql()
             => "INSERT INTO log_query (name, query) VALUES (@name, @query)";
 
-        public string GetPagedLogEntriesSql(int page, int pageSize, DateTime startingTimestamp, string query)
+        public string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, string query)
         {
             if (page <= 0)
             {
@@ -46,16 +46,16 @@ LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name";
 
             string TimestampWhereClause() =>
-                startingTimestamp == default(DateTime)
-                    ? ""
-                    : $@"WHERE timestamp <= '{startingTimestamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                startingTimestamp.HasValue
+                    ? $@"WHERE timestamp <= '{startingTimestamp.Value.ToString("yyyy-MM-dd HH:mm:ss.fff")}'"
+                    : "";
 
             string QueryWhereClause() =>
                 String.IsNullOrWhiteSpace(query)
                     ? ""
-                    : startingTimestamp == default(DateTime)
-                        ? $"WHERE {BuildPredicate(query, _nonPropertyColumns)}"
-                        : $"AND {BuildPredicate(query, _nonPropertyColumns)}";
+                    : startingTimestamp.HasValue
+                        ? $"AND {BuildPredicate(query, _nonPropertyColumns)}"
+                        : $"WHERE {BuildPredicate(query, _nonPropertyColumns)}";
         }
 
         private static string BuildPredicate(string filterQuery, string[] nonPropertyColumns)

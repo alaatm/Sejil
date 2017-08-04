@@ -215,7 +215,7 @@ namespace Sejil.Test.Logging.Sinks
             await sink.CallEmitBatchAsync(events);
 
             // Assert
-            var logEvents = await repository.GetEventsPageAsync(1, DateTime.MinValue, null);
+            var logEvents = await repository.GetEventsPageAsync(1, null, null);
             Assert.Equal(2, logEvents.Count());
 
             var logEvent1 = logEvents.FirstOrDefault(p => p.Level == "Information");

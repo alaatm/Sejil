@@ -6,6 +6,6 @@ namespace Sejil.Data.Internal
     {
         string InsertLogQuerySql();
         string GetSavedQueriesSql();
-        string GetPagedLogEntriesSql(int page, int pageSize, DateTime startingTimestamp, string query);
+        string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, string query);
     }
 }

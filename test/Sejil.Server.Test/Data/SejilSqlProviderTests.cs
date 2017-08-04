@@ -43,7 +43,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act & assert
-            var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(0, 1, DateTime.MinValue, null));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(0, 1, null, null));
             Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
         }
 
@@ -54,7 +54,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act & assert
-            var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(-1, 1, DateTime.MinValue, null));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(-1, 1, null, null));
             Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
         }
 
@@ -65,7 +65,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act & assert
-            var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, 0, DateTime.MinValue, null));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, 0, null, null));
             Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
         }
 
@@ -76,7 +76,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act & assert
-            var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, -1, DateTime.MinValue, null));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, -1, null, null));
             Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
         }
 
@@ -89,7 +89,7 @@ namespace Sejil.Test.Data
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act
-            var sql = provider.GetPagedLogEntriesSql(page, pageSize, DateTime.MinValue, null);
+            var sql = provider.GetPagedLogEntriesSql(page, pageSize, null, null);
 
             // Assert
             Assert.Equal(
@@ -106,10 +106,10 @@ ORDER BY l.timestamp DESC, p.name", sql);
         }
 
         [Fact]
-        public void GetPagedLogEntriesSql_ignores_timestamp_arg_when_it_equals_DateTime_MinValue()
+        public void GetPagedLogEntriesSql_ignores_timestamp_arg_when_null()
         {
             // Arrange
-            var timestamp = DateTime.MinValue;
+            DateTime? timestamp = null;
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act
@@ -188,7 +188,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
             var provider = new SejilSqlProvider(settingsMoq.Object);
 
             // Act
-            var sql = provider.GetPagedLogEntriesSql(2, 100, DateTime.MinValue, query);
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, query);
 
             // Assert
             Assert.Equal(expectedSql, GetInnerPredicate(sql));
