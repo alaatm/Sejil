@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 import { runInAction, observable, action } from 'mobx';
 import { HttpClient } from './HttpClient';
 import ILogEntry from './interfaces/ILogEntry';

@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as mobx from 'mobx';

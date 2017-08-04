@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 import EventEntry from './EventEntry';

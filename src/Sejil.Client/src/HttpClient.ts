@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 export interface IHttpClient {
     get(url: string): Promise<string>;
     post(url: string, content: string): Promise<string>;

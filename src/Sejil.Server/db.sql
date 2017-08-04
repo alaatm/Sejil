@@ -1,3 +1,6 @@
+-- Copyright (C) 2017 Alaa Masoud
+-- See the LICENSE file in the project root for more information.
+
 CREATE TABLE IF NOT EXISTS log(
 	id TEXT NOT NULL PRIMARY KEY,
 	message TEXT NOT NULL,

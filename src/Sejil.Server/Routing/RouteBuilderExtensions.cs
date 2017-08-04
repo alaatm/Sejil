@@ -1,3 +1,6 @@
+// Copyright (C) 2017 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 #if NETSTANDARD1_6
 using System;
 using System.Threading.Tasks;
