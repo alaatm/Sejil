@@ -1,7 +1,6 @@
 # Sejil
 
 [![Build status](https://ci.appveyor.com/api/projects/status/5eci12hmv92dd8i6?svg=true)](https://ci.appveyor.com/project/alaatm/sejil)
-[![Coverage Report](https://sejil.blob.core.windows.net/code-coverage/badge_combined.svg)](https://sejil.blob.core.windows.net/code-coverage/index.htm)
 
 Sejil is a library that will enable you to view all your ASP.net core app's log events. It supports structured logging, querying as well as saving log event queries.
 
@@ -45,3 +44,11 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
         ...
     }
     </pre>
+
+## License
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+Copyright &copy; Alaa Masoud.
+
+This project is provided as-is under the Apache 2.0 license. For more information see the [LICENSE file](https://github.com/alaatm/Sejil/blob/master/LICENSE).
