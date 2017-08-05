@@ -250,6 +250,45 @@ namespace Sejil.Test.Logging.Sinks
             Assert.Equal("null", logEvent2.Properties.ElementAt(1).Value);
         }
 
+        [Theory]
+        [InlineData("RequestPath")]
+        [InlineData("Path")]
+        public async Task EmitBatchAsync_ignores_events_with_sejil_url_in_RequestPath_or_Path_properties(string propertyName)
+        {
+            // Arrange
+            var db = Guid.NewGuid().ToString();
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
+            settingsMoq.SetupGet(p => p.PageSize).Returns(100);
+            settingsMoq.SetupGet(p => p.Url).Returns("/sejil");
+            var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+            var sink = new SejilSinkMock(settingsMoq.Object);
+
+            var tokens = new List<MessageTemplateToken>
+            {
+                new PropertyToken(propertyName, "{"+propertyName+"}"),
+            };
+
+            var properties = new List<LogEventProperty>
+            {
+                new LogEventProperty(propertyName, new ScalarValue("/sejil/events")),
+            };
+
+            var messageTemplate = new MessageTemplate(tokens);
+
+            var events = new List<LogEvent>
+            {
+                new LogEvent(DateTime.Now, LogEventLevel.Information, null, messageTemplate, properties),
+            };
+
+            // Act
+            await sink.CallEmitBatchAsync(events);
+
+            // Assert
+            var logEvents = await repository.GetEventsPageAsync(1, null, null);
+            Assert.Equal(0, logEvents.Count());
+        }
+
         private IEnumerable<string> GetTables(string db)
         {
             using (var conn = new SqliteConnection($"DataSource={db}"))
