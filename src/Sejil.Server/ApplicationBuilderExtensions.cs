@@ -80,11 +80,9 @@ namespace Sejil
 
         private static async Task<string> GetRequestBodyAsync(HttpRequest request)
         {
-            // TODO: Remove right side of the OR below and replace 'request.Body.Length' 
-            // with 'request.ContentLength' once test issue is fixed
-            if (request.ContentLength > 0 || request.Body?.Length > 0)
+            if (request.ContentLength > 0)
             {
-                var buffer = new byte[(int)request.Body.Length];
+                var buffer = new byte[(int)request.ContentLength];
                 await request.Body.ReadAsync(buffer, 0, buffer.Length);
                 return Encoding.UTF8.GetString(buffer);
             }
