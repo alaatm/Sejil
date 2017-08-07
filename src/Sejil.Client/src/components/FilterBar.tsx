@@ -25,7 +25,7 @@ export default class FilterBar extends React.Component<IProps, {}> {
 
         if (e.shiftKey && e.keyCode === 13) {
             e.preventDefault();
-            store.filterEvents();
+            store.reset();
         }
     }
 

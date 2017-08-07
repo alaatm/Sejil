@@ -38,15 +38,28 @@ after_test:
 artifacts:
   - path: 'nuget-build\*.nupkg'
     name: Nuget
+
   - path: 'test\Sejil.Server.Test\coverage\report'
-    name: CoverageReport
+    name: ServerCoverageReport
+    
+  - path: 'test\Sejil.Client.Test\coverage\lcov-report'
+    name: ClientCoverageReport
 
 deploy:
   - provider: AzureBlob
     storage_account_name: $(CC_ACCT_NAME)
     storage_access_key: $(CC_ACCT_KEY)
     container: $(CC_CONTAINER_NAME)
-    folder: \
-    artifact: CoverageReport
+    folder: \server
+    artifact: ServerCoverageReport
     unzip: true
     set_content_type: true
+
+  - provider: AzureBlob
+    storage_account_name: $(CC_ACCT_NAME)
+    storage_access_key: $(CC_ACCT_KEY)
+    container: $(CC_CONTAINER_NAME)
+    folder: \client
+    artifact: ClientCoverageReport
+    unzip: true
+    set_content_type: true    

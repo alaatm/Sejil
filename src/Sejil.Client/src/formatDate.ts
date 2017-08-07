@@ -1,7 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-export default function dateFormat(date: Date | string) {
+export default function formatDate(date: Date | string) {
     const d = date instanceof Date
         ? date
         : new Date(date);
@@ -16,7 +16,7 @@ export default function dateFormat(date: Date | string) {
     const ms = milliSeconds < 10 ? '00' + milliSeconds : milliSeconds < 100 ? '0' + milliSeconds : milliSeconds;
     const time = h + ':' + m + ':' + s + '.' + ms;
 
-    return d.getDate() + ' ' + getMonthName(d.getMonth()) + ' ' + d.getFullYear() + ' ' + time;
+    return pad(d.getDate(), 2) + ' ' + getMonthName(d.getMonth()) + ' ' + d.getFullYear() + ' ' + time;
 }
 
 function getMonthName(n: number) {
@@ -36,4 +36,9 @@ function getMonthName(n: number) {
     }
 
     throw new Error('Invalid month number.');
+}
+
+function pad(num: number, size: number) {
+    const s = '000000000' + num;
+    return s.substr(s.length-size);
 }

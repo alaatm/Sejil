@@ -2,7 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 import * as React from 'react';
-import dateFormat from '../dateFormat';
+import formatDate from '../formatDate';
 import EventEntryProperties from './EventEntryProperties';
 import ILogEntry from '../interfaces/ILogEntry';
 
@@ -29,7 +29,7 @@ export default class EventEntry extends React.Component<IProps, IState> {
 
     render() {
         const entry = this.props.entry;
-        const timestamp = dateFormat(entry.timestamp);
+        const timestamp = formatDate(entry.timestamp);
         const levelClass = `level-indicator level-${entry.level.toLowerCase()}`;
         const eventClass = `event level-${entry.level.toLowerCase()} ${this.state.collapsed ? 'collapsed' : 'expanded'}`;
 

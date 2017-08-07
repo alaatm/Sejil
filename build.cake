@@ -37,19 +37,13 @@ Setup(context =>
 Task("Clean")
 	.Does(() =>
 {
-	 Func<IFileSystemInfo, bool> exclude_node_modules = 
-		fsi => !fsi.Path.FullPath.Contains("node_modules");
+	if (DirectoryExists("./src/Sejil.Server/bin")) DeleteDirectory("./src/Sejil.Server/bin", true);
+	if (DirectoryExists("./src/Sejil.Server/obj")) DeleteDirectory("./src/Sejil.Server/obj", true);
+	if (DirectoryExists("./test/Sejil.Server.Test/bin"))DeleteDirectory("./test/Sejil.Server.Test/bin", true);
+	if (DirectoryExists("./test/Sejil.Server.Test/obj")) DeleteDirectory("./test/Sejil.Server.Test/obj", true);
 
-	DeleteDirectories(GetDirectories("./**/bin", exclude_node_modules), true);
-	DeleteDirectories(GetDirectories("./**/obj", exclude_node_modules), true);
-	if (DirectoryExists(_packFolder))
-	{
-		DeleteDirectory(_packFolder, true);
-	}
-	if (DirectoryExists(System.IO.Path.Combine(CLIENT_DIR, "dist")))
-	{
-		DeleteDirectory(System.IO.Path.Combine(CLIENT_DIR, "dist"), true);
-	}
+	if (DirectoryExists(_packFolder)) DeleteDirectory(_packFolder, true);
+	if (DirectoryExists(System.IO.Path.Combine(CLIENT_DIR, "dist"))) DeleteDirectory(System.IO.Path.Combine(CLIENT_DIR, "dist"), true);
 });
 
 Task("ClientBuild")
@@ -95,6 +89,14 @@ Task("Test")
 	{ 
 		Configuration = configuration,
 	});
+
+	// ./src/Sejil.Client/> npm test
+	var pi = new System.Diagnostics.ProcessStartInfo("npm");
+	pi.UseShellExecute = false;
+	pi.WorkingDirectory = "./src/Sejil.Client/";
+	pi.Arguments = "test";
+	var process = System.Diagnostics.Process.Start(pi);
+	process.WaitForExit();
 });
 
 Task("Pack")

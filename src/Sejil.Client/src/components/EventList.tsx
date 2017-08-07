@@ -38,7 +38,10 @@ export default class EventList extends React.Component<IProps, {}> {
         );
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        const store = this.props.store || new Store();
+        await store.loadEvents();
+
         const elem = this.contentElem;
         elem.addEventListener('scroll', async () => {
             if (elem.scrollTop + elem.offsetHeight >= elem.scrollHeight) {

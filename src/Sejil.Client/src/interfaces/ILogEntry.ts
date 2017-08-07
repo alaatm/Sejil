@@ -9,8 +9,6 @@ export default interface ILogEntry {
     messageTemplate: string;
     level: string;
     timestamp: string;
-    exception: string | null;
-    sourceContext: string;
-    requestId: string;
+    exception?: string;
     properties: ILogEntryProperty[];
 }
