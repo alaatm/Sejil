@@ -89,14 +89,6 @@ Task("Test")
 	{ 
 		Configuration = configuration,
 	});
-
-	// ./src/Sejil.Client/> npm test
-	var pi = new System.Diagnostics.ProcessStartInfo("npm");
-	pi.UseShellExecute = false;
-	pi.WorkingDirectory = "./src/Sejil.Client/";
-	pi.Arguments = "test";
-	var process = System.Diagnostics.Process.Start(pi);
-	process.WaitForExit();
 });
 
 Task("Pack")

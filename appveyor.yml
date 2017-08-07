@@ -31,6 +31,7 @@ build_script:
 
 test_script:
   - ps: ./build.ps1 -target Test
+  - ps: cd ./src/Sejil.Client; npm test; cd ../../
 
 after_test:
   - ps: ./build.ps1 -target CoverageReport
