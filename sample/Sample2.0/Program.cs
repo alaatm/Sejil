@@ -25,7 +25,7 @@ namespace sample
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .AddSejil("/logs", LogLevel.Debug)
+                .AddSejil("/sejil", LogLevel.Debug)
                 .UseStartup<Startup>()
                 .Build();
     }

@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/5eci12hmv92dd8i6?svg=true)](https://ci.appveyor.com/project/alaatm/sejil)
 
-Sejil is a library that will enable you to view all your ASP.net core app's log events. It supports structured logging, querying as well as saving log event queries.
+Sejil is a library that enables you to capture, view and filter your ASP.net core app's log events right from your app. It supports structured logging, querying as well as saving log event queries.
 
 ### Getting started
 
@@ -18,7 +18,7 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
     public static void Main(string[] args)
     {
         var host = new WebHostBuilder()
-            <b>.AddSejil("/logs", LogLevel.Debug)</b>
+            <b>.AddSejil("/sejil", LogLevel.Debug)</b>
             .UseKestrel()
         ...
     }
@@ -29,7 +29,7 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
     <pre>
     public static IWebHost BuildWebHost(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
-            <b>.AddSejil("/logs", LogLevel.Debug)</b>
+            <b>.AddSejil("/sejil", LogLevel.Debug)</b>
             .UseStartup<Startup>()
             .Build();
     </pre>
@@ -44,6 +44,8 @@ Sejil is a library that will enable you to view all your ASP.net core app's log 
         ...
     }
     </pre>
+
+3. Navigate to *http://your-app-url/sejil* to see your app's logs.
 
 ## License
 

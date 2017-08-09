@@ -16,7 +16,7 @@ namespace Sample
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
-                .AddSejil("logs", LogLevel.Debug)
+                .AddSejil("/sejil", LogLevel.Debug)
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
