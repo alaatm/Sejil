@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using Sejil.Models.Internal;
 
 namespace Sejil.Data.Internal
 {
@@ -9,6 +10,6 @@ namespace Sejil.Data.Internal
     {
         string InsertLogQuerySql();
         string GetSavedQueriesSql();
-        string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, string query);
+        string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, LogQueryFilter queryFilter);
     }
 }

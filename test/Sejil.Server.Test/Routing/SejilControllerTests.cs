@@ -48,16 +48,15 @@ namespace Sejil.Test.Routing
             // Arrange
             var page = 1;
             var startingTimestamp = DateTime.Now;
-            var query = "query";
 
             var repositoryMoq = new Mock<ISejilRepository>();
             var controller = new SejilController(repositoryMoq.Object, Mock.Of<ISejilSettings>());
 
             // Act
-            await controller.GetEventsAsync(CreateContextMoq().contextMoq.Object, page, startingTimestamp, query);
+            await controller.GetEventsAsync(CreateContextMoq().contextMoq.Object, page, startingTimestamp, new LogQueryFilter());
 
             // Assert
-            repositoryMoq.Verify(p => p.GetEventsPageAsync(page, startingTimestamp, query), Times.Once);
+            repositoryMoq.Verify(p => p.GetEventsPageAsync(page, startingTimestamp, It.IsAny<LogQueryFilter>()), Times.Once);
         }
 
         [Fact]
@@ -66,16 +65,35 @@ namespace Sejil.Test.Routing
             // Arrange
             var page = 0;
             var startingTimestamp = DateTime.Now;
-            var query = "query";
 
             var repositoryMoq = new Mock<ISejilRepository>();
             var controller = new SejilController(repositoryMoq.Object, Mock.Of<ISejilSettings>());
 
             // Act
-            await controller.GetEventsAsync(CreateContextMoq().contextMoq.Object, page, startingTimestamp, query);
+            await controller.GetEventsAsync(CreateContextMoq().contextMoq.Object, page, startingTimestamp, new LogQueryFilter());
 
             // Assert
-            repositoryMoq.Verify(p => p.GetEventsPageAsync(page + 1, startingTimestamp, query), Times.Once);
+            repositoryMoq.Verify(p => p.GetEventsPageAsync(page + 1, startingTimestamp, It.IsAny<LogQueryFilter>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetEventsAsync_passes_query_filter_to_repository()
+        {
+            // Arrange
+            var qf = new LogQueryFilter
+            {
+                QueryText = "p=v",
+                DateFilter = "5m",
+                DateRangeFilter = new List<DateTime>() { DateTime.Now, DateTime.Now }
+            };
+            var repositoryMoq = new Mock<ISejilRepository>();
+            var controller = new SejilController(repositoryMoq.Object, Mock.Of<ISejilSettings>());
+
+            // Act
+            await controller.GetEventsAsync(CreateContextMoq().contextMoq.Object, 1, null, qf);
+
+            // Assert
+            repositoryMoq.Verify(p => p.GetEventsPageAsync(1, null, It.Is<LogQueryFilter>(f => f == qf)), Times.Once);
         }
 
         [Fact]

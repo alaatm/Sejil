@@ -28,12 +28,10 @@ export default class EventList extends React.Component<IProps, {}> {
         const store = this.props.store || new Store();
 
         return (
-            <div className="stream-view">
-                <div ref={(e: HTMLDivElement) => this.contentElem = e} className="content">
-                    {store.logEntries.map(s => (
-                        <EventEntry key={s.id} entry={s} />
-                    ))}
-                </div>
+            <div ref={(e: HTMLDivElement) => this.contentElem = e} className="logs-view">
+                {store.logEntries.map(s => (
+                    <EventEntry key={s.id} entry={s} />
+                ))}
             </div >
         );
     }

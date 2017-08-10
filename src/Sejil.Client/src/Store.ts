@@ -5,11 +5,13 @@ import { runInAction, observable, action } from 'mobx';
 import { IHttpClient, HttpClient } from './HttpClient';
 import ILogEntry from './interfaces/ILogEntry';
 import ILogQuery from './interfaces/ILogQuery';
+import { formatServerDate } from './formatDate';
 
 export default class Store {
     @observable logEntries: ILogEntry[] = [];
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
+    dateFilter: string | Date[] | null = null;
     private http: IHttpClient;
     private page = 1;
     private startingTimestamp: string | undefined = undefined;
@@ -19,7 +21,7 @@ export default class Store {
         this.http = http;
     }
 
-    public async reset() {
+    @action public async reset() {
         this.page = 1;
         this.startingTimestamp = undefined;
         this.logEntries = [];
@@ -31,7 +33,11 @@ export default class Store {
             ? `${this.rootUrl}/events?page=${this.page}&startingTs=${this.startingTimestamp}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
-        const json = await this.http.post(url, this.queryText);
+        const json = await this.http.post(url, JSON.stringify({
+            queryText: this.queryText,
+            dateFilter: this.dateFilter instanceof Array ? null : this.dateFilter,
+            dateRangeFilter: this.dateFilter instanceof Array ? this.dateFilter.map(d => formatServerDate(d)) : null
+        }));
         const events = JSON.parse(json) as ILogEntry[];
 
         if (events.length) {

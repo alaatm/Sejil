@@ -1,7 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-export default function formatDate(date: Date | string) {
+export function formatLogEntryDate(date: Date | string) {
     const d = date instanceof Date
         ? date
         : new Date(date);
@@ -17,6 +17,10 @@ export default function formatDate(date: Date | string) {
     const time = h + ':' + m + ':' + s + '.' + ms;
 
     return pad(d.getDate(), 2) + ' ' + getMonthName(d.getMonth()) + ' ' + d.getFullYear() + ' ' + time;
+}
+
+export function formatServerDate(date: Date) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1, 2)}-${pad(date.getDate(), 2)}`;
 }
 
 function getMonthName(n: number) {
@@ -40,5 +44,5 @@ function getMonthName(n: number) {
 
 function pad(num: number, size: number) {
     const s = '000000000' + num;
-    return s.substr(s.length-size);
+    return s.substr(s.length - size);
 }

@@ -2,7 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 import * as React from 'react';
-import formatDate from '../formatDate';
+import { formatLogEntryDate } from '../formatDate';
 import EventEntryProperties from './EventEntryProperties';
 import ILogEntry from '../interfaces/ILogEntry';
 
@@ -29,24 +29,27 @@ export default class EventEntry extends React.Component<IProps, IState> {
 
     render() {
         const entry = this.props.entry;
-        const timestamp = formatDate(entry.timestamp);
-        const levelClass = `level-indicator level-${entry.level.toLowerCase()}`;
-        const eventClass = `event level-${entry.level.toLowerCase()} ${this.state.collapsed ? 'collapsed' : 'expanded'}`;
+        const timestamp = formatLogEntryDate(entry.timestamp);
+        const levelClass = `level level-${entry.level.toLowerCase()}`;
+        const logClass = `log level-${entry.level.toLowerCase()} ${this.state.collapsed ? 'collapsed' : 'expanded'}`;
 
         return (
-            <div className={eventClass} onClick={this.toggleEvent}>
-                <div className="timestamp">{timestamp}</div>
-                <div className="description">
+            <div className={logClass}>
+                <div className="log-entry" onClick={this.toggleEvent}>
+                    <div className="timestamp">{timestamp}</div>
                     <div className="message">
                         <span className={levelClass} title={entry.level}></span>
                         {entry.message}
-                        {!this.state.collapsed && <EventEntryProperties props={entry.properties} />}
                     </div>
-                    {
-                        !this.state.collapsed && entry.exception &&
-                        <p className="exception">{entry.exception}</p>
-                    }
                 </div>
+                {
+                    !this.state.collapsed &&
+                    <EventEntryProperties props={entry.properties} />
+                }
+                {
+                    !this.state.collapsed && entry.exception &&
+                    <p className="exception">{entry.exception}</p>
+                }
             </div>
         );
     }

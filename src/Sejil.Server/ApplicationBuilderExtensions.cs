@@ -41,7 +41,8 @@ namespace Sejil
 
                 routes.MapPost($"{url}/events", async context =>
                 {
-                    var query = await GetRequestBodyAsync(context.Request);
+                    var query = JsonConvert.DeserializeObject<LogQueryFilter>(
+                        await GetRequestBodyAsync(context.Request));
                     Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                     var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 

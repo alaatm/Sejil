@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
+using Sejil.Models.Internal;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -147,7 +148,31 @@ ORDER BY l.timestamp DESC, p.name", sql);
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-    WHERE timestamp <= '2017-08-03 14:56:33.876'
+    WHERE (timestamp <= '2017-08-03 14:56:33.876')
+    
+    ORDER BY timestamp DESC
+    LIMIT 100 OFFSET 100
+) l
+LEFT JOIN log_property p ON l.id = p.logId
+ORDER BY l.timestamp DESC, p.name", sql);
+        }
+
+        [Fact]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_before_specified_timestamp_and_with_dateFilter()
+        {
+            // Arrange
+            var timestamp = new DateTime(2017, 8, 3, 14, 56, 33, 876);
+            var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, timestamp, new LogQueryFilter { DateFilter = "5m" });
+
+            // Assert
+            Assert.Equal(
+@"SELECT l.*, p.* from 
+(
+    SELECT * FROM log
+    WHERE (timestamp <= '2017-08-03 14:56:33.876' AND timestamp >= datetime('now', '-5 Minute'))
     
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
@@ -165,15 +190,15 @@ ORDER BY l.timestamp DESC, p.name", sql);
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act
-            var sql = provider.GetPagedLogEntriesSql(2, 100, timestamp, query);
+            var sql = provider.GetPagedLogEntriesSql(2, 100, timestamp, new LogQueryFilter { QueryText = query });
 
             // Assert
             Assert.Equal(
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-    WHERE timestamp <= '2017-08-03 14:56:33.876'
-    AND id IN (SELECT logId FROM log_property WHERE name = 'p' AND value = 'v')
+    WHERE (timestamp <= '2017-08-03 14:56:33.876')
+    AND (id IN (SELECT logId FROM log_property WHERE name = 'p' AND value = 'v'))
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -191,10 +216,41 @@ ORDER BY l.timestamp DESC, p.name", sql);
             var provider = new SejilSqlProvider(settingsMoq.Object);
 
             // Act
-            var sql = provider.GetPagedLogEntriesSql(2, 100, null, query);
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { QueryText = query });
 
             // Assert
             Assert.Equal(expectedSql, GetInnerPredicate(sql));
+        }
+
+        [Theory]
+        [MemberData(nameof(GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateFilter_TestData))]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateFilter(string dateFilter, string expectedSql)
+        {
+            // Arrange
+            var settingsMoq = new Mock<ISejilSettings>();
+            var provider = new SejilSqlProvider(settingsMoq.Object);
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { DateFilter = dateFilter });
+
+            // Assert
+            Assert.Equal(expectedSql, GetInnerPredicate_ts(sql));
+        }
+
+        [Fact]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateRangeFilter()
+        {
+            // Arrange
+            var d1 = new DateTime(2017, 8, 1);
+            var d2 = new DateTime(2017, 8, 10);
+            var settingsMoq = new Mock<ISejilSettings>();
+            var provider = new SejilSqlProvider(settingsMoq.Object);
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { DateRangeFilter = new List<DateTime> { d1, d2 } });
+
+            // Assert
+            Assert.Equal("(timestamp >= '2017-08-01' and timestamp < '2017-08-10')", GetInnerPredicate_ts(sql));
         }
 
         public static IEnumerable<object[]> GetPagedLogEntriesSql_TestData()
@@ -323,6 +379,50 @@ ORDER BY l.timestamp DESC, p.name", sql);
             };
         }
 
+        public static IEnumerable<object[]> GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateFilter_TestData()
+        {
+            yield return new object[]
+            {
+                "5m",
+                "(timestamp >= datetime('now', '-5 Minute'))"
+            };
+            yield return new object[]
+            {
+                "15m",
+                "(timestamp >= datetime('now', '-15 Minute'))"
+            };
+            yield return new object[]
+            {
+                "1h",
+                "(timestamp >= datetime('now', '-1 Hour'))"
+            };
+            yield return new object[]
+            {
+                "6h",
+                "(timestamp >= datetime('now', '-6 Hour'))"
+            };
+            yield return new object[]
+            {
+                "12h",
+                "(timestamp >= datetime('now', '-12 Hour'))"
+            };
+            yield return new object[]
+            {
+                "24h",
+                "(timestamp >= datetime('now', '-24 Hour'))"
+            };
+            yield return new object[]
+            {
+                "2d",
+                "(timestamp >= datetime('now', '-2 Day'))"
+            };
+            yield return new object[]
+            {
+                "5d",
+                "(timestamp >= datetime('now', '-5 Day'))"
+            };
+        }
+
         private string GetInnerPredicate(string sql)
         {
             return sql.Replace(
@@ -332,6 +432,22 @@ ORDER BY l.timestamp DESC, p.name", sql);
     
     WHERE ", "").Replace(
 @"
+    ORDER BY timestamp DESC
+    LIMIT 100 OFFSET 100
+) l
+LEFT JOIN log_property p ON l.id = p.logId
+ORDER BY l.timestamp DESC, p.name", "");
+        }
+
+        private string GetInnerPredicate_ts(string sql)
+        {
+            return sql.Replace(
+@"SELECT l.*, p.* from 
+(
+    SELECT * FROM log
+    WHERE ", "").Replace(
+@"
+    
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l

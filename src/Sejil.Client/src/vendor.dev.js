@@ -10,3 +10,9 @@ import 'tslib';
 
 import 'antd/lib/input';
 import 'antd/lib/input/style/css';
+import 'antd/lib/button';
+import 'antd/lib/button/style/css';
+import 'antd/lib/date-picker';
+import 'antd/lib/date-picker/style/css';
+import 'antd/lib/locale-provider';
+import 'antd/lib/locale-provider/en_US';

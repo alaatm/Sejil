@@ -1,24 +1,35 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-import formatDate from '../src/formatDate';
+import { formatLogEntryDate, formatServerDate } from '../src/formatDate';
 
 describe('dateFormat() tests', () => {
-    it('should return a date formatted as dd MMM yyyy HH:mm:ss.fff', async () => {
-        expect(formatDate(new Date(2017, 1, 1, 1, 1, 1, 1)))
+    it('formatLogEntryDate() should return a date formatted as dd MMM yyyy HH:mm:ss.fff', () => {
+        expect(formatLogEntryDate(new Date(2017, 1, 1, 1, 1, 1, 1)))
             .toBe('01 Feb 2017 01:01:01.001');
-        expect(formatDate(new Date(2017, 10, 10, 10, 10, 10, 10)))
+        expect(formatLogEntryDate(new Date(2017, 10, 10, 10, 10, 10, 10)))
             .toBe('10 Nov 2017 10:10:10.010');
-        expect(formatDate(new Date(2017, 10, 10, 10, 10, 10, 100)))
+        expect(formatLogEntryDate(new Date(2017, 10, 10, 10, 10, 10, 100)))
             .toBe('10 Nov 2017 10:10:10.100');
-        expect(formatDate('Fri Nov 10 2017 10:10:10.100'))
+        expect(formatLogEntryDate('Fri Nov 10 2017 10:10:10.100'))
             .toBe('10 Nov 2017 10:10:10.100');
 
         for (let i = 0; i < 12; i++) {
-            expect(formatDate(new Date(2017, i, 1, 1, 1, 1, 1)))
+            expect(formatLogEntryDate(new Date(2017, i, 1, 1, 1, 1, 1)))
                 .toBe(`01 ${getMonth(i)} 2017 01:01:01.001`);
         }
     });
+
+    it('formatServerDate() should return a date formatted as yyyy-MM-dd', () => {
+        // Arrange
+        const date = new Date(2017, 0, 10, 2, 2, 2, 200);
+
+        // Act
+        const format = formatServerDate(date);
+
+        // Assert
+        expect(format).toBe('2017-01-10');
+    })
 });
 
 function getMonth(i: number) {

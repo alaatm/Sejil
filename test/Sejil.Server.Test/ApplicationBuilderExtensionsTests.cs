@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Sejil.Test
         [Theory]
         [MemberData(nameof(HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData))]
         public async Task HttpPost_events_url_calls_controller_GetEventsAsync_method(string queryString,
-            string bodyContent, int expectedPageArg, DateTime? expectedstartingTsArg, string expectedQueryArg)
+            string bodyContent, int expectedPageArg, DateTime? expectedstartingTsArg, LogQueryFilter expectedQueryFilterArg)
         {
             // Arrange
             var url = "/sejil";
@@ -56,7 +57,10 @@ namespace Sejil.Test
 
             // Assert
             controllerMoq.Verify(p => p.GetEventsAsync(It.IsAny<HttpContext>(),
-                expectedPageArg, expectedstartingTsArg, expectedQueryArg), Times.Once);
+                expectedPageArg, expectedstartingTsArg, It.Is<LogQueryFilter>(qf =>
+                qf.QueryText == expectedQueryFilterArg.QueryText &&
+                qf.DateFilter == expectedQueryFilterArg.DateFilter &&
+                Join(qf.DateRangeFilter) == Join(expectedQueryFilterArg.DateRangeFilter))), Times.Once);
         }
 
         [Fact]
@@ -120,15 +124,24 @@ namespace Sejil.Test
         {
             yield return new object[]
             {
-                "", null, 0, null, null
+                "", "{\"queryText\":\"\",\"dateFilter\":null,\"dateRangeFilter\":null}", 0, null, new LogQueryFilter { QueryText = "" }
             };
             yield return new object[]
             {
-                "?page=2", "my query", 2, null, "my query"
+                "", "{\"queryText\":\"my query\",\"dateFilter\":\"5m\",\"dateRangeFilter\":null}", 0, null, new LogQueryFilter { QueryText = "my query", DateFilter = "5m"}
             };
             yield return new object[]
             {
-                "?page=2&startingTs=2017-08-04%2006%3A07%3A44.100", "my query", 2, new DateTime(2017, 8, 4, 6, 7, 44, 100), "my query"
+                "", "{\"queryText\":\"my query\",\"dateFilter\":null,\"dateRangeFilter\":[\"2017-08-01\",\"2017-08-10\"]}", 0, null,
+                    new LogQueryFilter { QueryText = "my query", DateFilter = null, DateRangeFilter = new List<DateTime> { new DateTime(2017, 8, 1), new DateTime(2017, 8, 10) }}
+            };
+            yield return new object[]
+            {
+                "?page=2", "{\"queryText\":\"my query\",\"dateFilter\":null,\"dateRangeFilter\":null}", 2, null, new LogQueryFilter { QueryText = "my query" }
+            };
+            yield return new object[]
+            {
+                "?page=2&startingTs=2017-08-04%2006%3A07%3A44.100", "{\"queryText\":\"my query\",\"dateFilter\":null,\"dateRangeFilter\":null}", 2, new DateTime(2017, 8, 4, 6, 7, 44, 100), new LogQueryFilter { QueryText = "my query" }
             };
         }
 
@@ -147,6 +160,12 @@ namespace Sejil.Test
                 });
 
             return new TestServer(builder);
+        }
+
+        string Join(List<DateTime> dateList)
+        {
+            if (dateList == null || dateList?.Count == 0) return null;
+            return String.Join(",", dateList);
         }
     }
 }

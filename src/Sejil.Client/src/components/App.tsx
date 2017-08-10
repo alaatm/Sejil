@@ -13,14 +13,18 @@ export default class App extends React.Component<{}, {}> {
     render() {
         return (
             <Provider store={new Store()}>
-                <div>
+                <div className="wrapper">
                     <div className="header">
                         Sejil
                     </div>
-                    <div className="view">
-                        <div className="events">
-                            <SideBar />
-                            <FilterBar />
+
+                    <div className="left-pane">
+                        <SideBar />
+                    </div>
+                    <div className="center-pane">
+                        <FilterBar />
+
+                        <div className="logs-pane">
                             <EventList />
                         </div>
                     </div>

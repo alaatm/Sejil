@@ -32,9 +32,9 @@ namespace Sejil.Routing.Internal
             await context.Response.WriteAsync(_settings.SejilAppHtml);
         }
 
-        public async Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, string query)
+        public async Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, LogQueryFilter queryFilter)
         {
-            var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, query);
+            var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
 
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));

@@ -26,7 +26,7 @@ describe('Store', () => {
 
         // Assert
         expect(httpClientMoq.post).toHaveBeenCalled();
-        expect(httpClientMoq.post).toHaveBeenCalledWith(`${rootUrl}/events?page=1`, '');
+        expect(httpClientMoq.post).toHaveBeenCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
         expect(toJS(store.logEntries)).toHaveLength(testEvents.events.length);
         expect(toJS(store.logEntries)).toMatchObject(testEvents.events);
     });
@@ -58,7 +58,7 @@ describe('Store', () => {
 
         // Assert
         expect(httpClientMoq.post).toHaveBeenCalledTimes(3);
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${expectedTimestamp}`, '');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${expectedTimestamp}`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
         expect(toJS(store.logEntries)).toHaveLength(testEvents_page1.events.length + testEvents_page2.events.length + testEvents_page3.events.length);
         expect(toJS(store.logEntries)).toMatchObject(testEvents_page1.events.concat(testEvents_page2.events.concat(testEvents_page3.events)));
     });
@@ -81,7 +81,7 @@ describe('Store', () => {
         await store.loadEvents();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
     });
 
     it('loadEvents() should not advance page number when no results are returned', async () => {
@@ -109,7 +109,46 @@ describe('Store', () => {
         await store.loadEvents();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${testEvents_page1.events[0].timestamp}`, '');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${testEvents_page1.events[0].timestamp}`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+    });
+
+    it('loadEvents() should add queryText and datefilters as content when set', async () => {
+        // Arrange
+        const Mock = jest.fn<HttpClient>(() => ({
+            get: jest.fn(),
+            post: jest.fn(() => '[]')
+        }));
+
+        const httpClientMoq = new Mock();
+        const store = new Store(httpClientMoq);
+        store.queryText = 'prop=val';
+        store.dateFilter = '5m';
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"prop=val","dateFilter":"5m","dateRangeFilter":null}');
+    });
+
+    it('loadEvents() should add date range filters as content when set', async () => {
+        // Arrange
+        const Mock = jest.fn<HttpClient>(() => ({
+            get: jest.fn(),
+            post: jest.fn(() => '[]')
+        }));
+
+        const httpClientMoq = new Mock();
+        const store = new Store(httpClientMoq);
+        store.queryText = 'prop=val';
+        store.dateFilter = [new Date(2017, 8, 1), new Date(2017, 8, 10)];
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"prop=val","dateFilter":null,"dateRangeFilter":["2017-09-01","2017-09-10"]}');
     });
 
     it('reset() should load first set of events', async () => {
@@ -133,7 +172,7 @@ describe('Store', () => {
         await store.reset();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
     });
 
     it('saveQuery() should save query', async () => {

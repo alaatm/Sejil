@@ -15,7 +15,7 @@ export default class EventEntry extends React.Component<IProps, {}> {
 
     render() {
         return (
-            <div className="event-properties">
+            <div className="log-properties">
                 {this.props.props.map(p => (
                     <div key={p.id} className="property">
                         <div className="property-name">{p.name}</div>
