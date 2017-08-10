@@ -30,7 +30,7 @@ export default class Store {
 
     @action public async loadEvents() {
         const url = this.startingTimestamp
-            ? `${this.rootUrl}/events?page=${this.page}&startingTs=${this.startingTimestamp}`
+            ? `${this.rootUrl}/events?page=${this.page}&startingTs=${encodeURIComponent(this.startingTimestamp)}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
         const json = await this.http.post(url, JSON.stringify({
