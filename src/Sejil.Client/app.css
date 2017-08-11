@@ -69,18 +69,6 @@ section {
     z-index: 5;
 }
 
-.left-pane {
-    color: #a8a8a8;
-    height: 100%;
-    float: left;
-    width: 250px;
-    padding: 10px;
-    background-color: #3a3633;
-    border-top: 1px solid #1a1817;
-    position: absolute;
-    padding-top: 40px;
-}
-
 .center-pane {
     height: 100%;
     width: 100%;
@@ -197,6 +185,7 @@ section {
     color: #222;
     padding-left: 5px;
     font-size: 12px;
+    font-weight: 400;
     height: 18px;
     margin-bottom: 2px;
 }
@@ -271,4 +260,66 @@ section {
     padding: 2px;
     background-color: #bb312f;
     margin-left: 167px;
+}
+
+.left-pane {
+    color: #a8a8a8;
+    float: left;
+    height: 100%;
+    width: 250px;
+    padding: 10px;
+    background-color: #3a3633;
+    border-top: 1px solid #1a1817;
+    position: absolute;
+    padding-top: 40px;
+}
+
+.side-bar .section {
+    border-bottom: 1px solid #a8a8a8;
+    padding-bottom: 10px;
+}
+
+.side-bar .section .section-item {
+    padding: 5px;
+    padding-left: 10px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.side-bar .section .section-item.selected {
+    background-color: wheat;
+}
+
+.side-bar .section .section-header {
+    font-weight: bold;
+    font-size: 13.5px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.side-bar .section .level-indicator {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 5px;
+    background-color: white;
+}
+
+.side-bar .section .level-indicator.level-error,
+.side-bar .section .level-indicator.level-critical,
+.side-bar .section .level-indicator.level-fatal {
+    background-color: #e03836;
+}
+
+.side-bar .section .level-indicator.level-warning {
+    background-color: #f9c019;
+}
+
+.side-bar .section .level-indicator.level-information {
+    background-color: #007acc;
+}
+
+.side-bar .section .level-indicator.level-trace,
+.side-bar .section .level-indicator.level-debug {
+    background-color: lightgray;
 }
