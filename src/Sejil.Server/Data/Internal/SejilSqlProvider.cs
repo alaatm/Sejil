@@ -44,8 +44,8 @@ namespace Sejil.Data.Internal
 $@"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-    {TimestampWhereClause()}
-    {QueryWhereClause()}
+    {timestampWhereClause}
+    {queryWhereClause}{FiltersWhereClause()}
     ORDER BY timestamp DESC
     LIMIT {pageSize} OFFSET {(page - 1) * pageSize}
 ) l
@@ -92,7 +92,36 @@ ORDER BY l.timestamp DESC, p.name";
                     ? ""
                     : timestampWhereClause.Length > 0
                         ? $"AND ({BuildPredicate(queryFilter.QueryText, _nonPropertyColumns)})"
-                        : $"WHERE {BuildPredicate(queryFilter.QueryText, _nonPropertyColumns)}";
+                        : $"WHERE ({BuildPredicate(queryFilter.QueryText, _nonPropertyColumns)})";
+
+            string FiltersWhereClause() =>
+                String.IsNullOrWhiteSpace(queryFilter?.LevelFilter) && (!queryFilter?.ExceptionsOnly ?? true)
+                    ? ""
+                    : timestampWhereClause.Length > 0 || queryWhereClause.Length > 0
+                        ? $" AND ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})"
+                        : $"WHERE ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})";
+        }
+
+        private static string BuildFilterWhereClause(string levelFilter, bool exceptionsOnly)
+        {
+            var sp = new StringBuilder();
+
+            if (!String.IsNullOrWhiteSpace(levelFilter))
+            {
+                sp.AppendFormat("level = '{0}'", levelFilter);
+            }
+
+            if (exceptionsOnly && sp.Length > 0)
+            {
+                sp.Append(" AND ");
+            }
+
+            if (exceptionsOnly)
+            {
+                sp.Append("exception is not null");
+            }
+
+            return sp.ToString();
         }
 
         private static string BuildPredicate(string filterQuery, string[] nonPropertyColumns)

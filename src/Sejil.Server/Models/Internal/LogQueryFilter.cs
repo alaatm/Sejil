@@ -11,5 +11,7 @@ namespace Sejil.Models.Internal
         public string QueryText { get; set; }
         public string DateFilter { get; set; }
         public List<DateTime> DateRangeFilter { get; set; }
+        public string LevelFilter { get; set; }
+        public bool ExceptionsOnly { get; set; }
     }
 }

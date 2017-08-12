@@ -206,6 +206,56 @@ LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name", sql);
         }
 
+        [Fact]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_before_specified_timestamp_with_specified_filter()
+        {
+            // Arrange
+            var timestamp = new DateTime(2017, 8, 3, 14, 56, 33, 876);
+            var levelFilter = "info";
+            var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, timestamp, new LogQueryFilter { LevelFilter = levelFilter });
+
+            // Assert
+            Assert.Equal(
+@"SELECT l.*, p.* from 
+(
+    SELECT * FROM log
+    WHERE (timestamp <= '2017-08-03 14:56:33.876')
+     AND (level = 'info')
+    ORDER BY timestamp DESC
+    LIMIT 100 OFFSET 100
+) l
+LEFT JOIN log_property p ON l.id = p.logId
+ORDER BY l.timestamp DESC, p.name", sql);
+        }
+
+        [Fact]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_query_with_specified_filter()
+        {
+            // Arrange
+            var query = "p=v";
+            var levelFilter = "info";
+            var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { QueryText = query, LevelFilter = levelFilter });
+
+            // Assert
+            Assert.Equal(
+@"SELECT l.*, p.* from 
+(
+    SELECT * FROM log
+    
+    WHERE (id IN (SELECT logId FROM log_property WHERE name = 'p' AND value = 'v')) AND (level = 'info')
+    ORDER BY timestamp DESC
+    LIMIT 100 OFFSET 100
+) l
+LEFT JOIN log_property p ON l.id = p.logId
+ORDER BY l.timestamp DESC, p.name", sql);
+        }
+
         [Theory]
         [MemberData(nameof(GetPagedLogEntriesSql_TestData))]
         public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_query(string query, string expectedSql, params string[] nonPropertyColumns)
@@ -237,6 +287,21 @@ ORDER BY l.timestamp DESC, p.name", sql);
             Assert.Equal(expectedSql, GetInnerPredicate_ts(sql));
         }
 
+        [Theory]
+        [MemberData(nameof(GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_filter_TestData))]
+        public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_filter(string levelFilter, bool exceptionsOnly, string expectedSql)
+        {
+            // Arrange
+            var settingsMoq = new Mock<ISejilSettings>();
+            var provider = new SejilSqlProvider(settingsMoq.Object);
+
+            // Act
+            var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { LevelFilter = levelFilter, ExceptionsOnly = exceptionsOnly });
+
+            // Assert
+            Assert.Equal(expectedSql, GetInnerPredicate(sql));
+        }
+
         [Fact]
         public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateRangeFilter()
         {
@@ -250,7 +315,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
             var sql = provider.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { DateRangeFilter = new List<DateTime> { d1, d2 } });
 
             // Assert
-            Assert.Equal("(timestamp >= '2017-08-01' and timestamp < '2017-08-10')", GetInnerPredicate_ts(sql));
+            Assert.Equal("timestamp >= '2017-08-01' and timestamp < '2017-08-10'", GetInnerPredicate_ts(sql));
         }
 
         public static IEnumerable<object[]> GetPagedLogEntriesSql_TestData()
@@ -384,42 +449,64 @@ ORDER BY l.timestamp DESC, p.name", sql);
             yield return new object[]
             {
                 "5m",
-                "(timestamp >= datetime('now', '-5 Minute'))"
+                "timestamp >= datetime('now', '-5 Minute')"
             };
             yield return new object[]
             {
                 "15m",
-                "(timestamp >= datetime('now', '-15 Minute'))"
+                "timestamp >= datetime('now', '-15 Minute')"
             };
             yield return new object[]
             {
                 "1h",
-                "(timestamp >= datetime('now', '-1 Hour'))"
+                "timestamp >= datetime('now', '-1 Hour')"
             };
             yield return new object[]
             {
                 "6h",
-                "(timestamp >= datetime('now', '-6 Hour'))"
+                "timestamp >= datetime('now', '-6 Hour')"
             };
             yield return new object[]
             {
                 "12h",
-                "(timestamp >= datetime('now', '-12 Hour'))"
+                "timestamp >= datetime('now', '-12 Hour')"
             };
             yield return new object[]
             {
                 "24h",
-                "(timestamp >= datetime('now', '-24 Hour'))"
+                "timestamp >= datetime('now', '-24 Hour')"
             };
             yield return new object[]
             {
                 "2d",
-                "(timestamp >= datetime('now', '-2 Day'))"
+                "timestamp >= datetime('now', '-2 Day')"
             };
             yield return new object[]
             {
                 "5d",
-                "(timestamp >= datetime('now', '-5 Day'))"
+                "timestamp >= datetime('now', '-5 Day')"
+            };
+        }
+
+        public static IEnumerable<object[]> GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_filter_TestData()
+        {
+            yield return new object[]
+            {
+                "info",
+                false,
+                "level = 'info'"
+            };
+            yield return new object[]
+            {
+                null,
+                true,
+                "exception is not null"
+            };
+            yield return new object[]
+            {
+                "info",
+                true,
+                "level = 'info' AND exception is not null"
             };
         }
 
@@ -430,8 +517,8 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     
-    WHERE ", "").Replace(
-@"
+    WHERE (", "").Replace(
+@")
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -445,8 +532,8 @@ ORDER BY l.timestamp DESC, p.name", "");
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-    WHERE ", "").Replace(
-@"
+    WHERE (", "").Replace(
+@")
     
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100

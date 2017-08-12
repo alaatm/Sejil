@@ -26,7 +26,8 @@ describe('Store', () => {
 
         // Assert
         expect(httpClientMoq.post).toHaveBeenCalled();
-        expect(httpClientMoq.post).toHaveBeenCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
         expect(toJS(store.logEntries)).toHaveLength(testEvents.events.length);
         expect(toJS(store.logEntries)).toMatchObject(testEvents.events);
     });
@@ -49,7 +50,7 @@ describe('Store', () => {
         const store = new Store(httpClientMoq);
 
         const expectedPageNumber = 3;
-        const expectedTimestamp = testEvents_page1.events[0].timestamp;
+        const expectedTimestamp = encodeURIComponent(testEvents_page1.events[0].timestamp);
 
         // Act
         await store.loadEvents();
@@ -58,7 +59,8 @@ describe('Store', () => {
 
         // Assert
         expect(httpClientMoq.post).toHaveBeenCalledTimes(3);
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${expectedTimestamp}`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${expectedTimestamp}`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
         expect(toJS(store.logEntries)).toHaveLength(testEvents_page1.events.length + testEvents_page2.events.length + testEvents_page3.events.length);
         expect(toJS(store.logEntries)).toMatchObject(testEvents_page1.events.concat(testEvents_page2.events.concat(testEvents_page3.events)));
     });
@@ -81,7 +83,8 @@ describe('Store', () => {
         await store.loadEvents();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
     });
 
     it('loadEvents() should not advance page number when no results are returned', async () => {
@@ -109,10 +112,11 @@ describe('Store', () => {
         await store.loadEvents();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${testEvents_page1.events[0].timestamp}`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=${expectedPageNumber}&startingTs=${encodeURIComponent(testEvents_page1.events[0].timestamp)}`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
     });
 
-    it('loadEvents() should add queryText and datefilters as content when set', async () => {
+    it('loadEvents() should add queryText as content when set', async () => {
         // Arrange
         const Mock = jest.fn<HttpClient>(() => ({
             get: jest.fn(),
@@ -122,13 +126,32 @@ describe('Store', () => {
         const httpClientMoq = new Mock();
         const store = new Store(httpClientMoq);
         store.queryText = 'prop=val';
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"prop=val","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
+    });
+
+    it('loadEvents() should add date filter as content when set', async () => {
+        // Arrange
+        const Mock = jest.fn<HttpClient>(() => ({
+            get: jest.fn(),
+            post: jest.fn(() => '[]')
+        }));
+
+        const httpClientMoq = new Mock();
+        const store = new Store(httpClientMoq);
         store.dateFilter = '5m';
 
         // Act
         await store.loadEvents();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"prop=val","dateFilter":"5m","dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":"5m","dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
     });
 
     it('loadEvents() should add date range filters as content when set', async () => {
@@ -148,7 +171,45 @@ describe('Store', () => {
 
         // Assert
         expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
-            '{"queryText":"prop=val","dateFilter":null,"dateRangeFilter":["2017-09-01","2017-09-10"]}');
+            '{"queryText":"prop=val","dateFilter":null,"dateRangeFilter":["2017-09-01","2017-09-10"],"levelFilter":null,"exceptionsOnly":false}');
+    });
+
+    it('loadEvents() should add level filter as content when set', async () => {
+        // Arrange
+        const Mock = jest.fn<HttpClient>(() => ({
+            get: jest.fn(),
+            post: jest.fn(() => '[]')
+        }));
+
+        const httpClientMoq = new Mock();
+        const store = new Store(httpClientMoq);
+        store.levelFilter = 'info';
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":"info","exceptionsOnly":false}');
+    });
+
+    it('loadEvents() should add exception filter as content when set', async () => {
+        // Arrange
+        const Mock = jest.fn<HttpClient>(() => ({
+            get: jest.fn(),
+            post: jest.fn(() => '[]')
+        }));
+
+        const httpClientMoq = new Mock();
+        const store = new Store(httpClientMoq);
+        store.exceptionsOnly = true;
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":true}');
     });
 
     it('reset() should load first set of events', async () => {
@@ -172,7 +233,8 @@ describe('Store', () => {
         await store.reset();
 
         // Assert
-        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, '{"queryText":"","dateFilter":null,"dateRangeFilter":null}');
+        expect(httpClientMoq.post).toHaveBeenLastCalledWith(`${rootUrl}/events?page=1`, 
+            '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}');
     });
 
     it('saveQuery() should save query', async () => {

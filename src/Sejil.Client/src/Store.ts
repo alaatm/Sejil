@@ -12,6 +12,8 @@ export default class Store {
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
     dateFilter: string | Date[] | null = null;
+    levelFilter: string | null = null;
+    exceptionsOnly = false;
     private http: IHttpClient;
     private page = 1;
     private startingTimestamp: string | undefined = undefined;
@@ -36,7 +38,9 @@ export default class Store {
         const json = await this.http.post(url, JSON.stringify({
             queryText: this.queryText,
             dateFilter: this.dateFilter instanceof Array ? null : this.dateFilter,
-            dateRangeFilter: this.dateFilter instanceof Array ? this.dateFilter.map(d => formatServerDate(d)) : null
+            dateRangeFilter: this.dateFilter instanceof Array ? this.dateFilter.map(d => formatServerDate(d)) : null,
+            levelFilter: this.levelFilter,
+            exceptionsOnly: this.exceptionsOnly
         }));
         const events = JSON.parse(json) as ILogEntry[];
 
