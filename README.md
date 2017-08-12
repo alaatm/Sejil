@@ -4,7 +4,7 @@
 
 Sejil is a library that enables you to capture, view and filter your ASP.net core app's log events right from your app. It supports structured logging, querying as well as saving log event queries.
 
-### Getting started
+## Getting started
 
 1. Installing package
 
@@ -46,6 +46,24 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     </pre>
 
 3. Navigate to *http://your-app-url/sejil* to view your app's logs.
+
+## Building
+
+To build the project, you just need to clone the repo then run the build command:
+
+<pre>
+git clone https://github.com/alaatm/Sejil.git
+cd ./Sejil
+./build.ps1  # If running Windows
+./build.sh   # If running Linux/OSX
+</pre>
+
+You can run one of the sample apps afterwards, `Sample1.0` targets `netcoreapp1.1` while `Sample2.0` targets `netcoreapp2.0`:
+
+<pre>
+cd ./sample/Sample2.0
+dotnet run
+</pre>
 
 ## License
 
