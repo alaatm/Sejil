@@ -45,7 +45,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     }
     </pre>
 
-3. Navigate to *http://your-app-url/sejil* to see your app's logs.
+3. Navigate to *http://your-app-url/sejil* to view your app's logs.
 
 ## License
 
