@@ -71,6 +71,13 @@ namespace Sejil
                     var controller = GetSejilController(context);
                     controller.SetMinimumLogLevel(context, minLogLevel);
                 });
+
+                routes.MapPost($"{url}/del-query", async context =>
+                {
+                    var queryName = await GetRequestBodyAsync(context.Request);
+                    var controller = GetSejilController(context);
+                    await controller.DeleteQueryAsync(context, queryName);
+                });
             });
 
             return app;

@@ -41,6 +41,19 @@ namespace Sejil.Test.Data
         }
 
         [Fact]
+        public void DeleteQuerySql_returns_correct_sql()
+        {
+            // Arrange
+            var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
+
+            // Act
+            var sql = provider.DeleteQuerySql();
+
+            // Assert
+            Assert.Equal("DELETE FROM log_query WHERE name = @name", sql);
+        }
+
+        [Fact]
         public void GetPagedLogEntriesSql_throws_when_page_arg_is_zero()
         {
             // Arrange

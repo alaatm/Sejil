@@ -40,7 +40,7 @@ export default class Store {
             dateFilter: this.dateFilter instanceof Array ? null : this.dateFilter,
             dateRangeFilter: this.dateFilter instanceof Array ? this.dateFilter.map(d => formatServerDate(d)) : null,
             levelFilter: this.levelFilter,
-            exceptionsOnly: this.exceptionsOnly
+            exceptionsOnly: this.exceptionsOnly,
         }));
         const events = JSON.parse(json) as ILogEntry[];
 
@@ -70,5 +70,15 @@ export default class Store {
         const queries = JSON.parse(json) as ILogQuery[];
 
         runInAction('load queries', () => this.queries = queries);
+    }
+
+    @action public async deleteQuery(q: ILogQuery) {
+        await this.http.post(`${this.rootUrl}/del-query`, q.name);
+        runInAction('delete query', () => {
+            const index = this.queries.findIndex(p => p.name === q.name);
+            if (index >= 0) {
+                this.queries.splice(index, 1);
+            }
+        });
     }
 }

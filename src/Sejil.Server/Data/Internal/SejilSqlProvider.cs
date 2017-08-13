@@ -25,6 +25,9 @@ namespace Sejil.Data.Internal
         public string InsertLogQuerySql()
             => "INSERT INTO log_query (name, query) VALUES (@name, @query)";
 
+        public string DeleteQuerySql()
+            => "DELETE FROM log_query WHERE name = @name";
+
         public string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, LogQueryFilter queryFilter)
         {
             if (page <= 0)

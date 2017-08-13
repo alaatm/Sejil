@@ -74,6 +74,46 @@ namespace Sejil.Test.Data
         }
 
         [Fact]
+        public async Task DeleteQueryAsync_deletes_specified_query()
+        {
+            // Arrange
+            var db = Guid.NewGuid().ToString();
+            InitializeDatabse(db);
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
+            var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+            await repository.SaveQueryAsync(new LogQuery { Name = "Test1", Query = "q1" });
+
+            // Act
+            var result = await repository.DeleteQueryAsync("Test1");
+
+            // Assert
+            Assert.True(result);
+            var queries = await repository.GetSavedQueriesAsync();
+            Assert.Equal(0, queries.Count());
+        }
+
+        [Fact]
+        public async Task DeleteQueryAsync_returns_false_when_specified_query_does_not_exist()
+        {
+            // Arrange
+            var db = Guid.NewGuid().ToString();
+            InitializeDatabse(db);
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
+            var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+            await repository.SaveQueryAsync(new LogQuery { Name = "Test1", Query = "q1" });
+
+            // Act
+            var result = await repository.DeleteQueryAsync("Test2");
+
+            // Assert
+            Assert.False(result);
+            var queries = await repository.GetSavedQueriesAsync();
+            Assert.Equal(1, queries.Count());
+        }
+
+        [Fact]
         public async Task GetEventsPageAsync_no_props_returns_events_page()
         {
             // Arrange

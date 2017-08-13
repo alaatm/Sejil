@@ -15,5 +15,6 @@ namespace Sejil.Routing.Internal
         Task SaveQueryAsync(HttpContext context, LogQuery logQuery);
         Task GetQueriesAsync(HttpContext context);
         void SetMinimumLogLevel(HttpContext context, string minLogLevel);
+        Task DeleteQueryAsync(HttpContext context, string queryName);
     }
 }

@@ -31,6 +31,7 @@ export default class FilterBar extends React.Component<IProps, IState> {
         this.updateFilterText = this.updateFilterText.bind(this);
         this.onPeriodRangeChange = this.onPeriodRangeChange.bind(this);
         this.onClearPeriodClick = this.onClearPeriodClick.bind(this);
+        this.saveFilter = this.saveFilter.bind(this);
         this.state = { activeFilterPeriod: '', periodFilterRange: [] };
     }
 
@@ -40,6 +41,20 @@ export default class FilterBar extends React.Component<IProps, IState> {
         if (e.keyCode === 13) {
             e.preventDefault();
             store.reset();
+        }
+    }
+
+    saveFilter() {
+        const store = this.props.store || new Store();
+
+        const filterName = prompt('Enter filter name');
+        if (filterName != null && filterName.length) {
+            if (store.queries.findIndex(p => p.name === filterName) >= 0) {
+                alert('Query name already exist.');
+                return;
+            }
+
+            store.saveQuery(filterName, store.queryText);
         }
     }
 
@@ -58,7 +73,7 @@ export default class FilterBar extends React.Component<IProps, IState> {
     @action setPeriodFilter(period: string, range: Moment[]) {
         this.setState({
             activeFilterPeriod: period,
-            periodFilterRange: range
+            periodFilterRange: range,
         });
 
         const store = this.props.store || new Store();
@@ -90,19 +105,22 @@ export default class FilterBar extends React.Component<IProps, IState> {
         return (
             <LocaleProvider locale={enUS}>
                 <div className="filter-bar">
-                    <Input
-                        className="filter-text"
-                        placeholder="Type a filter then hit enter to filter the logs"
-                        spellCheck={false}
-                        value={store.queryText}
-                        onKeyDown={this.onKeyDown}
-                        onChange={this.updateFilterText} />
+                    <div>
+                        <Input
+                            className="filter-text"
+                            placeholder="Type a filter then hit enter to filter the logs"
+                            spellCheck={false}
+                            value={store.queryText}
+                            onKeyDown={this.onKeyDown}
+                            onChange={this.updateFilterText} />
+                        <Button className="filter-save" disabled={store.queryText.length === 0} onClick={this.saveFilter}>Save</Button>
+                    </div>
 
                     <div className="period-filter">
                         <div className="left">
                             <ButtonGroup className="filter-group">
                                 {['5m', '15m', '1h', '6h', '12h', '24h', '2d', '5d'].map((b, i) => (
-                                    this.state.activeFilterPeriod == b
+                                    this.state.activeFilterPeriod === b
                                         ? <Button key={i} type="primary" onClick={this.setPeriodFilter.bind(this, b)}>{b}</Button>
                                         : <Button key={i} onClick={this.onSetPeriodClick.bind(this, b)}>{b}</Button>
                                 ))}

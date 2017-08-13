@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import { action } from 'mobx';
 import { inject, observer } from 'mobx-react';
+import * as AntIcon from 'antd/lib/icon';
 import Store from '../Store';
 import ILogQuery from '../interfaces/ILogQuery';
 
@@ -25,6 +26,11 @@ export default class SavedQueries extends React.Component<IProps, {}> {
         store.reset();
     }
 
+    deleteQuery(q: ILogQuery) {
+        const store = this.props.store || new Store();
+        store.deleteQuery(q);
+    }
+
     async componentDidMount() {
         const store = this.props.store || new Store();
         await store.loadQueries();
@@ -32,15 +38,17 @@ export default class SavedQueries extends React.Component<IProps, {}> {
 
     render() {
         const store = this.props.store || new Store();
+        const Icon = AntIcon as any; // To bypass compiler error
 
         return (
             <div className="section">
                 <div className="section-header">Saved Queries</div>
                 {
-                    store.queries.map(q => 
-                        <div className="section-item" 
-                             onClick={this.loadQuery.bind(this, q)}>
-                             {q.name}
+                    store.queries.map(q =>
+                        <div className="section-item"
+                            onClick={this.loadQuery.bind(this, q)}>
+                            {q.name}
+                            <Icon type="delete" style={{ float: 'right' }} title="Delete" onClick={this.deleteQuery.bind(this, q)} />
                         </div>)
                 }
             </div>

@@ -14,7 +14,7 @@ namespace Sejil.Routing.Internal
 {
     public class SejilController : ISejilController
     {
-        private static JsonSerializerSettings _camelCaseSerializerSetting = 
+        private static JsonSerializerSettings _camelCaseSerializerSetting =
             new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         private readonly ISejilRepository _repository;
@@ -59,6 +59,11 @@ namespace Sejil.Routing.Internal
             context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
                 ? StatusCodes.Status200OK
                 : StatusCodes.Status400BadRequest;
+        }
+
+        public async Task DeleteQueryAsync(HttpContext context, string queryName)
+        {
+            await _repository.DeleteQueryAsync(queryName);
         }
     }
 }

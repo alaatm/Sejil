@@ -120,6 +120,24 @@ namespace Sejil.Test
             controllerMoq.Verify(p => p.SetMinimumLogLevel(It.IsAny<HttpContext>(), targetMinLogLevel), Times.Once);
         }
 
+        [Fact]
+        public async Task HttpPost_del_query_url_calls_controller_DeleteQueryAsync_method()
+        {
+            // Arrange
+            var url = "/sejil";
+            var query = "query";
+            var target = $"{url}/del-query";
+            var controllerMoq = new Mock<ISejilController>();
+            var server = CreateServer(url, controllerMoq.Object);
+            var content = new StringContent(query);
+
+            // Act
+            await server.CreateClient().PostAsync(target, content);
+
+            // Assert
+            controllerMoq.Verify(p => p.DeleteQueryAsync(It.IsAny<HttpContext>(), query), Times.Once);
+        }
+
         public static IEnumerable<object[]> HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData()
         {
             yield return new object[]

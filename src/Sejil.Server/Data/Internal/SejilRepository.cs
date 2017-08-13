@@ -15,7 +15,7 @@ using Sejil.Models.Internal;
 
 namespace Sejil.Data.Internal
 {
-    public class SejilRepository: ISejilRepository
+    public class SejilRepository : ISejilRepository
     {
         private readonly ISejilSqlProvider _sql;
         private readonly string _connectionString;
@@ -79,6 +79,21 @@ namespace Sejil.Data.Internal
                     }).ToList();
 
                 return lookup.Values.AsEnumerable();
+            }
+        }
+
+        public async Task<bool> DeleteQueryAsync(string queryName)
+        {
+            using (var conn = new SqliteConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = _sql.DeleteQuerySql();
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Parameters.AddWithValue("@name", queryName);
+                    return await cmd.ExecuteNonQueryAsync() > 0;
+                }
             }
         }
     }

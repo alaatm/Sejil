@@ -218,6 +218,21 @@ namespace Sejil.Test.Routing
             responseMoq.VerifySet(p => p.StatusCode = expectedStatusCode);
         }
 
+        [Fact]
+        public async Task DeleteQueryAsync_calls_repository_DeleteQueryAsync()
+        {
+            // Arrange
+            var queryName = "query";
+            var repositoryMoq = new Mock<ISejilRepository>();
+            var controller = new SejilController(repositoryMoq.Object, Mock.Of<ISejilSettings>());
+
+            // Act
+            await controller.DeleteQueryAsync(CreateContextMoq().contextMoq.Object, queryName);
+
+            // Assert
+            repositoryMoq.Verify(p => p.DeleteQueryAsync(queryName), Times.Once);
+        }
+
         private (IEnumerable<LogEntry> logEntries, string logEntriesJson) GetTestLogEntries()
         {
             var events = new List<LogEntry>()

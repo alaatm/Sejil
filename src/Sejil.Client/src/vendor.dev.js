@@ -8,6 +8,8 @@ import 'mobx-react';
 import 'mobx-react-devtools';
 import 'tslib';
 
+import 'antd/lib/icon';
+import 'antd/lib/icon/style/css';
 import 'antd/lib/input';
 import 'antd/lib/input/style/css';
 import 'antd/lib/button';
