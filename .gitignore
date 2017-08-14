@@ -12,3 +12,5 @@ package-lock.json
 
 src/Sejil.Server/index.html
 coverage/
+
+ignore/
