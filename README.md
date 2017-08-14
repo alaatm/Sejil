@@ -44,6 +44,9 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     Add highlited code below in your startup.cs
 
     <pre>
+    using Sejil;
+    ...
+    
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
         ...
