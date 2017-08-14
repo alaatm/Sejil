@@ -1,6 +1,8 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+// Credits to https://github.com/aspnet/SignalR/blob/dev/client-ts/Microsoft.AspNetCore.SignalR.Client.TS/HttpClient.ts
+
 export interface IHttpClient {
     get(url: string): Promise<string>;
     post(url: string, content: string): Promise<string>;
