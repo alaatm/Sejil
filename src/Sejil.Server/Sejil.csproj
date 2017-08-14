@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>View and filter your ASP.net core log events right from your app </Description>
+    <Summary>A pluggable logs viewer</Summary>
+    <Description>Capture, view and filter your ASP.net core log events right from your app</Description>
     <Authors>Alaa Masoud</Authors>
+    <Copyright>Copyright © Alaa Masoud</Copyright>
     <PackageId>Sejil</PackageId>
     <PackageTags>sejil;logging;structured</PackageTags>
     <PackageIconUrl></PackageIconUrl>
@@ -13,6 +15,9 @@
     <AssemblyName>Sejil</AssemblyName>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <DebugType>full</DebugType>
+    <AssemblyOriginatorKeyFile>Sejil.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
@@ -26,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.1" />
-    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="Dapper.StrongName" Version="1.50.2" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
