@@ -15,45 +15,46 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
 1. Installing package
 
-    `Install-Package Sejil`
+    ```powershell
+    Install-Package Sejil
+    ```
 
 2. Adding code
 
     For ASP.net Core 1.x.x:
 
-    <pre>
+    ```csharp
     public static void Main(string[] args)
     {
         var host = new WebHostBuilder()
-            <b>.AddSejil("/sejil", LogLevel.Debug)</b>
-            .UseKestrel()
-        ...
+            .AddSejil("/sejil", LogLevel.Debug)
+            // ...
     }
-    </pre>
+    ```
 
     For ASP.net core 2.x.x:
 
-    <pre>
+    ```csharp
     public static IWebHost BuildWebHost(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
-            <b>.AddSejil("/sejil", LogLevel.Debug)</b>
-            .UseStartup<Startup>()
-            .Build();
-    </pre>
+            .AddSejil("/sejil", LogLevel.Debug)
+            // ...
+    ```
 
-    Add highlited code below in your startup.cs
+    Add code below in your startup.cs
 
-    <pre>
-    <b>using Sejil;</b>
-    ...
-    
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-        ...
-        <b>app.UseSejil();</b>
-        ...
+    ```csharp
+    using Sejil;
+
+    public class Startup
+    {    
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            app.UseSejil();
+            // ...
+        }
     }
-    </pre>
+    ```
 
 3. Navigate to *http://your-app-url/sejil* to view your app's logs.
 
@@ -61,19 +62,19 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
 To build the project, you just need to clone the repo then run the build command:
 
-<pre>
+```powershell
 git clone https://github.com/alaatm/Sejil.git
 cd ./Sejil
 ./build.ps1  # If running Windows
 ./build.sh   # If running Linux/OSX
-</pre>
+```
 
 You can run one of the sample apps afterwards, `Sample1.0` targets `netcoreapp1.1` while `Sample2.0` targets `netcoreapp2.0`:
 
-<pre>
+```powershell
 cd ./sample/Sample2.0
 dotnet run
-</pre>
+```
 
 ## Features and Screenshots
 
