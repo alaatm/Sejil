@@ -102,6 +102,7 @@ Task("Pack")
 	{ 
 		Configuration = configuration,
 		OutputDirectory = Directory(_packFolder),
+		IncludeSymbols = true,
 		NoBuild = true
 	});
 });
