@@ -21,7 +21,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
 2. Adding code
 
-    For ASP.net Core 1.x.x:
+    For ASP.net Core 1.x.x, add below code to **Program.cs**:
 
     ```csharp
     public static void Main(string[] args)
@@ -32,7 +32,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     }
     ```
 
-    For ASP.net core 2.x.x:
+    For ASP.net core 2.x.x, add below code to **Program.cs**:
 
     ```csharp
     public static IWebHost BuildWebHost(string[] args) =>
@@ -41,7 +41,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
             // ...
     ```
 
-    Add code below in your startup.cs
+    Add below code to **Startup.cs**
 
     ```csharp
     using Sejil;
