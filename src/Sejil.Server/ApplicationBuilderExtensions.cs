@@ -36,7 +36,7 @@ namespace Sejil
                 routes.MapGet(url, async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.GetIndexAsync(context);
+                    await controller.GetIndexAsync();
                 });
 
                 routes.MapPost($"{url}/events", async context =>
@@ -47,7 +47,7 @@ namespace Sejil
                     var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
                     var controller = GetSejilController(context);
-                    await controller.GetEventsAsync(context, page, dateParsed ? startingTs : (DateTime?)null, query);
+                    await controller.GetEventsAsync(page, dateParsed ? startingTs : (DateTime?)null, query);
                 });
 
                 routes.MapPost($"{url}/log-query", async context =>
@@ -56,27 +56,27 @@ namespace Sejil
                         await GetRequestBodyAsync(context.Request));
 
                     var controller = GetSejilController(context);
-                    await controller.SaveQueryAsync(context, logQuery);
+                    await controller.SaveQueryAsync(logQuery);
                 });
 
                 routes.MapGet($"{url}/log-queries", async context =>
                 {
                     var controller = GetSejilController(context);
-                    await controller.GetQueriesAsync(context);
+                    await controller.GetQueriesAsync();
                 });
 
                 routes.MapPost($"{url}/min-log-level", async context =>
                 {
                     var minLogLevel = await GetRequestBodyAsync(context.Request);
                     var controller = GetSejilController(context);
-                    controller.SetMinimumLogLevel(context, minLogLevel);
+                    controller.SetMinimumLogLevel(minLogLevel);
                 });
 
                 routes.MapPost($"{url}/del-query", async context =>
                 {
                     var queryName = await GetRequestBodyAsync(context.Request);
                     var controller = GetSejilController(context);
-                    await controller.DeleteQueryAsync(context, queryName);
+                    await controller.DeleteQueryAsync(queryName);
                 });
             });
 

@@ -10,6 +10,8 @@ using Sejil.Data.Internal;
 using Sejil.Routing.Internal;
 using Sejil.Configuration.Internal;
 using Sejil.Logging;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.AspNetCore.Hosting
 {
@@ -28,8 +30,9 @@ namespace Microsoft.AspNetCore.Hosting
 
             return builder
                 .ConfigureLogging((logging) => logging.AddSerilog(CreateLogger(settings)))
-                .ConfigureServices(services => 
+                .ConfigureServices(services =>
                 {
+                    services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                     services.AddSingleton<ISejilSettings>(settings);
                     services.AddScoped<ISejilRepository, SejilRepository>();
                     services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();

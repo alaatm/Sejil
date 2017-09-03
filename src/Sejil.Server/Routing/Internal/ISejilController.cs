@@ -10,11 +10,11 @@ namespace Sejil.Routing.Internal
 {
     public interface ISejilController
     {
-        Task GetIndexAsync(HttpContext context);
-        Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, LogQueryFilter queryFilter);
-        Task SaveQueryAsync(HttpContext context, LogQuery logQuery);
-        Task GetQueriesAsync(HttpContext context);
-        void SetMinimumLogLevel(HttpContext context, string minLogLevel);
-        Task DeleteQueryAsync(HttpContext context, string queryName);
+        Task GetIndexAsync();
+        Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter);
+        Task SaveQueryAsync(LogQuery logQuery);
+        Task GetQueriesAsync();
+        void SetMinimumLogLevel(string minLogLevel);
+        Task DeleteQueryAsync(string queryName);
     }
 }

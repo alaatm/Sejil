@@ -19,49 +19,51 @@ namespace Sejil.Routing.Internal
 
         private readonly ISejilRepository _repository;
         private readonly ISejilSettings _settings;
+        private HttpContext _context { get; set; }
 
-        public SejilController(ISejilRepository repository, ISejilSettings settings)
+        public SejilController(IHttpContextAccessor contextAccessor, ISejilRepository repository, ISejilSettings settings)
         {
+            _context = contextAccessor.HttpContext;
             _repository = repository;
             _settings = settings;
         }
 
-        public async Task GetIndexAsync(HttpContext context)
+        public async Task GetIndexAsync()
         {
-            context.Response.ContentType = "text/html";
-            await context.Response.WriteAsync(_settings.SejilAppHtml);
+            _context.Response.ContentType = "text/html";
+            await _context.Response.WriteAsync(_settings.SejilAppHtml);
         }
 
-        public async Task GetEventsAsync(HttpContext context, int page, DateTime? startingTs, LogQueryFilter queryFilter)
+        public async Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter)
         {
             var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
 
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
         }
 
-        public async Task SaveQueryAsync(HttpContext context, LogQuery logQuery)
+        public async Task SaveQueryAsync(LogQuery logQuery)
         {
-            context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
+            _context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
                 ? StatusCodes.Status201Created
                 : StatusCodes.Status500InternalServerError;
         }
 
-        public async Task GetQueriesAsync(HttpContext context)
+        public async Task GetQueriesAsync()
         {
             var logQueryList = await _repository.GetSavedQueriesAsync();
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
         }
 
-        public void SetMinimumLogLevel(HttpContext context, string minLogLevel)
+        public void SetMinimumLogLevel(string minLogLevel)
         {
-            context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
+            _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
                 ? StatusCodes.Status200OK
                 : StatusCodes.Status400BadRequest;
         }
 
-        public async Task DeleteQueryAsync(HttpContext context, string queryName)
+        public async Task DeleteQueryAsync(string queryName)
         {
             await _repository.DeleteQueryAsync(queryName);
         }

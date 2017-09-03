@@ -35,7 +35,7 @@ namespace Sejil.Test
             await server.CreateClient().GetAsync(target);
 
             // Assert
-            controllerMoq.Verify(p => p.GetIndexAsync(It.IsAny<HttpContext>()), Times.Once);
+            controllerMoq.Verify(p => p.GetIndexAsync(), Times.Once);
         }
 
         [Theory]
@@ -56,7 +56,7 @@ namespace Sejil.Test
             await server.CreateClient().PostAsync(target, content);
 
             // Assert
-            controllerMoq.Verify(p => p.GetEventsAsync(It.IsAny<HttpContext>(),
+            controllerMoq.Verify(p => p.GetEventsAsync(
                 expectedPageArg, expectedstartingTsArg, It.Is<LogQueryFilter>(qf =>
                 qf.QueryText == expectedQueryFilterArg.QueryText &&
                 qf.DateFilter == expectedQueryFilterArg.DateFilter &&
@@ -82,7 +82,7 @@ namespace Sejil.Test
             await server.CreateClient().PostAsync(target, content);
 
             // Assert
-            controllerMoq.Verify(p => p.SaveQueryAsync(It.IsAny<HttpContext>(),
+            controllerMoq.Verify(p => p.SaveQueryAsync(
                 It.Is<LogQuery>(v => v.Name == logQuery.Name && v.Query == logQuery.Query)), Times.Once);
         }
 
@@ -99,7 +99,7 @@ namespace Sejil.Test
             await server.CreateClient().GetAsync(target);
 
             // Assert
-            controllerMoq.Verify(p => p.GetQueriesAsync(It.IsAny<HttpContext>()), Times.Once);
+            controllerMoq.Verify(p => p.GetQueriesAsync(), Times.Once);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Sejil.Test
             await server.CreateClient().PostAsync(target, content);
 
             // Assert
-            controllerMoq.Verify(p => p.SetMinimumLogLevel(It.IsAny<HttpContext>(), targetMinLogLevel), Times.Once);
+            controllerMoq.Verify(p => p.SetMinimumLogLevel(targetMinLogLevel), Times.Once);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Sejil.Test
             await server.CreateClient().PostAsync(target, content);
 
             // Assert
-            controllerMoq.Verify(p => p.DeleteQueryAsync(It.IsAny<HttpContext>(), query), Times.Once);
+            controllerMoq.Verify(p => p.DeleteQueryAsync(query), Times.Once);
         }
 
         public static IEnumerable<object[]> HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData()

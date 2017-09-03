@@ -56,7 +56,8 @@ namespace Sejil.Test
             // Arrange
             var webhostBuilder = new WebHostBuilder()
                 .Configure(app => { })
-                .ConfigureServices(services => services.AddSingleton<IServer>(Mock.Of<IServer>()));
+                .ConfigureServices(services =>
+                    services.AddSingleton<IServer>(Mock.Of<IServer>()));
 
             // Act
             webhostBuilder.AddSejil("/sejil", LogLevel.Debug);
