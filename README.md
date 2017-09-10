@@ -7,13 +7,13 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 ## Quick Links
 
 - [Getting started](#getting-started)
-- [Building](#building)
 - [Features and Screenshots](#features-and-screenshots)
+- [Building](#building)
 - [License](#license)
 
 ## Getting started
 
-1. Installing package
+1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
     Install-Package -IncludePrerelease Sejil
@@ -58,24 +58,6 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
 3. Navigate to *http://your-app-url/sejil* to view your app's logs.
 
-## Building
-
-To build the project, you just need to clone the repo then run the build command:
-
-```powershell
-git clone https://github.com/alaatm/Sejil.git
-cd ./Sejil
-./build.ps1  # If running Windows
-./build.sh   # If running Linux/OSX
-```
-
-You can run one of the sample apps afterwards, `Sample1.0` targets `netcoreapp1.1` while `Sample2.0` targets `netcoreapp2.0`:
-
-```powershell
-cd ./sample/Sample2.0
-dotnet run
-```
-
 ## Features and Screenshots
 
 - View your app's logs
@@ -101,6 +83,24 @@ dotnet run
 - Load your saved queries
 
     <img src="./assets/006-screenshot-load-query_opt.jpg" width="800">
+
+## Building
+
+To build the project, you just need to clone the repo then run the build command:
+
+```powershell
+git clone https://github.com/alaatm/Sejil.git
+cd ./Sejil
+./build.ps1  # If running Windows
+./build.sh   # If running Linux/OSX
+```
+
+You can run one of the sample apps afterwards, `Sample1.0` targets `netcoreapp1.1` while `Sample2.0` targets `netcoreapp2.0`:
+
+```powershell
+cd ./sample/Sample2.0
+dotnet run
+```
 
 ## License
 
