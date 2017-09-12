@@ -45,7 +45,8 @@ namespace Sejil.Logging.Sinks
                         {
                             foreach (var logEvent in events)
                             {
-                                if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") && 
+                                // Do not log events that were generated from browsing Sejil URL.
+                                if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
                                     p.Value.ToString().Contains(_uri)))
                                 {
                                     continue;

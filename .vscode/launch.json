@@ -1,12 +1,11 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
+    "configurations": [{
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/sample/Sample2.0/bin/Debug/netcoreapp2.0/Sample.dll",
+            "program": "${workspaceRoot}/sample/Sample2.0/bin/Debug/netcoreapp2.0/Sample2.0.dll",
             "args": [],
             "cwd": "${workspaceRoot}/sample/Sample2.0",
             "stopAtEntry": false,
