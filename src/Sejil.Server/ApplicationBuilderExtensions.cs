@@ -11,6 +11,7 @@ using Sejil.Configuration.Internal;
 using Sejil.Routing.Internal;
 using Newtonsoft.Json;
 using Sejil.Models.Internal;
+using Serilog.Context;
 #if NETSTANDARD1_6
 using Sejil.Routing;
 #elif NETSTANDARD2_0
@@ -30,6 +31,17 @@ namespace Sejil
         {
             var settings = app.ApplicationServices.GetService(typeof(ISejilSettings)) as SejilSettings;
             var url = settings.Url.Substring(1); // Skip the '/'
+
+            app.Use(async (context, next) =>
+                    {
+                        var userName = context.User.Identity.IsAuthenticated
+                            ? context.User.Identity.Name
+                            : context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                        using (LogContext.PushProperty("Username", userName))
+                        {
+                            await next.Invoke();
+                        }
+                    });
 
             app.UseRouter(routes =>
             {
