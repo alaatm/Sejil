@@ -1,16 +1,20 @@
-// Copyright (C) 2017 Alaa Masoud
-// See the LICENSE file in the project root for more information.
+import './index.css';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as mobx from 'mobx';
-// import DevTools from 'mobx-react-devtools';
+
 import App from './components/App';
 
 mobx.useStrict(true);
 
+let mobxDevTools: JSX.Element | boolean = false;
+if (process.env.NODE_ENV === 'development') {
+    const DevTools = require('mobx-react-devtools').default;
+    mobxDevTools = <DevTools />;
+}
+
 ReactDOM.render(
-    // <div> <App /><DevTools /> </div>,
-    <div> <App /> </div>,
-    document.getElementById('app'),
+    <div>{mobxDevTools}<App /></div>,
+    document.getElementById('root') as HTMLElement
 );

@@ -3,16 +3,17 @@
 
 import * as React from 'react';
 
-import { action } from 'mobx';
 import { inject, observer } from 'mobx-react';
+
 import Store from '../Store';
+import { action } from 'mobx';
 
 interface IProps {
     store?: Store;
 }
 
 interface IState {
-    selected: boolean
+    selected: boolean;
 }
 
 @inject('store')
@@ -30,9 +31,8 @@ export default class ExceptionsFilter extends React.Component<IProps, IState> {
             selected: true
         });
 
-        const store = this.props.store || new Store();
-        store.exceptionsOnly = true;
-        store.reset();
+        this.props.store!.exceptionsOnly = true;
+        this.props.store!.reset();
     }
 
     clearFilter() {
@@ -40,9 +40,8 @@ export default class ExceptionsFilter extends React.Component<IProps, IState> {
             selected: false
         });
 
-        const store = this.props.store || new Store();
-        store.exceptionsOnly = false;
-        store.reset();
+        this.props.store!.exceptionsOnly = false;
+        this.props.store!.reset();
     }
 
     render() {

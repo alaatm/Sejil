@@ -1,8 +1,11 @@
+#addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json"
 #tool nuget:?package=OpenCover
 #tool nuget:?package=ReportGenerator
 #r "cake-tools\Cake.Npm.dll"
 #r "cake-tools\Cake.Webpack.dll"
 #r "cake-tools\Cake.Gulp.dll"
+
+using Newtonsoft.Json.Linq;
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -16,7 +19,7 @@ var configuration = Argument("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 // Define directories.
-const string CLIENT_DIR = "./src/Sejil.Client";
+const string CLIENT_DIR = "./src/Sejil.Client/build";
 const string SERVER_DIR = "./src/Sejil.Server";
 const string SERVER_TESTS_DIR = "./test/Sejil.Server.Test";
 
@@ -43,31 +46,32 @@ Task("Clean")
 	if (DirectoryExists("./test/Sejil.Server.Test/obj")) DeleteDirectory("./test/Sejil.Server.Test/obj", true);
 
 	if (DirectoryExists(_packFolder)) DeleteDirectory(_packFolder, true);
-	if (DirectoryExists(System.IO.Path.Combine(CLIENT_DIR, "dist"))) DeleteDirectory(System.IO.Path.Combine(CLIENT_DIR, "dist"), true);
+	if (DirectoryExists(CLIENT_DIR) DeleteDirectory(CLIENT_DIR, true);
 });
 
 Task("ClientBuild")
 	.Does(() =>
 {
-	// ./src/Sejil.Client/> npm install
+	//./src/Sejil.Client/> npm install
 	Npm.FromPath(CLIENT_DIR).Install();
-	// ./src/Sejil.Client/> webpack
-	Webpack.FromPath(CLIENT_DIR).Local();
-	// ./src/Sejil.Client/> gulp
-	Gulp.FromPath(CLIENT_DIR).Local();
+	// ./src/Sejil.Client/> npm run build
+	Npm.FromPath(CLIENT_DIR).RunScript("build");
 });
 
 Task("CopyEmbeddedHtml")
 	.Does(() =>
 {
 	var html = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "index.html"));
-	var appCss = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "dist/app.min.css"));
-	var vendorScript = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "dist/vendor.js"));
-	var appScript = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "dist/app.js"));
+	var manifest = JObject.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "asset-manifest.json")));
+	var cssPath = manifest["main.css"].ToString();
+	var jsPath = manifest["main.js"].ToString();
+	var appCss = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, cssPath));
+	appCss = appCss.Substring(0, appCss.IndexOf("/*# sourceMappingURL=main."));
+	var appJs = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, jsPath));
+	appJs = appJs.Substring(0, appJs.IndexOf("//# sourceMappingURL=main"));
 
-	html = html.Replace("<script src=\"./dist/vendor.js\"></script>", "<script>" + vendorScript + "</script>");
-	html = html.Replace("<script src=\"./dist/app.js\"></script>", "<script>" + appScript + "</script>");
-	html = html.Replace("<link rel=\"stylesheet\" href=\"app.css\">", "<style>" + appCss + "</style>");
+	html = html.Replace("<script type=\"text/javascript\" src=\"/" + jsPath +"\"></script>", "<script>" + appJs + "</script>");
+	html = html.Replace("<link href=\"/" + cssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
 
 	System.IO.File.WriteAllText(System.IO.Path.Combine(SERVER_DIR, "index.html"), html);
 });

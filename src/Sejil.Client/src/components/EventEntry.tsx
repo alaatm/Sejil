@@ -1,10 +1,13 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+import './EventEntry.css';
+
 import * as React from 'react';
-import { formatLogEntryDate } from '../formatDate';
+
 import EventEntryProperties from './EventEntryProperties';
 import ILogEntry from '../interfaces/ILogEntry';
+import { formatLogEntryDate } from '../misc/formatDate';
 
 interface IProps {
     entry: ILogEntry;
@@ -38,7 +41,7 @@ export default class EventEntry extends React.Component<IProps, IState> {
                 <div className="log-entry" onClick={this.toggleEvent}>
                     <div className="timestamp">{timestamp}</div>
                     <div className="message">
-                        <span className={levelClass} title={entry.level}></span>
+                        <span className={levelClass} title={entry.level} />
                         {entry.message}
                     </div>
                 </div>

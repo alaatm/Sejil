@@ -37,9 +37,9 @@ function getMonthName(n: number) {
         case 9: return 'Oct';
         case 10: return 'Nov';
         case 11: return 'Dec';
+        default:
+            throw new Error('Invalid month number.');
     }
-
-    throw new Error('Invalid month number.');
 }
 
 function pad(num: number, size: number) {

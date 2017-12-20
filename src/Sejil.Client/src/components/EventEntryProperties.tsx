@@ -2,7 +2,8 @@
 // See the LICENSE file in the project root for more information.
 
 import * as React from 'react';
-import ILogEntryProperty from '../interfaces/ILogEntryProperty';
+
+import { ILogEntryProperty } from '../interfaces';
 
 interface IProps {
     props: ILogEntryProperty[];

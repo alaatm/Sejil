@@ -3,11 +3,12 @@
 
 import * as React from 'react';
 
-import { action } from 'mobx';
 import { inject, observer } from 'mobx-react';
-import * as AntIcon from 'antd/lib/icon';
+
+import { ILogQuery } from '../interfaces';
+import { Icon } from 'antd';
 import Store from '../Store';
-import ILogQuery from '../interfaces/ILogQuery';
+import { action } from 'mobx';
 
 interface IProps {
     store?: Store;
@@ -21,35 +22,36 @@ export default class SavedQueries extends React.Component<IProps, {}> {
     }
 
     @action loadQuery(q: ILogQuery) {
-        const store = this.props.store || new Store();
-        store.queryText = q.query;
-        store.reset();
+        this.props.store!.queryText = q.query;
+        this.props.store!.reset();
     }
 
     deleteQuery(q: ILogQuery) {
-        const store = this.props.store || new Store();
-        store.deleteQuery(q);
+        this.props.store!.deleteQuery(q);
     }
 
     async componentDidMount() {
-        const store = this.props.store || new Store();
-        await store.loadQueries();
+        await this.props.store!.loadQueries();
     }
 
     render() {
-        const store = this.props.store || new Store();
-        const Icon = AntIcon as any; // To bypass compiler error
-
         return (
             <div className="section">
                 <div className="section-header">Saved Queries</div>
-                {
-                    store.queries.map(q =>
-                        <div className="section-item"
-                            onClick={this.loadQuery.bind(this, q)}>
-                            {q.name}
-                            <Icon type="delete" style={{ float: 'right' }} title="Delete" onClick={this.deleteQuery.bind(this, q)} />
-                        </div>)
+                {this.props.store!.queries.map((q, i) =>
+                    <div
+                        key={i}
+                        className="section-item"
+                        onClick={this.loadQuery.bind(this, q)}
+                    >
+                        {q.name}
+                        <Icon
+                            type="delete"
+                            style={{ float: 'right' }}
+                            title="Delete"
+                            onClick={this.deleteQuery.bind(this, q)}
+                        />
+                    </div>)
                 }
             </div>
         );

@@ -1,13 +1,15 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+import './App.css';
 
 import * as React from 'react';
-import { Provider } from 'mobx-react';
-import Store from '../Store';
+
 import EventList from './EventList';
 import FilterBar from './FilterBar';
+import { Provider } from 'mobx-react';
 import SideBar from './SideBar';
+import Store from '../Store';
 
 export default class App extends React.Component<{}, {}> {
     render() {

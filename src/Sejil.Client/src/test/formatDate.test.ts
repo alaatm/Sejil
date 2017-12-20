@@ -1,7 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-import { formatLogEntryDate, formatServerDate } from '../src/formatDate';
+import { formatLogEntryDate, formatServerDate } from '../misc/formatDate';
 
 describe('dateFormat() tests', () => {
     it('formatLogEntryDate() should return a date formatted as dd MMM yyyy HH:mm:ss.fff', () => {
@@ -46,7 +46,6 @@ function getMonth(i: number) {
         case 9: return 'Oct';
         case 10: return 'Nov';
         case 11: return 'Dec';
+        default: return '';
     }
-
-    return '';
 }

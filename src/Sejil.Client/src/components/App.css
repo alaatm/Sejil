@@ -1,0 +1,42 @@
+.wrapper {
+    height: 100%;
+}
+
+.header {
+    padding: 10px;
+    height: 40px;
+    width: 250px;
+    position: fixed;
+    background-color: #3a3633;
+    color: #a8a8a8;
+    border-bottom: 1px solid #525151;
+    font-size: 17px;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.left-pane {
+    color: #a8a8a8;
+    float: left;
+    height: 100%;
+    width: 250px;
+    padding: 10px;
+    background-color: #3a3633;
+    border-top: 1px solid #1a1817;
+    position: absolute;
+    padding-top: 40px;
+    overflow-y: auto;
+}
+
+.center-pane {
+    height: 100%;
+    width: calc(100% - 250px);
+    position: absolute;
+    left: 250px;
+}
+
+.logs-pane {
+    padding: 10px;
+    height: calc(100% - 115px);
+    border-top: 1px solid #aaa;
+}

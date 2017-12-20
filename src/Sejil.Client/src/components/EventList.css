@@ -1,0 +1,8 @@
+.logs-view {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    height: 100%;
+    overflow-y: auto;
+    position: relative;
+}

@@ -3,9 +3,10 @@
 
 import * as React from 'react';
 
-import { action } from 'mobx';
 import { inject, observer } from 'mobx-react';
+
 import Store from '../Store';
+import { action } from 'mobx';
 
 interface IProps {
     store?: Store;
@@ -72,7 +73,7 @@ export default class LogLevelFilter extends React.Component<IProps, IState> {
 
     private updateSelectedState(level: LogLevel) {
         this.state.levels.forEach(l => l.selected = false);
-        const item = this.state.levels.filter(l => l.name == level.name)[0];
+        const item = this.state.levels.filter(l => l.name === level.name)[0];
         item.selected = true;
 
         return this.state.levels;
@@ -83,8 +84,12 @@ export default class LogLevelFilter extends React.Component<IProps, IState> {
             <div className="section">
                 <div className="section-header">Log Level Filteration</div>
                 {this.state.levels.map((l, i) => (
-                    <div key={i} className={`section-item ${l.selected ? 'selected' : ''}`} onClick={this.levelFilterClick.bind(this, l)}>
-                        <div className={`level-indicator level-${l.name.toLowerCase()}`}></div>
+                    <div
+                        key={i}
+                        className={`section-item ${l.selected ? 'selected' : ''}`}
+                        onClick={this.levelFilterClick.bind(this, l)}
+                    >
+                        <div className={`level-indicator level-${l.name.toLowerCase()}`} />
                         {l.name}
                     </div>
                 ))}

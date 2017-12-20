@@ -1,17 +1,16 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-import * as React from 'react';
-import * as AntInput from 'antd/lib/input';
-import * as AntButton from 'antd/lib/button';
-import * as AntDatePicker from 'antd/lib/date-picker';
-import * as AntLocaleProvider from 'antd/lib/locale-provider';
-import * as AntenUS from 'antd/lib/locale-provider/en_US';
-import { Moment } from 'moment';
+import './FilterBar.css';
 
-import { action } from 'mobx';
+import * as React from 'react';
+
+import { Button, DatePicker, Input } from 'antd';
 import { inject, observer } from 'mobx-react';
+
+import { Moment } from 'moment';
 import Store from '../Store';
+import { action } from 'mobx';
 
 interface IProps {
     store?: Store;
@@ -19,7 +18,7 @@ interface IProps {
 
 interface IState {
     activeFilterPeriod: string;
-    periodFilterRange: Moment[];
+    periodFilterRange?: [Moment, Moment];
 }
 
 @inject('store')
@@ -32,107 +31,110 @@ export default class FilterBar extends React.Component<IProps, IState> {
         this.onPeriodRangeChange = this.onPeriodRangeChange.bind(this);
         this.onClearPeriodClick = this.onClearPeriodClick.bind(this);
         this.saveFilter = this.saveFilter.bind(this);
-        this.state = { activeFilterPeriod: '', periodFilterRange: [] };
+        this.state = { activeFilterPeriod: '' };
     }
 
     onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        const store = this.props.store || new Store();
-
         if (e.keyCode === 13) {
             e.preventDefault();
-            store.reset();
+            this.props.store!.reset();
         }
     }
 
     saveFilter() {
-        const store = this.props.store || new Store();
-
         const filterName = prompt('Enter filter name');
         if (filterName != null && filterName.length) {
-            if (store.queries.findIndex(p => p.name === filterName) >= 0) {
+            if (this.props.store!.queries.findIndex(p => p.name === filterName) >= 0) {
                 alert('Query name already exist.');
                 return;
             }
 
-            store.saveQuery(filterName, store.queryText);
+            this.props.store!.saveQuery(filterName, this.props.store!.queryText);
         }
     }
 
     onSetPeriodClick(period: string) {
-        this.setPeriodFilter(period, []);
+        this.setPeriodFilter(period);
     }
 
     onPeriodRangeChange(date: Moment[]) {
-        this.setPeriodFilter('', date);
+        this.setPeriodFilter('', [date[0], date[1]]);
     }
 
     onClearPeriodClick() {
-        this.setPeriodFilter('', []);
+        this.setPeriodFilter('');
     }
 
-    @action setPeriodFilter(period: string, range: Moment[]) {
+    @action setPeriodFilter(period: string, range?: [Moment, Moment]) {
         this.setState({
             activeFilterPeriod: period,
             periodFilterRange: range,
         });
 
-        const store = this.props.store || new Store();
-        store.dateFilter = period.length
+        this.props.store!.dateFilter = period.length
             ? period
-            : range.length
+            : range
                 ? range.map(m => m.toDate())
                 : null;
-        store.reset();
+        this.props.store!.reset();
     }
 
     @action updateFilterText(e: React.ChangeEvent<HTMLInputElement>) {
-        const store = this.props.store || new Store();
-        store.queryText = e.target.value;
+        this.props.store!.queryText = e.target.value;
     }
 
     render() {
-        const store = this.props.store || new Store();
-
-        const LocaleProvider = AntLocaleProvider as any; // To bypass compiler error
-        const enUS = AntenUS as any; // To bypass compiler error
-        const Input = AntInput as any; // To bypass compiler error
-        const Button = AntButton as any; // To bypass compier error
-        const DatePicker = AntDatePicker as any; // To bypass compier error
+        const store = this.props.store!;
 
         const ButtonGroup = Button.Group;
         const RangePicker = DatePicker.RangePicker;
 
         return (
-            <LocaleProvider locale={enUS}>
-                <div className="filter-bar">
-                    <div>
-                        <Input
-                            className="filter-text"
-                            placeholder="Type a filter then hit enter to filter the logs"
-                            spellCheck={false}
-                            value={store.queryText}
-                            onKeyDown={this.onKeyDown}
-                            onChange={this.updateFilterText} />
-                        <Button className="filter-save" disabled={store.queryText.length === 0} onClick={this.saveFilter}>Save</Button>
-                    </div>
+            <div className="filter-bar">
+                <div>
+                    <Input
+                        className="filter-text"
+                        placeholder="Type a filter then hit enter to filter the logs"
+                        spellCheck={false}
+                        value={store.queryText}
+                        onKeyDown={this.onKeyDown}
+                        onChange={this.updateFilterText}
+                    />
+                    <Button
+                        className="filter-save"
+                        disabled={store.queryText.length === 0}
+                        onClick={this.saveFilter}
+                    >
+                        Save
+                    </Button>
+                </div>
 
-                    <div className="period-filter">
-                        <div className="left">
-                            <ButtonGroup className="filter-group">
-                                {['5m', '15m', '1h', '6h', '12h', '24h', '2d', '5d'].map((b, i) => (
-                                    this.state.activeFilterPeriod === b
-                                        ? <Button key={i} type="primary" onClick={this.setPeriodFilter.bind(this, b)}>{b}</Button>
-                                        : <Button key={i} onClick={this.onSetPeriodClick.bind(this, b)}>{b}</Button>
-                                ))}
-                            </ButtonGroup>
-                        </div>
-                        <div className="right">
-                            <RangePicker value={this.state.periodFilterRange} onChange={this.onPeriodRangeChange} format={'DD MMM YYYY'} />
-                            <Button onClick={this.onClearPeriodClick}>Clear All</Button>
-                        </div>
+                <div className="period-filter">
+                    <div className="left">
+                        <ButtonGroup className="filter-group">
+                            {['5m', '15m', '1h', '6h', '12h', '24h', '2d', '5d'].map((b, i) => (
+                                this.state.activeFilterPeriod === b
+                                    ? <Button
+                                        key={i}
+                                        type="primary"
+                                        onClick={this.setPeriodFilter.bind(this, b)}
+                                    >
+                                        {b}
+                                    </Button>
+                                    : <Button key={i} onClick={this.onSetPeriodClick.bind(this, b)}>{b}</Button>
+                            ))}
+                        </ButtonGroup>
+                    </div>
+                    <div className="right">
+                        <RangePicker
+                            value={this.state.periodFilterRange}
+                            onChange={this.onPeriodRangeChange}
+                            format={'DD MMM YYYY'}
+                        />
+                        <Button onClick={this.onClearPeriodClick}>Clear All</Button>
                     </div>
                 </div>
-            </LocaleProvider>
+            </div>
         );
     }
 }

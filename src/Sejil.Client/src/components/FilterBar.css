@@ -1,0 +1,52 @@
+.filter-bar {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    height: 115px;
+}
+
+.filter-bar .filter-text.ant-input {
+    min-height: 40px;
+    padding-left: 10px;
+    font-family: consolas, monaco, monospace;
+    font-size: 14px;
+    width: calc(100% - 115px);
+}
+
+.filter-bar .filter-save {
+    height: 37px;
+    font-size: 14px;
+    margin-left: 15px;
+    width: 100px;
+}
+
+.filter-bar .period-filter .filter-group {
+    padding-top: 15px;
+}
+
+.filter-bar .period-filter .filter-group button {
+    width: 50px;
+    height: 35px;
+    font-size: 14px;
+}
+
+.filter-bar .period-filter .left {
+    width: 50%;
+    display: inline-block;
+}
+
+.filter-bar .period-filter .right {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+}
+
+.filter-bar .period-filter .right button {
+    margin-left: 15px;
+    height: 35px;
+    font-size: 14px;
+}
+
+.filter-bar .ant-calendar-picker-input {
+    height: 35px;
+    font-size: 14px;
+}

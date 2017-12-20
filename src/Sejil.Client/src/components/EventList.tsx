@@ -1,8 +1,12 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+import './EventList.css';
+
 import * as React from 'react';
-import { observer, inject } from 'mobx-react';
+
+import { inject, observer } from 'mobx-react';
+
 import EventEntry from './EventEntry';
 import Store from '../Store';
 
@@ -20,16 +24,13 @@ export default class EventList extends React.Component<IProps, {}> {
     }
 
     async load() {
-        const store = this.props.store || new Store();
-        await store.loadEvents();
+        await this.props.store!.loadEvents();
     }
 
     render() {
-        const store = this.props.store || new Store();
-
         return (
             <div ref={(e: HTMLDivElement) => this.contentElem = e} className="logs-view">
-                {store.logEntries.map(s => (
+                {this.props.store!.logEntries.map(s => (
                     <EventEntry key={s.id} entry={s} />
                 ))}
             </div >
@@ -37,8 +38,7 @@ export default class EventList extends React.Component<IProps, {}> {
     }
 
     async componentDidMount() {
-        const store = this.props.store || new Store();
-        await store.loadEvents();
+        await this.props.store!.loadEvents();
 
         const elem = this.contentElem;
         elem.addEventListener('scroll', async () => {

@@ -1,11 +1,10 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-import { runInAction, observable, action } from 'mobx';
-import { IHttpClient, HttpClient } from './HttpClient';
-import ILogEntry from './interfaces/ILogEntry';
-import ILogQuery from './interfaces/ILogQuery';
-import { formatServerDate } from './formatDate';
+import { ILogEntry, ILogQuery } from './interfaces';
+import { action, observable, runInAction } from 'mobx';
+
+import { formatServerDate } from './misc/formatDate';
 
 export default class Store {
     @observable logEntries: ILogEntry[] = [];
@@ -14,14 +13,9 @@ export default class Store {
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
-    private http: IHttpClient;
     private page = 1;
     private startingTimestamp: string | undefined = undefined;
     private rootUrl = window.location.pathname;
-
-    constructor(http: IHttpClient = new HttpClient()) {
-        this.http = http;
-    }
 
     @action public async reset() {
         this.page = 1;
@@ -35,14 +29,21 @@ export default class Store {
             ? `${this.rootUrl}/events?page=${this.page}&startingTs=${encodeURIComponent(this.startingTimestamp)}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
-        const json = await this.http.post(url, JSON.stringify({
-            queryText: this.queryText,
-            dateFilter: this.dateFilter instanceof Array ? null : this.dateFilter,
-            dateRangeFilter: this.dateFilter instanceof Array ? this.dateFilter.map(d => formatServerDate(d)) : null,
-            levelFilter: this.levelFilter,
-            exceptionsOnly: this.exceptionsOnly,
-        }));
-        const events = JSON.parse(json) as ILogEntry[];
+        const response = await fetch(url, {
+            method: 'post',
+            body: JSON.stringify({
+                queryText: this.queryText,
+                dateFilter: this.dateFilter instanceof Array
+                    ? null
+                    : this.dateFilter,
+                dateRangeFilter: this.dateFilter instanceof Array
+                    ? this.dateFilter.map(d => formatServerDate(d))
+                    : null,
+                levelFilter: this.levelFilter,
+                exceptionsOnly: this.exceptionsOnly,
+            })
+        });
+        const events = await response.json() as ILogEntry[];
 
         if (events.length) {
             if (!this.startingTimestamp) {
@@ -55,8 +56,12 @@ export default class Store {
     }
 
     @action public async saveQuery(name: string, query: string) {
-        await this.http.post(`${this.rootUrl}/log-query`, JSON.stringify({ name, query }));
-        runInAction('save query',
+        await fetch(`${this.rootUrl}/log-query`, {
+            method: 'post',
+            body: JSON.stringify({ name, query })
+        });
+        runInAction(
+            'save query',
             () => {
                 this.queries.push({
                     name,
@@ -66,14 +71,17 @@ export default class Store {
     }
 
     @action public async loadQueries() {
-        const json = await this.http.get(`${this.rootUrl}/log-queries`);
-        const queries = JSON.parse(json) as ILogQuery[];
+        const response = await fetch(`${this.rootUrl}/log-queries`);
+        const queries = await response.json() as ILogQuery[];
 
         runInAction('load queries', () => this.queries = queries);
     }
 
     @action public async deleteQuery(q: ILogQuery) {
-        await this.http.post(`${this.rootUrl}/del-query`, q.name);
+        await fetch(`${this.rootUrl}/del-query`, {
+            method: 'post',
+            body: q.name
+        });
         runInAction('delete query', () => {
             const index = this.queries.findIndex(p => p.name === q.name);
             if (index >= 0) {
