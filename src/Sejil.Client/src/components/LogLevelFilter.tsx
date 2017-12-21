@@ -14,6 +14,7 @@ interface IProps {
 
 interface LogLevel {
     name: string;
+    value: string;
     selected: boolean;
 }
 
@@ -30,21 +31,27 @@ export default class LogLevelFilter extends React.Component<IProps, IState> {
         this.state = {
             levels: [{
                 name: 'Verbose',
+                value: 'Trace',
                 selected: false
             }, {
                 name: 'Debug',
+                value: 'Debug',
                 selected: false
             }, {
                 name: 'Information',
+                value: 'Information',
                 selected: false
             }, {
                 name: 'Warning',
+                value: 'Warning',
                 selected: false
             }, {
                 name: 'Error',
+                value: 'Error',
                 selected: false
             }, {
                 name: 'Critical',
+                value: 'Fatal',
                 selected: false
             }]
         };
@@ -55,9 +62,8 @@ export default class LogLevelFilter extends React.Component<IProps, IState> {
             levels: this.updateSelectedState(level)
         });
 
-        const store = this.props.store || new Store();
-        store.levelFilter = level.name;
-        store.reset();
+        this.props.store!.levelFilter = level.value;
+        this.props.store!.reset();
     }
 
     clearLevelFilter() {
@@ -66,9 +72,8 @@ export default class LogLevelFilter extends React.Component<IProps, IState> {
             levels: this.state.levels
         });
 
-        const store = this.props.store || new Store();
-        store.levelFilter = null;
-        store.reset();
+        this.props.store!.levelFilter = null;
+        this.props.store!.reset();
     }
 
     private updateSelectedState(level: LogLevel) {
