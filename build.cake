@@ -2,8 +2,6 @@
 #tool nuget:?package=OpenCover
 #tool nuget:?package=ReportGenerator
 #r "cake-tools\Cake.Npm.dll"
-#r "cake-tools\Cake.Webpack.dll"
-#r "cake-tools\Cake.Gulp.dll"
 
 using Newtonsoft.Json.Linq;
 
@@ -19,14 +17,16 @@ var configuration = Argument("configuration", "Release");
 //////////////////////////////////////////////////////////////////////
 
 // Define directories.
-const string CLIENT_DIR = "./src/Sejil.Client/build";
+const string CLIENT_DIR = "./src/Sejil.Client";
 const string SERVER_DIR = "./src/Sejil.Server";
 const string SERVER_TESTS_DIR = "./test/Sejil.Server.Test";
 
 var _packFolder = "./nuget-build/";
+ICakeContext _context;
 
 Setup(context =>
 {
+	_context = context;
 	var env = configuration.ToLower() == "debug"
 		? "development"
 		: "production";
@@ -40,13 +40,14 @@ Setup(context =>
 Task("Clean")
 	.Does(() =>
 {
-	if (DirectoryExists("./src/Sejil.Server/bin")) DeleteDirectory("./src/Sejil.Server/bin", true);
-	if (DirectoryExists("./src/Sejil.Server/obj")) DeleteDirectory("./src/Sejil.Server/obj", true);
-	if (DirectoryExists("./test/Sejil.Server.Test/bin"))DeleteDirectory("./test/Sejil.Server.Test/bin", true);
-	if (DirectoryExists("./test/Sejil.Server.Test/obj")) DeleteDirectory("./test/Sejil.Server.Test/obj", true);
+	DeleteDir("./src/Sejil.Server/bin");
+	DeleteDir("./src/Sejil.Server/bin");
+	DeleteDir("./src/Sejil.Server/obj");
+	DeleteDir("./test/Sejil.Server.Test/bin");
+	DeleteDir("./test/Sejil.Server.Test/obj");
 
-	if (DirectoryExists(_packFolder)) DeleteDirectory(_packFolder, true);
-	if (DirectoryExists(CLIENT_DIR) DeleteDirectory(CLIENT_DIR, true);
+	DeleteDir(_packFolder);
+	DeleteDir(CombinePaths(CLIENT_DIR, "build"));
 });
 
 Task("ClientBuild")
@@ -61,19 +62,19 @@ Task("ClientBuild")
 Task("CopyEmbeddedHtml")
 	.Does(() =>
 {
-	var html = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "index.html"));
-	var manifest = JObject.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, "asset-manifest.json")));
+	var html = ReadFile(CombinePaths(CLIENT_DIR, "build", "index.html"));
+	var manifest = JObject.Parse(ReadFile(CombinePaths(CLIENT_DIR, "build", "asset-manifest.json")));
 	var cssPath = manifest["main.css"].ToString();
 	var jsPath = manifest["main.js"].ToString();
-	var appCss = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, cssPath));
+	var appCss = ReadFile(CombinePaths(CLIENT_DIR, "build", cssPath));
 	appCss = appCss.Substring(0, appCss.IndexOf("/*# sourceMappingURL=main."));
-	var appJs = System.IO.File.ReadAllText(System.IO.Path.Combine(CLIENT_DIR, jsPath));
+	var appJs = ReadFile(CombinePaths(CLIENT_DIR, "build", jsPath));
 	appJs = appJs.Substring(0, appJs.IndexOf("//# sourceMappingURL=main"));
 
 	html = html.Replace("<script type=\"text/javascript\" src=\"/" + jsPath +"\"></script>", "<script>" + appJs + "</script>");
 	html = html.Replace("<link href=\"/" + cssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
 
-	System.IO.File.WriteAllText(System.IO.Path.Combine(SERVER_DIR, "index.html"), html);
+	System.IO.File.WriteAllText(CombinePaths(SERVER_DIR, "index.html"), html);
 });
 
 Task("Build")
@@ -147,6 +148,33 @@ Task("CoverageReport")
 
 Task("Default")
     .IsDependentOn("Pack");
+
+//////////////////////////////////////////////////////////////////////
+// HELPER METHODS
+//////////////////////////////////////////////////////////////////////
+
+void DeleteDir(string path)
+{
+	if (_context.DirectoryExists(path))
+	{
+		_context.DeleteDirectory(path, new DeleteDirectorySettings
+		{
+			Force = true,
+			Recursive = true
+		});
+	}
+}
+
+string CombinePaths(params string[] paths)
+{
+	return System.IO.Path.Combine(paths);
+}
+
+string ReadFile(string path)
+{
+	return System.IO.File.ReadAllText(path);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
