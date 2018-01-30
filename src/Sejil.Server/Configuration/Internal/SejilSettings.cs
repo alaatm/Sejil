@@ -4,6 +4,10 @@
 using Serilog.Events;
 using Serilog.Core;
 using System.IO;
+using System;
+#if NETSTANDARD1_6
+using System.Runtime.InteropServices;
+#endif
 
 namespace Sejil.Configuration.Internal
 {
@@ -26,8 +30,15 @@ namespace Sejil.Configuration.Internal
             {
                 MinimumLevel = minLogLevel
             };
-            var basePath = System.Reflection.Assembly.GetEntryAssembly().Location;
-            SqliteDbPath = Path.Combine(Path.GetDirectoryName(basePath), $"Sejil-{UUID}.sqlite");
+
+#if NETSTANDARD1_6
+            var appDataFolder = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home");
+#elif NETSTANDARD2_0
+            var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+#endif
+
+            var appName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+            SqliteDbPath = Path.Combine(appDataFolder, appName, $"Sejil-{UUID}.sqlite");
 
             NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
             PageSize = 100;
