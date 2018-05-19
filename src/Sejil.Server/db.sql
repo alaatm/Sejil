@@ -37,3 +37,5 @@ CREATE TABLE IF NOT EXISTS log_query(
 	name VARCHAR(255) NOT NULL,
 	query TEXT NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS log_query_name_idx ON log_query(name);
