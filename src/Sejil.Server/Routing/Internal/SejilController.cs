@@ -56,6 +56,16 @@ namespace Sejil.Routing.Internal
             await _context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
         }
 
+        public async Task GetMinimumLogLevelAsync()
+        {
+            var response = new
+            {
+                MinimumLogLevel = _settings.LoggingLevelSwitch.MinimumLevel.ToString()
+            };
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+        }
+
         public void SetMinimumLogLevel(string minLogLevel)
         {
             _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)

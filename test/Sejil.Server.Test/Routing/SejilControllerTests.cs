@@ -15,6 +15,8 @@ using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
+using Serilog.Core;
+using Serilog.Events;
 using Xunit;
 
 namespace Sejil.Test.Routing
@@ -182,6 +184,48 @@ namespace Sejil.Test.Routing
             // Assert
             responseMoq.VerifySet(p => p.ContentType = "application/json");
             var data = Encoding.UTF8.GetBytes(logQueriesJson);
+            bodyMoq.Verify(p => p.WriteAsync(data, 0, data.Length, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetMinimumLogLevelAsync_retreives_minimumLogLevel_from_settings()
+        {
+            // Arrange
+            var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Debug);
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.LoggingLevelSwitch).Returns(levelSwitch);
+            var controller = CreateController(CreateContextMoq().contextMoq.Object, Mock.Of<ISejilRepository>(), settingsMoq.Object);
+
+            // Act
+            await controller.GetMinimumLogLevelAsync();
+
+            // Assert
+            settingsMoq.VerifyGet(p => p.LoggingLevelSwitch, Times.Once);
+        }
+
+        [Fact]
+        public async Task GetMinimumLogLevelAsync_writes_response_json_to_response_stream()
+        {
+            // Arrange
+            var levelSwitch = new LoggingLevelSwitch(LogEventLevel.Debug);
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.LoggingLevelSwitch).Returns(levelSwitch);
+
+            var responseJson = JsonConvert.SerializeObject(new
+            {
+                MinimumLogLevel = levelSwitch.MinimumLevel.ToString()
+            }, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+
+
+            var (contextMoq, responseMoq, bodyMoq) = CreateContextMoq();
+            var controller = CreateController(contextMoq.Object, Mock.Of<ISejilRepository>(), settingsMoq.Object);
+
+            // Act
+            await controller.GetMinimumLogLevelAsync();
+
+            // Assert
+            responseMoq.VerifySet(p => p.ContentType = "application/json");
+            var data = Encoding.UTF8.GetBytes(responseJson);
             bodyMoq.Verify(p => p.WriteAsync(data, 0, data.Length, It.IsAny<CancellationToken>()), Times.Once);
         }
 

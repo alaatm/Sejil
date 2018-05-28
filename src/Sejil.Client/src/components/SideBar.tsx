@@ -8,6 +8,7 @@ import * as React from 'react';
 import ExceptionsFilter from './ExceptionsFilter';
 import LogLevelFilter from './LogLevelFilter';
 import SavedQueries from './SavedQueries';
+import Settings from './Settings';
 
 export default class SideBar extends React.Component<{}, {}> {
     render() {
@@ -16,6 +17,7 @@ export default class SideBar extends React.Component<{}, {}> {
                 <LogLevelFilter />
                 <ExceptionsFilter />
                 <SavedQueries />
+                <Settings />
             </div>
         );
     }

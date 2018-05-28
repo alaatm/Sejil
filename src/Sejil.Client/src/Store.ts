@@ -10,6 +10,7 @@ export default class Store {
     @observable logEntries: ILogEntry[] = [];
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
+    @observable minLogLevel = '';
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
@@ -88,5 +89,20 @@ export default class Store {
                 this.queries.splice(index, 1);
             }
         });
+    }
+
+    @action public async loadMinLogLevel() {
+        const response = await fetch(`${this.rootUrl}/min-log-level`);
+        const responseJson = await response.json() as { minimumLogLevel: string };
+
+        runInAction('load min log level', () => this.minLogLevel = responseJson.minimumLogLevel);
+    }
+
+    @action public async setMinLogLevel(level: string) {
+        await fetch(`${this.rootUrl}/min-log-level`, {
+            method: 'post',
+            body: level
+        });
+        runInAction('set min log level', () => this.minLogLevel = level);
     }
 }

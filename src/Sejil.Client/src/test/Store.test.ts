@@ -332,6 +332,43 @@ describe('Store', () => {
         fetch.resetMocks();
     });
 
+    it('loadMinLogLevel() should retreive and set minimum log level', async () => {
+        // Arrange
+        const logLevel = 'Debug';
+        const testMinLogLevel = `{ "minimumLogLevel": "${logLevel}" }`;
+        fetch.mockResponse(testMinLogLevel);
+
+        const store = new Store();
+
+        // Act
+        await store.loadMinLogLevel();
+
+        // Assert
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledWith(`${rootUrl}/min-log-level`);
+        expect(store.minLogLevel).toEqual('Debug');
+
+        fetch.resetMocks();
+    });
+
+    it('setMinLogLevel() should set minimum log level', async () => {
+        // Arrange
+        fetch.mockResponse('');
+        const store = new Store();
+
+        const logLevel = 'Information';
+
+        // Act
+        await store.setMinLogLevel(logLevel);
+
+        // Assert
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledWith(`${rootUrl}/min-log-level`, buildRequestObject('post', logLevel));
+        expect(store.minLogLevel).toEqual(logLevel);
+
+        fetch.resetMocks();
+    });
+
     function buildRequestObject(method: string, body: string) {
         return { body, method };
     }
