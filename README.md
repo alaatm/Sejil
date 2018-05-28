@@ -16,7 +16,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
-    Install-Package -IncludePrerelease Sejil
+    dotnet add package Sejil --version 1.0.0-beta5
     ```
 
 2. Adding code
