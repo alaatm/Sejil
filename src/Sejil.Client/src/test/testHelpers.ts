@@ -13,7 +13,7 @@ export function createTestLogEntries(start: number, end: number) {
     for (let i = start; i < end; i++) {
         const id = pad(i, 2);
         events.push({
-            id: id,
+            id,
             message: `msg ${i}`,
             messageTemplate: `msg ${i}`,
             level: 'info',
@@ -52,7 +52,7 @@ export function createTestQuery(name: string = 'query', query: string = 'p=v'): 
 }
 
 function createLogProperties(logId: string, count: number) {
-    let props: ILogEntryProperty[] = [];
+    const props: ILogEntryProperty[] = [];
     for (let i = 0; i < count; i++) {
         props.push({
             id: i,
@@ -71,7 +71,7 @@ function pad(num: number, size: number) {
 }
 
 function hoursFromNow(h: number) {
-    let d = new Date();
+    const d = new Date();
     d.setHours(d.getHours() + h);
     return d;
 }

@@ -57,7 +57,7 @@ export default class FilterBar extends React.Component<IProps, IState> {
         this.setPeriodFilter(period);
     }
 
-    onPeriodRangeChange(date: Moment[]) {
+    onPeriodRangeChange(date: [Moment, Moment], dateStrings: [string, string]) {
         this.setPeriodFilter('', [date[0], date[1]]);
     }
 

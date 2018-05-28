@@ -2,11 +2,11 @@ import './index.css';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as mobx from 'mobx';
+import { configure } from 'mobx';
 
 import App from './components/App';
 
-mobx.useStrict(true);
+configure({ enforceActions: true });
 
 let mobxDevTools: JSX.Element | boolean = false;
 if (process.env.NODE_ENV === 'development') {
