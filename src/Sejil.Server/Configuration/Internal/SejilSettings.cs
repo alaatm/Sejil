@@ -49,6 +49,7 @@ namespace Sejil.Configuration.Internal
             switch (minLogLevel.ToLower())
             {
                 case "trace":
+                case "verbose":
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
                     return true;
                 case "debug":
@@ -64,6 +65,7 @@ namespace Sejil.Configuration.Internal
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Error;
                     return true;
                 case "critical":
+                case "fatal":
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Fatal;
                     return true;
             }

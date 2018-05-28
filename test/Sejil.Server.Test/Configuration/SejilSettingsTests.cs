@@ -98,11 +98,13 @@ namespace Sejil.Test.Configuration
 
         [Theory]
         [InlineData("Trace", LogEventLevel.Verbose, true)]
+        [InlineData("verbose", LogEventLevel.Verbose, true)]
         [InlineData("DEBUG", LogEventLevel.Debug, true)]
         [InlineData("information", LogEventLevel.Information, true)]
         [InlineData("Warning", LogEventLevel.Warning, true)]
         [InlineData("Error", LogEventLevel.Error, true)]
         [InlineData("Critical", LogEventLevel.Fatal, true)]
+        [InlineData("faTAL", LogEventLevel.Fatal, true)]
         [InlineData("none", 0, false)]
         public void TrySetMinimumLogLevel_attempts_to_sets_specified_min_log_level(string logLevel, LogEventLevel expected, bool expectedResult)
         {
