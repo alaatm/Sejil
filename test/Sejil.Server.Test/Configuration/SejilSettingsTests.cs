@@ -63,18 +63,6 @@ namespace Sejil.Test.Configuration
         }
 
         [Fact]
-        public void Ctor_sets_db_path_to_localAppData()
-        {
-            // Arrange & act
-            var basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "testhost");
-            var settings = new SejilSettings("", LogEventLevel.Debug);
-
-            // Assert
-            Assert.Equal(basePath, Path.GetDirectoryName(settings.SqliteDbPath));
-        }
-
-        [Fact]
         public void Ctor_sets_default_db_name()
         {
             // Arrange & act

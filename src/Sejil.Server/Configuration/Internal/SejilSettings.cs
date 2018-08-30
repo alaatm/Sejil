@@ -31,14 +31,18 @@ namespace Sejil.Configuration.Internal
                 MinimumLevel = minLogLevel
             };
 
-#if NETSTANDARD1_6
-            var appDataFolder = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home");
-#elif NETSTANDARD2_0
-            var appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-#endif
-
-            var appName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
-            SqliteDbPath = Path.Combine(appDataFolder, appName, $"Sejil-{UUID}.sqlite");
+            if (IsRunningInAzure())
+            {
+                // If running in azure, we won't use local app folder as its temporary and will frequently be deleted.
+                // Use home folder instead.
+                SqliteDbPath = Path.Combine(Path.GetFullPath("/home"), $"Sejil-{UUID}.sqlite");
+            }
+            else
+            {
+                var appDataFolder = GetLocalAppFolder();
+                var appName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                SqliteDbPath = Path.Combine(appDataFolder, appName, $"Sejil-{UUID}.sqlite");
+            }
 
             NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
             PageSize = 100;
@@ -72,5 +76,17 @@ namespace Sejil.Configuration.Internal
 
             return false;
         }
+
+        private string GetLocalAppFolder()
+        {
+#if NETSTANDARD1_6
+            return Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home");
+#elif NETSTANDARD2_0
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+#endif
+        }
+
+        private bool IsRunningInAzure()
+            => !String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
     }
 }
