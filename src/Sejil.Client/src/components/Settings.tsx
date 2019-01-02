@@ -36,7 +36,7 @@ export default class Settings extends React.Component<IProps, {}> {
                         onChange={this.handleMinLogLevelChange}
                         style={{ width: '100%' }}
                     >
-                        {this._logLevels.map((l, i) => <Option key={i} value={l}>{l}</Option>)}
+                        {this._logLevels.map((l, i) => <Option key={String(i)} value={l}>{l}</Option>)}
                     </Select>
                 </div>
             </div>
