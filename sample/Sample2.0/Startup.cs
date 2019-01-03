@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sejil;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using sample.Authentication;
 
 namespace sample
 {
@@ -27,6 +29,17 @@ namespace sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddAuthentication()
+               .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+
+            services.ConfigureSejil(options =>
+            {
+                options.AuthenticationScheme = "BasicAuthentication";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,6 +55,7 @@ namespace sample
             }
 
             app.UseStaticFiles();
+            app.UseAuthentication();
 
             app.UseSejil();
 
