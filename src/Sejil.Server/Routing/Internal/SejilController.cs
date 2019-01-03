@@ -81,6 +81,23 @@ namespace Sejil.Routing.Internal
             await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
         }
 
+        public async Task GetUserNameAsync()
+        {
+            var response = new
+            {
+#if NETSTANDARD2_0
+                UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
+                            ? _context.User.Identity.Name
+                            : _context.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+#else
+                UserName = ""
+#endif
+            };
+
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+        }
+
         public void SetMinimumLogLevel(string minLogLevel)
         {
             _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)

@@ -105,4 +105,11 @@ export default class Store {
         });
         runInAction('set min log level', () => this.minLogLevel = level);
     }
+	
+	@action public async loadUserName() {
+        const response = await fetch(`${this.rootUrl}/user-name`);
+        const responseJson = await response.json() as { userName: string };
+
+        runInAction('load user name', () => this.userName = responseJson.userName);
+    }
 }
