@@ -13,6 +13,8 @@ using Sejil;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using sample.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace sample
 {
@@ -30,15 +32,41 @@ namespace sample
         {
             services.AddMvc();
 
-            services.AddAuthentication()
-               .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+            //// Basic auth
+            //services.AddAuthentication()
+            //   .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie()
+            .AddOpenIdConnect(options =>
+            {
+                Configuration.GetSection("Authentication").Bind(options);
+              
+                options.ClaimActions.MapUniqueJsonKey("sub", "sub");
+                options.ClaimActions.MapUniqueJsonKey("name", "name");
+                options.ClaimActions.MapUniqueJsonKey("given_name", "given_name");
+                options.ClaimActions.MapUniqueJsonKey("family_name", "family_name");
+                options.ClaimActions.MapUniqueJsonKey("profile", "profile");
+                options.ClaimActions.MapUniqueJsonKey("email", "email");
+
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    NameClaimType = "name",
+                    RoleClaimType = "role"
+                };
+
+            });
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
 
             services.ConfigureSejil(options =>
             {
-                options.AuthenticationScheme = "BasicAuthentication";
+                options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
             });
         }
 
