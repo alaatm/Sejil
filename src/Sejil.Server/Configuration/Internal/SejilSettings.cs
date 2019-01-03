@@ -22,6 +22,13 @@ namespace Sejil.Configuration.Internal
         public string[] NonPropertyColumns { get; private set; }
         public int PageSize { get; private set; }
 
+#if NETSTANDARD2_0
+        /// <summary>
+        /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
+        /// </summary>
+        public string AuthenticationScheme { get; set; }
+#endif
+
         public SejilSettings(string uri, LogEventLevel minLogLevel)
         {
             SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
