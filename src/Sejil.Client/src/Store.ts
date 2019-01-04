@@ -11,6 +11,7 @@ export default class Store {
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
     @observable minLogLevel = '';
+	@observable userName = '';
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
