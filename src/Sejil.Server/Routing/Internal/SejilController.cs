@@ -88,7 +88,7 @@ namespace Sejil.Routing.Internal
 #if NETSTANDARD2_0
                 UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
                             ? _context.User.Identity.Name
-                            : _context.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+                            : ""
 #else
                 UserName = ""
 #endif

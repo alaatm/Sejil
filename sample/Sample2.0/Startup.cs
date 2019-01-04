@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using sample.Authentication;
 using Sejil;
+using System.Net;
+using System.Net.Http;
 
 namespace sample
 {
@@ -31,39 +33,35 @@ namespace sample
             //services.AddAuthentication()
             //   .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-            .AddCookie()
-            .AddOpenIdConnect(options =>
-            {
-                Configuration.GetSection("Authentication").Bind(options);
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //})
+            //.AddCookie()
+            //.AddOpenIdConnect(options =>
+            //{
+            //    Configuration.GetSection("Authentication").Bind(options);
 
-                options.ClaimActions.MapUniqueJsonKey("sub", "sub");
-                options.ClaimActions.MapUniqueJsonKey("name", "name");
-                options.ClaimActions.MapUniqueJsonKey("given_name", "given_name");
-                options.ClaimActions.MapUniqueJsonKey("family_name", "family_name");
-                options.ClaimActions.MapUniqueJsonKey("profile", "profile");
-                options.ClaimActions.MapUniqueJsonKey("email", "email");
+            //    // using behind a company proxy
+            //    options.BackchannelHttpHandler = new WinHttpHandler() { WindowsProxyUsePolicy = WindowsProxyUsePolicy.UseWinInetProxy, DefaultProxyCredentials = CredentialCache.DefaultNetworkCredentials };
 
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    NameClaimType = "name",
-                    RoleClaimType = "role"
-                };
+            //    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            //    {
+            //        NameClaimType = "name",
+            //        RoleClaimType = "role"
+            //    };
 
-            });
+            //});
 
-            // configure DI for application services
-            services.AddScoped<IUserService, UserService>();
+            //// configure DI for application services
+            //services.AddScoped<IUserService, UserService>();
 
-            services.ConfigureSejil(options =>
-            {
-                options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            });
+            //services.ConfigureSejil(options =>
+            //{
+            //    options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
