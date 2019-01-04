@@ -102,6 +102,12 @@ namespace Sejil
                     var controller = GetSejilController(context);
                     await controller.DeleteQueryAsync(queryName);
                 });
+
+                routes.MapGet($"{url}/title", async context =>
+                {
+                    var controller = GetSejilController(context);
+                    await controller.GetTitleAsync();
+                });
             });
 
             return app;

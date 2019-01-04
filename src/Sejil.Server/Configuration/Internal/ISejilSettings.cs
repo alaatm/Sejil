@@ -17,6 +17,11 @@ namespace Sejil.Configuration.Internal
         int PageSize { get; }
         bool TrySetMinimumLogLevel(string minLogLevel);
 
+        /// <summary>
+        /// Gets or sets the title shown in the front end
+        /// </summary>
+        string Title { get; set; }
+
 #if NETSTANDARD2_0
         /// <summary>
         /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
