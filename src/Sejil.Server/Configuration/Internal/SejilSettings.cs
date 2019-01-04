@@ -22,6 +22,11 @@ namespace Sejil.Configuration.Internal
         public string[] NonPropertyColumns { get; private set; }
         public int PageSize { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the title shown in the front end
+        /// </summary>
+        public string Title { get; set; } = "Sejil";
+
 #if NETSTANDARD2_0
         /// <summary>
         /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.

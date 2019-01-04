@@ -58,10 +58,11 @@ namespace sample
             //// configure DI for application services
             //services.AddScoped<IUserService, UserService>();
 
-            //services.ConfigureSejil(options =>
-            //{
-            //    options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            //});
+            services.ConfigureSejil(options =>
+            {
+                //options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.Title = "Logs";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

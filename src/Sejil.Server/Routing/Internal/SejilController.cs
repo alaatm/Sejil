@@ -109,5 +109,15 @@ namespace Sejil.Routing.Internal
         {
             await _repository.DeleteQueryAsync(queryName);
         }
+
+        public async Task GetTitleAsync()
+        {
+            var response = new
+            {
+                Title = _settings.Title
+            };
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+        }
     }
 }
