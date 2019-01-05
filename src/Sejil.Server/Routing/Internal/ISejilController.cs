@@ -17,5 +17,6 @@ namespace Sejil.Routing.Internal
         Task GetMinimumLogLevelAsync();
         void SetMinimumLogLevel(string minLogLevel);
         Task DeleteQueryAsync(string queryName);
+        Task GetUserNameAsync();
     }
 }

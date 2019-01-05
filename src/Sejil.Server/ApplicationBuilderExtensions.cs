@@ -83,6 +83,12 @@ namespace Sejil
                     await controller.GetMinimumLogLevelAsync();
                 });
 
+                routes.MapGet($"{url}/user-name", async context =>
+                {
+                    var controller = GetSejilController(context);
+                    await controller.GetUserNameAsync();
+                });
+
                 routes.MapPost($"{url}/min-log-level", async context =>
                 {
                     var minLogLevel = await GetRequestBodyAsync(context.Request);

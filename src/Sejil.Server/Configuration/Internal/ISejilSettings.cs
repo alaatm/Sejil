@@ -16,5 +16,12 @@ namespace Sejil.Configuration.Internal
         string[] NonPropertyColumns { get; }
         int PageSize { get; }
         bool TrySetMinimumLogLevel(string minLogLevel);
+
+#if NETSTANDARD2_0
+        /// <summary>
+        /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
+        /// </summary>
+        string AuthenticationScheme { get; set; }
+#endif
     }
 }

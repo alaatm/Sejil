@@ -11,6 +11,7 @@ export default class Store {
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
     @observable minLogLevel = '';
+	@observable userName = '';
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
@@ -104,5 +105,12 @@ export default class Store {
             body: level
         });
         runInAction('set min log level', () => this.minLogLevel = level);
+    }
+	
+	@action public async loadUserName() {
+        const response = await fetch(`${this.rootUrl}/user-name`);
+        const responseJson = await response.json() as { userName: string };
+
+        runInAction('load user name', () => this.userName = responseJson.userName);
     }
 }

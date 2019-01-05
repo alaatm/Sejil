@@ -4,6 +4,9 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.Authentication;
+#endif
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Sejil.Configuration.Internal;
@@ -30,8 +33,20 @@ namespace Sejil.Routing.Internal
 
         public async Task GetIndexAsync()
         {
+#if NETSTANDARD2_0
+            if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
+            {
+                await _context.ChallengeAsync(_settings.AuthenticationScheme);
+            }
+            else
+            {
+                _context.Response.ContentType = "text/html";
+                await _context.Response.WriteAsync(_settings.SejilAppHtml);
+            }
+#else
             _context.Response.ContentType = "text/html";
             await _context.Response.WriteAsync(_settings.SejilAppHtml);
+#endif
         }
 
         public async Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter)
@@ -62,6 +77,23 @@ namespace Sejil.Routing.Internal
             {
                 MinimumLogLevel = _settings.LoggingLevelSwitch.MinimumLevel.ToString()
             };
+            _context.Response.ContentType = "application/json";
+            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+        }
+
+        public async Task GetUserNameAsync()
+        {
+            var response = new
+            {
+#if NETSTANDARD2_0
+                UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
+                            ? _context.User.Identity.Name
+                            : ""
+#else
+                UserName = ""
+#endif
+            };
+
             _context.Response.ContentType = "application/json";
             await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
         }
