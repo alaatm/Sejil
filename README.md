@@ -16,7 +16,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
-    dotnet add package Sejil --version 1.0.0-beta5
+    dotnet add package Sejil --version 1.0.0-beta7
     ```
 
 2. Adding code
@@ -54,6 +54,30 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
             // ...
         }
     }
+    ```
+
+    (Optional) To require authentication for viewing logs:
+
+    ```csharp
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.ConfigureSejil(options =>
+            {
+                options.AuthenticationScheme = /* Your authentication scheme */
+            });
+        }
+    ```
+
+    (Optional) To change the logs page title (Defaults to *Sejil* if not set):
+
+    ```csharp
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.ConfigureSejil(options =>
+            {
+                options.Title = "My title";
+            });
+        }
     ```
 
 3. Navigate to *http://your-app-url/sejil* to view your app's logs.
