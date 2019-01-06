@@ -12,6 +12,7 @@ export default class Store {
     @observable queryText = '';
     @observable minLogLevel = '';
 	@observable userName = '';
+	@observable title = 'Sejil';
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
@@ -112,5 +113,12 @@ export default class Store {
         const responseJson = await response.json() as { userName: string };
 
         runInAction('load user name', () => this.userName = responseJson.userName);
+    }
+	
+	@action public async loadTitle() {
+        const response = await fetch(`${this.rootUrl}/title`);
+        const responseJson = await response.json() as { title: string };
+
+         runInAction('load page title', () => this.title = responseJson.title);
     }
 }

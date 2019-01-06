@@ -9,6 +9,7 @@ import EventList from './EventList';
 import FilterBar from './FilterBar';
 import { Provider } from 'mobx-react';
 import SideBar from './SideBar';
+import Header from './Header';
 import Store from '../Store';
 
 export default class App extends React.Component<{}, {}> {
@@ -17,7 +18,7 @@ export default class App extends React.Component<{}, {}> {
             <Provider store={new Store()}>
                 <div className="wrapper">
                     <div className="header">
-                        Sejil
+                         <Header />
                     </div>
 
                     <div className="left-pane">
