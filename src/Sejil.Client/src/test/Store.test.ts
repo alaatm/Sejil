@@ -369,6 +369,44 @@ describe('Store', () => {
         fetch.resetMocks();
     });
 
+    it('loadUserName() should retreive and set user name', async () => {
+        // Arrange
+        const username = 'john_doe';
+        const testUsername = `{ "userName": "${username}" }`;
+        fetch.mockResponse(testUsername);
+
+        const store = new Store();
+
+        // Act
+        await store.loadUserName();
+
+        // Assert
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledWith(`${rootUrl}/user-name`);
+        expect(store.userName).toEqual(username);
+
+        fetch.resetMocks();
+    });
+
+    it('loadTitle() should retreive and set title', async () => {
+        // Arrange
+        const title = 'My Title';
+        const testTitle = `{ "title": "${title}" }`;
+        fetch.mockResponse(testTitle);
+
+        const store = new Store();
+
+        // Act
+        await store.loadTitle();
+
+        // Assert
+        expect(fetch).toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledWith(`${rootUrl}/title`);
+        expect(store.title).toEqual(title);
+
+        fetch.resetMocks();
+    });
+
     function buildRequestObject(method: string, body: string) {
         return { body, method };
     }

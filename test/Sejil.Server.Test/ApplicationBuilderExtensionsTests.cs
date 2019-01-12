@@ -2,7 +2,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,6 +16,15 @@ using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Events;
 using Xunit;
+using Microsoft.AspNetCore.Builder;
+using Sejil.Data.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Text.Encodings.Web;
+using System.Security.Claims;
+using System.Net;
 
 namespace Sejil.Test
 {
@@ -138,6 +146,67 @@ namespace Sejil.Test
             controllerMoq.Verify(p => p.DeleteQueryAsync(query), Times.Once);
         }
 
+        [Fact]
+        public async Task HttpGet_root_url_succeeds_when_auth_is_required_and_user_is_authenticated()
+        {
+            // Arrange
+            var url = "/sejil";
+            var server = CreateServerWithAuth(url, true, "username");
+
+            // Act
+            var response = await server.CreateClient().GetAsync(url);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HttpGet_root_url_fails_when_auth_is_required_and_user_is_not_authenticated()
+        {
+            // Arrange
+            var url = "/sejil";
+            var server = CreateServerWithAuth(url, false);
+
+            // Act
+            var response = await server.CreateClient().GetAsync(url);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task HttpGet_username_returns_authenticated_username_when_authenticated()
+        {
+            // Arrange
+            var url = "/sejil";
+            var username = "username";
+            var server = CreateServerWithAuth(url, true, username);
+
+            // Act
+            var response = await server.CreateClient().GetAsync("/sejil/user-name");
+
+            // Assert
+            var result = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("{\"userName\":\"" + username + "\"}", result);
+        }
+
+        [Fact]
+        public async Task HttpGet_username_returns_emptyString_when_not_authenticated()
+        {
+            // Arrange
+            var url = "/sejil";
+            var server = CreateServerWithAuth(url, false);
+
+            // Act
+            var response = await server.CreateClient().GetAsync("/sejil/user-name");
+
+            // Assert
+            var result = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("{\"userName\":\"\"}", result);
+        }
+
         public static IEnumerable<object[]> HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData()
         {
             yield return new object[]
@@ -180,10 +249,83 @@ namespace Sejil.Test
             return new TestServer(builder);
         }
 
+        private static TestServer CreateServerWithAuth(string url, bool authenticated, string username = null)
+        {
+            var builder = new WebHostBuilder()
+                .Configure(app =>
+                {
+                    app.UseAuthentication();
+                    app.UseSejil();
+                })
+                .ConfigureServices(services =>
+                {
+                    if (authenticated)
+                    {
+                        services.AddAuthentication(TestAuthDefaults.AuthenticationScheme).AddAlwaysAuthenticated(username);
+                    }
+                    else
+                    {
+                        services.AddAuthentication(TestAuthDefaults.AuthenticationScheme).AddAlwaysNotAuthenticated();
+                    }
+                    services.AddRouting();
+
+                    services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                    services.AddSingleton<ISejilSettings>(new SejilSettings("/sejil", LogEventLevel.Debug));
+                    services.AddScoped<ISejilRepository, SejilRepository>();
+                    services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
+                    services.AddScoped<ISejilController, SejilController>();
+
+                    services.ConfigureSejil(options => options.AuthenticationScheme = TestAuthDefaults.AuthenticationScheme);
+                });
+
+            return new TestServer(builder);
+        }
+
         string Join(List<DateTime> dateList)
         {
             if (dateList == null || dateList?.Count == 0) return null;
             return String.Join(",", dateList);
         }
+    }
+
+    public class TestAuthDefaults
+    {
+        public static string AuthenticationScheme { get; } = "TestAuthScheme";
+    }
+
+    public class TestAuthOptions : AuthenticationSchemeOptions
+    {
+        public string Username { get; set; }
+    }
+
+    public class TestAuthHandler : AuthenticationHandler<TestAuthOptions>
+    {
+        public TestAuthHandler(IOptionsMonitor<TestAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+            : base(options, logger, encoder, clock) { }
+
+        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        {
+            if (!String.IsNullOrWhiteSpace(Options.Username))
+            {
+                var claims = new[] { new Claim(ClaimTypes.Name, Options.Username, ClaimValueTypes.String, ClaimsIssuer) };
+                var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));
+                var authTicket = new AuthenticationTicket(principal, Scheme.Name);
+
+                return Task.FromResult(AuthenticateResult.Success(authTicket));
+            }
+            else
+            {
+                return Task.FromResult(AuthenticateResult.Fail("fail"));
+            }
+        }
+    }
+
+    public static class AuthenticationBuilderExtensions
+    {
+        public static AuthenticationBuilder AddAlwaysAuthenticated(this AuthenticationBuilder builder, string username)
+            => builder.AddScheme<TestAuthOptions, TestAuthHandler>(TestAuthDefaults.AuthenticationScheme, options => options.Username = username);
+
+        public static AuthenticationBuilder AddAlwaysNotAuthenticated(this AuthenticationBuilder builder)
+            => builder.AddScheme<TestAuthOptions, TestAuthHandler>(TestAuthDefaults.AuthenticationScheme, _ => { });
     }
 }

@@ -277,6 +277,29 @@ namespace Sejil.Test.Routing
             repositoryMoq.Verify(p => p.DeleteQueryAsync(queryName), Times.Once);
         }
 
+        [Fact]
+        public async Task GetTitleAsync_writes_configured_title_to_response_stream()
+        {
+            // Arrange
+            var title = "Custom Title";
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.Title).Returns(title);
+            var (contextMoq, responseMoq, bodyMoq) = CreateContextMoq();
+            var controller = CreateController(contextMoq.Object, Mock.Of<ISejilRepository>(), settingsMoq.Object);
+            var responseJson = JsonConvert.SerializeObject(new
+            {
+                Title = title
+            }, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+
+            // Act
+            await controller.GetTitleAsync();
+
+            // Assert
+            responseMoq.VerifySet(p => p.ContentType = "application/json");
+            var data = Encoding.UTF8.GetBytes(responseJson);
+            bodyMoq.Verify(p => p.WriteAsync(data, 0, data.Length, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
         private ISejilController CreateController(HttpContext context, ISejilRepository repository, ISejilSettings settings)
             => new SejilController(new HttpContextAccessor { HttpContext = context }, repository, settings);
 
