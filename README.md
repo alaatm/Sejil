@@ -17,23 +17,11 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
-    dotnet add package Sejil --version 1.0.0-beta8
+    dotnet add package Sejil --version 1.0.0-beta9
     ```
 
 2. Adding code
-
-    For ASP.net Core 1.x.x, add below code to **Program.cs**:
-
-    ```csharp
-    public static void Main(string[] args)
-    {
-        var host = new WebHostBuilder()
-            .AddSejil("/sejil", LogLevel.Debug)
-            // ...
-    }
-    ```
-
-    For ASP.net core 2.x.x, add below code to **Program.cs**:
+    Add below code to **Program.cs**:
 
     ```csharp
     public static IWebHost BuildWebHost(string[] args) =>
@@ -120,10 +108,10 @@ cd ./Sejil
 ./build.sh   # If running Linux/OSX
 ```
 
-You can run one of the sample apps afterwards, `Sample1.0` targets `netcoreapp1.1` while `Sample2.0` targets `netcoreapp2.0`:
+You can run one of the sample apps afterwards:
 
 ```powershell
-cd ./sample/Sample2.0
+cd ./sample/SampleBasic
 dotnet run
 ```
 

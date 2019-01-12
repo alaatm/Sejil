@@ -16,7 +16,9 @@ namespace Microsoft.Extensions.DependencyInjection
 		public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
         {
             if (setupAction == null)
+            {
                 throw new ArgumentNullException(nameof(setupAction));
+            }
 
             var settings = services.BuildServiceProvider().GetService<ISejilSettings>();
 

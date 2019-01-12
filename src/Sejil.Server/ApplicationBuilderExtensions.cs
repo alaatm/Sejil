@@ -12,11 +12,7 @@ using Sejil.Routing.Internal;
 using Newtonsoft.Json;
 using Sejil.Models.Internal;
 using Serilog.Context;
-#if NETSTANDARD1_6
-using Sejil.Routing;
-#elif NETSTANDARD2_0
 using Microsoft.AspNetCore.Routing;
-#endif
 
 namespace Sejil
 {

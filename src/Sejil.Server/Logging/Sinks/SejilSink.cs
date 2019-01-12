@@ -12,9 +12,7 @@ using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 using Sejil.Configuration.Internal;
-#if NETSTANDARD2_0
 using System.Diagnostics;
-#endif
 
 namespace Sejil.Logging.Sinks
 {
@@ -82,11 +80,7 @@ namespace Sejil.Logging.Sinks
             cmd.Parameters["@messageTemplate"].Value = log.MessageTemplate.Text;
             cmd.Parameters["@level"].Value = log.Level.ToString();
             cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
-#if NETSTANDARD2_0
             cmd.Parameters["@exception"].Value = log.Exception?.Demystify().ToString() ?? (object)DBNull.Value;
-#else
-            cmd.Parameters["@exception"].Value = log.Exception?.ToString() ?? (object)DBNull.Value;
-#endif
 
             await cmd.ExecuteNonQueryAsync();
             return id;

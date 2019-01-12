@@ -22,11 +22,9 @@ namespace Sejil.Configuration.Internal
         /// </summary>
         string Title { get; set; }
 
-#if NETSTANDARD2_0
         /// <summary>
         /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
         /// </summary>
         string AuthenticationScheme { get; set; }
-#endif
     }
 }
