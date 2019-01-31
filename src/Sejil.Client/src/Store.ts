@@ -11,14 +11,17 @@ export default class Store {
     @observable queries: ILogQuery[] = [];
     @observable queryText = '';
     @observable minLogLevel = '';
-	@observable userName = '';
-	@observable title = 'Sejil';
+    @observable userName = '';
+    @observable title = 'Sejil';
+    @observable loading = false;
     dateFilter: string | Date[] | null = null;
     levelFilter: string | null = null;
     exceptionsOnly = false;
     private page = 1;
     private startingTimestamp: string | undefined = undefined;
     private rootUrl = window.location.pathname;
+
+    public onEventsLoadError: (response: Response | string) => void;
 
     @action public async reset() {
         this.page = 1;
@@ -32,29 +35,46 @@ export default class Store {
             ? `${this.rootUrl}/events?page=${this.page}&startingTs=${encodeURIComponent(this.startingTimestamp)}`
             : `${this.rootUrl}/events?page=${this.page}`;
 
-        const response = await fetch(url, {
-            method: 'post',
-            body: JSON.stringify({
-                queryText: this.queryText,
-                dateFilter: this.dateFilter instanceof Array
-                    ? null
-                    : this.dateFilter,
-                dateRangeFilter: this.dateFilter instanceof Array
-                    ? this.dateFilter.map(d => formatServerDate(d))
-                    : null,
-                levelFilter: this.levelFilter,
-                exceptionsOnly: this.exceptionsOnly,
-            })
-        });
-        const events = await response.json() as ILogEntry[];
+        runInAction('set loading started', () => this.loading = true);
+        try {
+            const response = await fetch(url, {
+                method: 'post',
+                body: JSON.stringify({
+                    queryText: this.queryText,
+                    dateFilter: this.dateFilter instanceof Array
+                        ? null
+                        : this.dateFilter,
+                    dateRangeFilter: this.dateFilter instanceof Array
+                        ? this.dateFilter.map(d => formatServerDate(d))
+                        : null,
+                    levelFilter: this.levelFilter,
+                    exceptionsOnly: this.exceptionsOnly,
+                })
+            });
+            runInAction('set loading finished', () => this.loading = false);
 
-        if (events.length) {
-            if (!this.startingTimestamp) {
-                this.startingTimestamp = events[0].timestamp;
+            if (!response.ok) {
+                if (this.onEventsLoadError) {
+                    this.onEventsLoadError(response);
+                }
+                return;
             }
 
-            runInAction('load entries', () => this.logEntries = this.logEntries.concat(events));
-            this.page++;
+            const events = await response.json() as ILogEntry[];
+
+            if (events.length) {
+                if (!this.startingTimestamp) {
+                    this.startingTimestamp = events[0].timestamp;
+                }
+
+                runInAction('load entries', () => this.logEntries = this.logEntries.concat(events));
+                this.page++;
+            }
+        } catch (err) {
+            runInAction('set loading finished', () => this.loading = false);
+            if (this.onEventsLoadError) {
+                this.onEventsLoadError(err);
+            }
         }
     }
 
@@ -107,18 +127,18 @@ export default class Store {
         });
         runInAction('set min log level', () => this.minLogLevel = level);
     }
-	
-	@action public async loadUserName() {
+
+    @action public async loadUserName() {
         const response = await fetch(`${this.rootUrl}/user-name`);
         const responseJson = await response.json() as { userName: string };
 
         runInAction('load user name', () => this.userName = responseJson.userName);
     }
-	
-	@action public async loadTitle() {
+
+    @action public async loadTitle() {
         const response = await fetch(`${this.rootUrl}/title`);
         const responseJson = await response.json() as { title: string };
 
-         runInAction('load page title', () => this.title = responseJson.title);
+        runInAction('load page title', () => this.title = responseJson.title);
     }
 }

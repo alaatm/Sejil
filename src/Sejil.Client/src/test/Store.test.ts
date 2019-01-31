@@ -11,6 +11,42 @@ const rootUrl = window.location.pathname;
 (global as any).fetch = require('jest-fetch-mock');
 
 describe('Store', () => {
+    it('loadEvents() raises error event when loading fails on server', async () => {
+        // Arrange
+        let errorEventRaised = false;
+        fetch.mockResponse('{}', { status: 500 });
+
+        const store = new Store();
+        store.onEventsLoadError = _ => errorEventRaised = true;
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(errorEventRaised).toBe(true);
+        expect(store.loading).toBe(false);
+
+        fetch.resetMocks();
+    });
+
+    it('loadEvents() raises error event when loading fails (fetch-reject)', async () => {
+        // Arrange
+        let errorEventRaised = false;
+        fetch.mockReject();
+
+        const store = new Store();
+        store.onEventsLoadError = _ => errorEventRaised = true;
+
+        // Act
+        await store.loadEvents();
+
+        // Assert
+        expect(errorEventRaised).toBe(true);
+        expect(store.loading).toBe(false);
+
+        fetch.resetMocks();
+    });
+
     it('loadEvents() should load events', async () => {
         // Arrange
         const testEvents = createTestLogEntries(0, 5);
@@ -30,6 +66,7 @@ describe('Store', () => {
                 '{"queryText":"","dateFilter":null,"dateRangeFilter":null,"levelFilter":null,"exceptionsOnly":false}'));
         expect(toJS(store.logEntries)).toHaveLength(testEvents.events.length);
         expect(toJS(store.logEntries)).toMatchObject(testEvents.events);
+        expect(store.loading).toBe(false);
 
         fetch.resetMocks();
     });
