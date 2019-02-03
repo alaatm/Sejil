@@ -15,7 +15,7 @@ namespace Sejil.Routing.Internal
 {
     public class SejilController : ISejilController
     {
-        private static JsonSerializerSettings _camelCaseSerializerSetting =
+        private static readonly JsonSerializerSettings _camelCaseSerializerSetting =
             new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         private readonly ISejilRepository _repository;
@@ -23,11 +23,7 @@ namespace Sejil.Routing.Internal
         private HttpContext _context { get; set; }
 
         public SejilController(IHttpContextAccessor contextAccessor, ISejilRepository repository, ISejilSettings settings)
-        {
-            _context = contextAccessor.HttpContext;
-            _repository = repository;
-            _settings = settings;
-        }
+            => (_context, _repository, _settings) = (contextAccessor.HttpContext, repository, settings);
 
         public async Task GetIndexAsync()
         {

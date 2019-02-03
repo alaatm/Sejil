@@ -12,12 +12,9 @@ namespace Sejil.Data.Internal
 {
     public class SejilSqlProvider : ISejilSqlProvider
     {
-        private string[] _nonPropertyColumns;
+        private readonly string[] _nonPropertyColumns;
 
-        public SejilSqlProvider(ISejilSettings settings)
-        {
-            _nonPropertyColumns = settings.NonPropertyColumns;
-        }
+        public SejilSqlProvider(ISejilSettings settings) => _nonPropertyColumns = settings.NonPropertyColumns;
 
         public string GetSavedQueriesSql()
             => "SELECT * FROM log_query";
