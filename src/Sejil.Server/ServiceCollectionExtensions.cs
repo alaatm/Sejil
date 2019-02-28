@@ -9,11 +9,11 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-		/// Configure Sejil
-		/// </summary>
-		/// <param name="services">The service collection.</param>
-		/// <param name="setupAction">Delegate to configure the settings.</param>		
-		public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
+        /// Configure Sejil
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="setupAction">Delegate to configure the settings.</param>		
+        public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
         {
             if (setupAction == null)
             {
