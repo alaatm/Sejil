@@ -5,19 +5,15 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
+using System.Text.Json;
 
 namespace Sejil.Routing.Internal
 {
     public class SejilController : ISejilController
     {
-        private static readonly JsonSerializerSettings _camelCaseSerializerSetting =
-            new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
-
         private readonly ISejilRepository _repository;
         private readonly ISejilSettings _settings;
         private HttpContext _context { get; set; }
@@ -43,7 +39,7 @@ namespace Sejil.Routing.Internal
             var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
 
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonConvert.SerializeObject(events, _camelCaseSerializerSetting));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions._camelCaseJson));
         }
 
         public async Task SaveQueryAsync(LogQuery logQuery)
@@ -57,7 +53,7 @@ namespace Sejil.Routing.Internal
         {
             var logQueryList = await _repository.GetSavedQueriesAsync();
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonConvert.SerializeObject(logQueryList, _camelCaseSerializerSetting));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(logQueryList, ApplicationBuilderExtensions._camelCaseJson));
         }
 
         public async Task GetMinimumLogLevelAsync()
@@ -67,7 +63,7 @@ namespace Sejil.Routing.Internal
                 MinimumLogLevel = _settings.LoggingLevelSwitch.MinimumLevel.ToString()
             };
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
         }
 
         public async Task GetUserNameAsync()
@@ -80,7 +76,7 @@ namespace Sejil.Routing.Internal
             };
 
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
         }
 
         public void SetMinimumLogLevel(string minLogLevel)
@@ -102,7 +98,7 @@ namespace Sejil.Routing.Internal
                 Title = _settings.Title
             };
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonConvert.SerializeObject(response, _camelCaseSerializerSetting));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
         }
     }
 }

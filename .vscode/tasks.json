@@ -4,12 +4,15 @@
     "version": "2.0.0",
     "command": "dotnet",
     "tasks": [{
-        "taskName": "build",
-        "type": "shell",
-        "group": "build",
-        "presentation": {
-            "reveal": "silent"
-        },
+        "label": "build",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+            "build",
+            "${workspaceFolder}/sample/SampleBasic/SampleBasic.csproj",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary"
+        ],
         "problemMatcher": "$msCompile"
-    }]
+    }, ]
 }

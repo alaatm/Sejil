@@ -9,15 +9,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Sejil.Configuration.Internal;
 using Sejil.Routing.Internal;
-using Newtonsoft.Json;
 using Sejil.Models.Internal;
 using Serilog.Context;
 using Microsoft.AspNetCore.Routing;
+using System.Text.Json;
 
 namespace Sejil
 {
     public static class ApplicationBuilderExtensions
     {
+        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         /// <summary>
         /// Adds Sejil to the request pipeline.
         /// </summary>
@@ -49,8 +51,7 @@ namespace Sejil
 
                 routes.MapPost($"{url}/events", async context =>
                 {
-                    var query = JsonConvert.DeserializeObject<LogQueryFilter>(
-                        await GetRequestBodyAsync(context.Request));
+                    var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, _camelCaseJson);
                     Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                     var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
@@ -60,8 +61,7 @@ namespace Sejil
 
                 routes.MapPost($"{url}/log-query", async context =>
                 {
-                    var logQuery = JsonConvert.DeserializeObject<LogQuery>(
-                        await GetRequestBodyAsync(context.Request));
+                    var logQuery = await JsonSerializer.DeserializeAsync<LogQuery>(context.Request.Body, _camelCaseJson);
 
                     var controller = GetSejilController(context);
                     await controller.SaveQueryAsync(logQuery);

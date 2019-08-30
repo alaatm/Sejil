@@ -1,32 +1,25 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Configuration;
-using Serilog.Extensions.Logging;
 
-namespace sample
+namespace Sample
 {
     public class Program
     {
         public static void Main(string[] args)
-        {           
-            BuildWebHost(args).Run();
+        {
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .AddSejil("/sejil", LogLevel.Debug)
-                .UseStartup<Startup>()
-                .Build();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.AddSejil("/sejil", LogLevel.Debug);
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
