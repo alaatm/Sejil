@@ -9,7 +9,7 @@ environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   CLI_CHANNEL: release/3.0.100-preview8
-  CLI_VERSION: 3.0.100-preview8
+  CLI_VERSION: Latest
   nodejs_version: "8"
 
 init:
