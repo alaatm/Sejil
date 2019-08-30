@@ -1,11 +1,11 @@
+**NOTE** The master branch has switched to .netcore 3.0. This README still refers to v1.0.1 which is available in branch [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1). There are no nuget packages available for master branch yet.
+
 # Sejil
 
 [![Build status](https://ci.appveyor.com/api/projects/status/5eci12hmv92dd8i6?svg=true)](https://ci.appveyor.com/project/alaatm/sejil)
 [![NuGet](https://img.shields.io/nuget/v/Sejil.svg)](https://www.nuget.org/packages/Sejil/)
 
 Sejil is a library that enables you to capture, view and filter your ASP.net core app's log events right from your app. It supports structured logging, querying as well as saving log event queries.
-
-**NOTE** The master branch has switched to .netcore 3.0. This README still refers to v1.0.1 which is available in branch [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1). There are no nuget packages available for master branch yet.
 
 ## Quick Links
 
