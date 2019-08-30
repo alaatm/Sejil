@@ -1,5 +1,5 @@
-version: '1.0.1-beta1.{build}'
-image: Visual Studio 2017
+version: '2.0.0-beta1.{build}'
+image: Visual Studio 2019
 
 branches:
   only:
@@ -8,8 +8,8 @@ branches:
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  CLI_CHANNEL: Current
-  CLI_VERSION: 2.0.0
+  CLI_CHANNEL: release/3.0.100-preview8
+  CLI_VERSION: 3.0.100-preview8
   nodejs_version: "8"
 
 init:
@@ -22,7 +22,7 @@ install:
   # Install .net SDK
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
-  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
+  - ps: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/dotnet/cli/release/3.0.100-preview8/scripts/obtain/dotnet-install.ps1" -OutFile "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1"
   - ps: '& "$($env:DOTNET_INSTALL_DIR)/dotnet-install.ps1" -Channel $env:CLI_CHANNEL -Version $env:CLI_VERSION -InstallDir $env:DOTNET_INSTALL_DIR'
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 
