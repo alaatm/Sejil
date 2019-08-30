@@ -93,7 +93,7 @@ namespace Sejil.Test.Configuration
         [InlineData("Error", LogEventLevel.Error, true)]
         [InlineData("Critical", LogEventLevel.Fatal, true)]
         [InlineData("faTAL", LogEventLevel.Fatal, true)]
-        [InlineData("none", 0, false)]
+        [InlineData("none", (LogEventLevel)0, false)]
         public void TrySetMinimumLogLevel_attempts_to_sets_specified_min_log_level(string logLevel, LogEventLevel expected, bool expectedResult)
         {
             // Arrange

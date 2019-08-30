@@ -42,7 +42,7 @@ namespace Sejil.Test.Data
             // Assert
             Assert.True(result);
             var savedQueries = await repository.GetSavedQueriesAsync();
-            Assert.Equal(1, savedQueries.Count());
+            Assert.Single(savedQueries);
             Assert.Equal(1, savedQueries.First().Id);
             Assert.Equal("Test", savedQueries.First().Name);
             Assert.Equal("q", savedQueries.First().Query);
@@ -90,7 +90,7 @@ namespace Sejil.Test.Data
             // Assert
             Assert.True(result);
             var queries = await repository.GetSavedQueriesAsync();
-            Assert.Equal(0, queries.Count());
+            Assert.Empty(queries);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace Sejil.Test.Data
             // Assert
             Assert.False(result);
             var queries = await repository.GetSavedQueriesAsync();
-            Assert.Equal(1, queries.Count());
+            Assert.Single(queries);
         }
 
         [Fact]
@@ -182,7 +182,7 @@ namespace Sejil.Test.Data
             var logs = await repository.GetEventsPageAsync(4, null, null);
 
             // Assert
-            Assert.Equal(1, logs.Count());
+            Assert.Single(logs);
             Assert.Equal("0", logs.ElementAt(0).Message);
             Assert.NotNull(logs.ElementAt(0).Properties);
             Assert.Equal(2, logs.ElementAt(0).Properties.Count);

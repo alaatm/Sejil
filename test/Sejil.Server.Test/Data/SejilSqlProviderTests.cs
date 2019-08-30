@@ -61,7 +61,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(0, 1, null, null));
-            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
+            Assert.Equal($"Argument must be greater than zero. (Parameter 'page')", ex.Message);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("page", () => provider.GetPagedLogEntriesSql(-1, 1, null, null));
-            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: page", ex.Message);
+            Assert.Equal($"Argument must be greater than zero. (Parameter 'page')", ex.Message);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, 0, null, null));
-            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
+            Assert.Equal($"Argument must be greater than zero. (Parameter 'pageSize')", ex.Message);
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace Sejil.Test.Data
 
             // Act & assert
             var ex = Assert.Throws<ArgumentOutOfRangeException>("pageSize", () => provider.GetPagedLogEntriesSql(1, -1, null, null));
-            Assert.Equal($"Argument must be greater than zero.{Environment.NewLine}Parameter name: pageSize", ex.Message);
+            Assert.Equal($"Argument must be greater than zero. (Parameter 'pageSize')", ex.Message);
         }
 
         [Fact]

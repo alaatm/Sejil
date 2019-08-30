@@ -53,7 +53,7 @@ namespace Sejil.Test.Logging.Sinks
             var fks = GetForeignKeyColumns(db, "log");
 
             Assert.Equal(6, columns.Count());
-            Assert.Equal(0, fks.Count());
+            Assert.Empty(fks);
 
             var idCol = columns.ElementAt(0);
             Assert.Equal("id", idCol.Name);
@@ -108,7 +108,7 @@ namespace Sejil.Test.Logging.Sinks
             var fks = GetForeignKeyColumns(db, "log_property");
 
             Assert.Equal(4, columns.Count());
-            Assert.Equal(1, fks.Count());
+            Assert.Single(fks);
 
             var idCol = columns.ElementAt(0);
             Assert.Equal("id", idCol.Name);
@@ -156,7 +156,7 @@ namespace Sejil.Test.Logging.Sinks
             var fks = GetForeignKeyColumns(db, "log_query");
 
             Assert.Equal(3, columns.Count());
-            Assert.Equal(0, fks.Count());
+            Assert.Empty(fks);
 
             var idCol = columns.ElementAt(0);
             Assert.Equal("id", idCol.Name);
@@ -286,7 +286,7 @@ namespace Sejil.Test.Logging.Sinks
 
             // Assert
             var logEvents = await repository.GetEventsPageAsync(1, null, null);
-            Assert.Equal(0, logEvents.Count());
+            Assert.Empty(logEvents);
         }
 
         private IEnumerable<string> GetTables(string db)

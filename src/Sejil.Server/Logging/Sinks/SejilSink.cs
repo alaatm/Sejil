@@ -18,7 +18,7 @@ namespace Sejil.Logging.Sinks
 {
     internal class SejilSink : PeriodicBatchingSink
     {
-        private static int _defaultBatchSizeLimit = 50;
+        private static readonly int _defaultBatchSizeLimit = 50;
         private static TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
 
         private readonly string _connectionString;

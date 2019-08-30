@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json;
 using Sejil.Configuration.Internal;
 using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
@@ -25,11 +24,14 @@ using Microsoft.Extensions.Options;
 using System.Text.Encodings.Web;
 using System.Security.Claims;
 using System.Net;
+using System.Text.Json;
 
 namespace Sejil.Test
 {
     public class ApplicationBuilderExtensionsTests
     {
+        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         [Fact]
         public async Task HttpGet_root_url_calls_controller_GetIndexAsync_method()
         {
@@ -84,7 +86,7 @@ namespace Sejil.Test
                 Name = "Test",
                 Query = "Test"
             };
-            var content = new StringContent(JsonConvert.SerializeObject(logQuery));
+            var content = new StringContent(JsonSerializer.Serialize(logQuery, _camelCaseJson));
 
             // Act
             await server.CreateClient().PostAsync(target, content);

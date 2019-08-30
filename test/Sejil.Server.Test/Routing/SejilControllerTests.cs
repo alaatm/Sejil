@@ -5,12 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
@@ -23,6 +22,8 @@ namespace Sejil.Test.Routing
 {
     public class SejilControllerTests
     {
+        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         [Fact]
         public async Task GetIndexAsync_writes_app_html_to_response_stream()
         {
@@ -211,10 +212,10 @@ namespace Sejil.Test.Routing
             var settingsMoq = new Mock<ISejilSettings>();
             settingsMoq.SetupGet(p => p.LoggingLevelSwitch).Returns(levelSwitch);
 
-            var responseJson = JsonConvert.SerializeObject(new
+            var responseJson = JsonSerializer.Serialize(new
             {
                 MinimumLogLevel = levelSwitch.MinimumLevel.ToString()
-            }, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            }, _camelCaseJson);
 
 
             var (contextMoq, responseMoq, bodyMoq) = CreateContextMoq();
@@ -286,10 +287,10 @@ namespace Sejil.Test.Routing
             settingsMoq.SetupGet(p => p.Title).Returns(title);
             var (contextMoq, responseMoq, bodyMoq) = CreateContextMoq();
             var controller = CreateController(contextMoq.Object, Mock.Of<ISejilRepository>(), settingsMoq.Object);
-            var responseJson = JsonConvert.SerializeObject(new
+            var responseJson = JsonSerializer.Serialize(new
             {
                 Title = title
-            }, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            }, _camelCaseJson);
 
             // Act
             await controller.GetTitleAsync();
@@ -324,8 +325,7 @@ namespace Sejil.Test.Routing
                 }
             };
 
-            var json = JsonConvert.SerializeObject(events,
-                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            var json = JsonSerializer.Serialize(events, _camelCaseJson);
 
             return (events, json);
         }
@@ -346,8 +346,7 @@ namespace Sejil.Test.Routing
                 },
             };
 
-            var json = JsonConvert.SerializeObject(queries,
-                new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            var json = JsonSerializer.Serialize(queries, _camelCaseJson);
 
             return (queries, json);
         }

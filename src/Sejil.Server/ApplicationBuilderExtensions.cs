@@ -31,15 +31,15 @@ namespace Sejil
             var url = settings.Url.Substring(1); // Skip the '/'
 
             app.Use(async (context, next) =>
-                    {
-                        var userName = context.User.Identity.IsAuthenticated
-                            ? context.User.Identity.Name
-                            : context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-                        using (LogContext.PushProperty("Username", userName))
-                        {
-                            await next.Invoke();
-                        }
-                    });
+            {
+                var userName = context.User.Identity.IsAuthenticated
+                    ? context.User.Identity.Name
+                    : context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                using (LogContext.PushProperty("Username", userName))
+                {
+                    await next.Invoke();
+                }
+            });
 
             app.UseRouter(routes =>
             {
