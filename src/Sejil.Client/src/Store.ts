@@ -73,7 +73,7 @@ export default class Store {
         } catch (err) {
             runInAction('set loading finished', () => this.loading = false);
             if (this.onEventsLoadError) {
-                this.onEventsLoadError(err);
+                this.onEventsLoadError(err.message || err);
             }
         }
     }
