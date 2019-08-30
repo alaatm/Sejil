@@ -5,6 +5,8 @@
 
 Sejil is a library that enables you to capture, view and filter your ASP.net core app's log events right from your app. It supports structured logging, querying as well as saving log event queries.
 
+**NOTE** The master branch has switched to .netcore 3.0. This README still refers to v1.0.1 which is available in branch [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1). There are no nuget packages available for master branch yet.
+
 ## Quick Links
 
 - [Getting started](#getting-started)
