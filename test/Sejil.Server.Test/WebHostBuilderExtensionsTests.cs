@@ -64,18 +64,17 @@ namespace Sejil.Test
 
             // Assert
             var webhost = webhostBuilder.Build();
-            using (var scope = webhost.Services.CreateScope())
-            {
-                var settings = scope.ServiceProvider.GetService(typeof(ISejilSettings));
-                var repository = scope.ServiceProvider.GetService(typeof(ISejilRepository));
-                var sqlProvider = scope.ServiceProvider.GetService(typeof(ISejilSqlProvider));
-                var controller = scope.ServiceProvider.GetService(typeof(ISejilController));
 
-                Assert.NotNull(settings);
-                Assert.NotNull(repository);
-                Assert.NotNull(sqlProvider);
-                Assert.NotNull(controller);
-            }
+            using var scope = webhost.Services.CreateScope();
+            var settings = scope.ServiceProvider.GetService(typeof(ISejilSettings));
+            var repository = scope.ServiceProvider.GetService(typeof(ISejilRepository));
+            var sqlProvider = scope.ServiceProvider.GetService(typeof(ISejilSqlProvider));
+            var controller = scope.ServiceProvider.GetService(typeof(ISejilController));
+
+            Assert.NotNull(settings);
+            Assert.NotNull(repository);
+            Assert.NotNull(sqlProvider);
+            Assert.NotNull(controller);
         }
 
         [Fact]

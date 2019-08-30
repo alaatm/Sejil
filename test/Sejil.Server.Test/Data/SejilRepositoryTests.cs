@@ -129,8 +129,9 @@ namespace Sejil.Test.Data
                 conn.Open();
                 for (var i = 0; i < 10; i++)
                 {
-                    var cmd = new SqliteCommand($@"INSERT INTO log (id, message, messageTemplate, level, timestamp) 
-                        VALUES ('{Guid.NewGuid().ToString()}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))", conn);
+                    using var cmd = conn.CreateCommand();
+                    cmd.CommandText = $@"INSERT INTO log (id, message, messageTemplate, level, timestamp) 
+                        VALUES ('{Guid.NewGuid().ToString()}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -192,13 +193,11 @@ namespace Sejil.Test.Data
 
         private void InitializeDatabse(string path)
         {
-            using (var conn = new SqliteConnection($"DataSource={path}"))
-            {
-                conn.Open();
-                var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
-                var cmd = new SqliteCommand(sql, conn);
-                cmd.ExecuteNonQuery();
-            }
+            using var conn = new SqliteConnection($"DataSource={path}");
+            conn.Open();
+            var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
+            var cmd = new SqliteCommand(sql, conn);
+            cmd.ExecuteNonQuery();
         }
     }
 }

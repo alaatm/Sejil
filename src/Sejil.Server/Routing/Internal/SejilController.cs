@@ -23,7 +23,7 @@ namespace Sejil.Routing.Internal
 
         public async Task GetIndexAsync()
         {
-            if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
+            if (!String.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
             {
                 await _context.ChallengeAsync(_settings.AuthenticationScheme);
             }
@@ -42,12 +42,10 @@ namespace Sejil.Routing.Internal
             await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions._camelCaseJson));
         }
 
-        public async Task SaveQueryAsync(LogQuery logQuery)
-        {
+        public async Task SaveQueryAsync(LogQuery logQuery) => 
             _context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
                 ? StatusCodes.Status201Created
                 : StatusCodes.Status500InternalServerError;
-        }
 
         public async Task GetQueriesAsync()
         {
@@ -70,7 +68,7 @@ namespace Sejil.Routing.Internal
         {
             var response = new
             {
-                UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
+                UserName = !String.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
                     ? _context.User.Identity.Name
                     : ""
             };
@@ -79,23 +77,19 @@ namespace Sejil.Routing.Internal
             await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
         }
 
-        public void SetMinimumLogLevel(string minLogLevel)
-        {
+        public void SetMinimumLogLevel(string minLogLevel) => 
             _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
                 ? StatusCodes.Status200OK
                 : StatusCodes.Status400BadRequest;
-        }
 
         public async Task DeleteQueryAsync(string queryName)
-        {
-            await _repository.DeleteQueryAsync(queryName);
-        }
+            => await _repository.DeleteQueryAsync(queryName);
 
         public async Task GetTitleAsync()
         {
             var response = new
             {
-                Title = _settings.Title
+                _settings.Title
             };
             _context.Response.ContentType = "application/json";
             await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));

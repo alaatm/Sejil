@@ -137,8 +137,11 @@ namespace Sejil.Logging.Sinks
             {
                 conn.Open();
                 var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
-                var cmd = new SqliteCommand(sql, conn);
-                cmd.ExecuteNonQuery();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 

@@ -14,14 +14,11 @@ namespace sample.Controllers
 {
     public class HomeController : Controller
     {
-        private ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger) => _logger = logger;
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
 
         public IActionResult About()
         {
@@ -37,10 +34,7 @@ namespace sample.Controllers
             return View();
         }
 
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 
         public IActionResult Divide(int n1, int n2)
         {

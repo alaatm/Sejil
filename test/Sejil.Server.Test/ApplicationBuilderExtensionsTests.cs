@@ -285,7 +285,11 @@ namespace Sejil.Test
 
         string Join(List<DateTime> dateList)
         {
-            if (dateList == null || dateList?.Count == 0) return null;
+            if (dateList == null || dateList?.Count == 0)
+            {
+                return null;
+            }
+
             return String.Join(",", dateList);
         }
     }

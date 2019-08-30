@@ -291,29 +291,23 @@ namespace Sejil.Test.Logging.Sinks
 
         private IEnumerable<string> GetTables(string db)
         {
-            using (var conn = new SqliteConnection($"DataSource={db}"))
-            {
-                conn.Open();
-                return conn.Query<string>("SELECT name FROM sqlite_master WHERE type='table';");
-            }
+            using var conn = new SqliteConnection($"DataSource={db}");
+            conn.Open();
+            return conn.Query<string>("SELECT name FROM sqlite_master WHERE type='table';");
         }
 
         private IEnumerable<ColumnInfo> GetColumns(string db, string tableName)
         {
-            using (var conn = new SqliteConnection($"DataSource={db}"))
-            {
-                conn.Open();
-                return conn.Query<ColumnInfo>($"pragma table_info('{tableName}');");
-            }
+            using var conn = new SqliteConnection($"DataSource={db}");
+            conn.Open();
+            return conn.Query<ColumnInfo>($"pragma table_info('{tableName}');");
         }
 
         private IEnumerable<ForeignKeyColumnInfo> GetForeignKeyColumns(string db, string tableName)
         {
-            using (var conn = new SqliteConnection($"DataSource={db}"))
-            {
-                conn.Open();
-                return conn.Query<ForeignKeyColumnInfo>($"pragma foreign_key_list('{tableName}');");
-            }
+            using var conn = new SqliteConnection($"DataSource={db}");
+            conn.Open();
+            return conn.Query<ForeignKeyColumnInfo>($"pragma foreign_key_list('{tableName}');");
         }
 
         class ColumnInfo
