@@ -1,4 +1,4 @@
-**NOTE** The master branch has switched to .netcore 3.0. This README still refers to v1.0.1 which is available in branch [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1). There are no nuget packages available for master branch yet.
+**NOTE** The master branch, including this readme, has switched to .netcore 3.0. For .netcore 1/2 based, please go here: [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1).
 
 # Sejil
 
@@ -19,7 +19,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
-    dotnet add package Sejil --version 1.0.1-beta1
+    dotnet add package Sejil --version 2.0.0-beta1
     ```
 
 2. Adding code
@@ -27,9 +27,12 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
     ```csharp
     public static IWebHost BuildWebHost(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .AddSejil("/sejil", LogLevel.Debug)
-            // ...
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.AddSejil("/sejil", LogLevel.Debug);
+                // ...
+            });            
     ```
 
     Add below code to **Startup.cs**
@@ -39,7 +42,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
     public class Startup
     {    
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSejil();
             // ...
