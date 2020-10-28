@@ -1,10 +1,11 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using System;
+using System.IO;
+using System.Reflection;
 using Serilog.Events;
 using Serilog.Core;
-using System.IO;
-using System;
 
 namespace Sejil.Configuration.Internal
 {
@@ -46,9 +47,9 @@ namespace Sejil.Configuration.Internal
             }
             else
             {
-                var appDataFolder = GetLocalAppFolder();
-                var appName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
-                SqliteDbPath = Path.Combine(appDataFolder, appName, $"Sejil-{UUID}.sqlite");
+                var localAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var appName = Assembly.GetEntryAssembly().GetName().Name;
+                SqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{UUID}.sqlite");
             }
 
             NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
@@ -83,9 +84,6 @@ namespace Sejil.Configuration.Internal
 
             return false;
         }
-
-        private string GetLocalAppFolder()
-            => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
         private bool IsRunningInAzure()
             => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
