@@ -18,7 +18,7 @@ namespace Sejil.Test.Configuration
         {
             // Arrange & act
             var basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "testhost");
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "testhost.x86");
             var settings = new SejilSettings("", LogEventLevel.Debug);
 
             // Assert

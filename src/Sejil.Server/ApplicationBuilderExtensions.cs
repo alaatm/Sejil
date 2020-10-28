@@ -114,17 +114,7 @@ namespace Sejil
 
         private static async Task<string> GetRequestBodyAsync(HttpRequest request)
         {
-            // TODO: Remove below try-catch and use request.ContentLength directly
-            // once test issue is fixed.
-            long length = 0;
-            try
-            {
-                length = request.Body?.Length ?? 0;
-            }
-            catch
-            {
-                length = request.ContentLength ?? 0;
-            }
+            var length = request.Body.Length;
 
             if (length > 0)
             {

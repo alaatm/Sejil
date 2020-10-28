@@ -25,6 +25,7 @@ using System.Text.Encodings.Web;
 using System.Security.Claims;
 using System.Net;
 using System.Text.Json;
+using System.IO;
 
 namespace Sejil.Test
 {
@@ -237,7 +238,22 @@ namespace Sejil.Test
         private static TestServer CreateServer(string url, ISejilController controller)
         {
             var builder = new WebHostBuilder()
-                .Configure(app => app.UseSejil())
+                .Configure(app =>
+                {
+                    // Workaround for https://github.com/dotnet/aspnetcore/issues/18463
+                    // so that ContentLength gets properly set for the test server.
+                    app.Use(async (context, next) =>
+                    {
+                        context.Request.EnableBuffering();
+                        using var ms = new MemoryStream();
+                        await context.Request.Body.CopyToAsync(ms);
+                        context.Request.ContentLength = ms.Length;
+                        context.Request.Body.Seek(0, SeekOrigin.Begin);
+                        await next.Invoke();
+                    });
+
+                    app.UseSejil();
+                })
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ISejilSettings>(new SejilSettings(url, LogEventLevel.Debug));
