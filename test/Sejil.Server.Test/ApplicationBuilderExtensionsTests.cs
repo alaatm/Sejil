@@ -114,7 +114,23 @@ namespace Sejil.Test
         }
 
         [Fact]
-        public async Task HttpPost_min_log_level_url_calls_controller_SetMinimumLogLevelAsync_method()
+        public async Task HttpGet_min_log_level_url_calls_controller_GetMinimumLogLevelAsync_method()
+        {
+            // Arrange
+            var url = "/sejil";
+            var target = $"{url}/min-log-level";
+            var controllerMoq = new Mock<ISejilController>();
+            var server = CreateServer(url, controllerMoq.Object);
+
+            // Act
+            await server.CreateClient().GetAsync(target);
+
+            // Assert
+            controllerMoq.Verify(p => p.GetMinimumLogLevelAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task HttpPost_min_log_level_url_calls_controller_SetMinimumLogLevel_method()
         {
             // Arrange
             var url = "/sejil";
@@ -147,6 +163,22 @@ namespace Sejil.Test
 
             // Assert
             controllerMoq.Verify(p => p.DeleteQueryAsync(query), Times.Once);
+        }
+
+        [Fact]
+        public async Task HttpGet_title_calls_controller_GetTitleAsync_method()
+        {
+            // Arrange
+            var url = "/sejil";
+            var target = $"{url}/title";
+            var controllerMoq = new Mock<ISejilController>();
+            var server = CreateServer(url, controllerMoq.Object);
+
+            // Act
+            await server.CreateClient().GetAsync(target);
+
+            // Assert
+            controllerMoq.Verify(p => p.GetTitleAsync(), Times.Once);
         }
 
         [Fact]
