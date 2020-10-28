@@ -237,10 +237,7 @@ namespace Sejil.Test
         private static TestServer CreateServer(string url, ISejilController controller)
         {
             var builder = new WebHostBuilder()
-                .Configure(app =>
-                {
-                    app.UseSejil();
-                })
+                .Configure(app => app.UseSejil())
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ISejilSettings>(new SejilSettings(url, LogEventLevel.Debug));
@@ -272,7 +269,7 @@ namespace Sejil.Test
                     services.AddRouting();
 
                     services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                    services.AddSingleton<ISejilSettings>(new SejilSettings("/sejil", LogEventLevel.Debug));
+                    services.AddSingleton<ISejilSettings>(new SejilSettings(url, LogEventLevel.Debug));
                     services.AddScoped<ISejilRepository, SejilRepository>();
                     services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                     services.AddScoped<ISejilController, SejilController>();
@@ -290,11 +287,11 @@ namespace Sejil.Test
                 return null;
             }
 
-            return String.Join(",", dateList);
+            return string.Join(",", dateList);
         }
     }
 
-    public class TestAuthDefaults
+    public static class TestAuthDefaults
     {
         public static string AuthenticationScheme { get; } = "TestAuthScheme";
     }
@@ -311,7 +308,7 @@ namespace Sejil.Test
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!String.IsNullOrWhiteSpace(Options.Username))
+            if (!string.IsNullOrWhiteSpace(Options.Username))
             {
                 var claims = new[] { new Claim(ClaimTypes.Name, Options.Username, ClaimValueTypes.String, ClaimsIssuer) };
                 var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));

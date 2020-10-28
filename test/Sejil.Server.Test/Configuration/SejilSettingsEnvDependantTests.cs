@@ -36,7 +36,7 @@ namespace Sejil.Test.Configuration
 
             // Assert
             Assert.Equal(basePath, Path.GetDirectoryName(settings.SqliteDbPath));
-            Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", String.Empty, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", string.Empty, EnvironmentVariableTarget.Process);
         }
     }
 }

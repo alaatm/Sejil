@@ -88,6 +88,6 @@ namespace Sejil.Configuration.Internal
             => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
         private bool IsRunningInAzure()
-            => !String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+            => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
     }
 }

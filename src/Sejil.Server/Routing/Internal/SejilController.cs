@@ -16,14 +16,14 @@ namespace Sejil.Routing.Internal
     {
         private readonly ISejilRepository _repository;
         private readonly ISejilSettings _settings;
-        private HttpContext _context { get; set; }
+        private readonly HttpContext _context;
 
         public SejilController(IHttpContextAccessor contextAccessor, ISejilRepository repository, ISejilSettings settings)
             => (_context, _repository, _settings) = (contextAccessor.HttpContext, repository, settings);
 
         public async Task GetIndexAsync()
         {
-            if (!String.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
+            if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
             {
                 await _context.ChallengeAsync(_settings.AuthenticationScheme);
             }
@@ -68,7 +68,7 @@ namespace Sejil.Routing.Internal
         {
             var response = new
             {
-                UserName = !String.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
+                UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
                     ? _context.User.Identity.Name
                     : ""
             };

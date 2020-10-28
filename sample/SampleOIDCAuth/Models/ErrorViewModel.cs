@@ -9,6 +9,6 @@ namespace sample.Models
     {
         public string RequestId { get; set; }
 
-        public bool ShowRequestId => !String.IsNullOrEmpty(RequestId);
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 }

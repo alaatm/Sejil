@@ -88,14 +88,14 @@ ORDER BY l.timestamp DESC, p.name";
             }
 
             string QueryWhereClause() =>
-                String.IsNullOrWhiteSpace(queryFilter?.QueryText)
+                string.IsNullOrWhiteSpace(queryFilter?.QueryText)
                     ? ""
                     : timestampWhereClause.Length > 0
                         ? $"AND ({BuildPredicate(queryFilter.QueryText, _nonPropertyColumns)})"
                         : $"WHERE ({BuildPredicate(queryFilter.QueryText, _nonPropertyColumns)})";
 
             string FiltersWhereClause() =>
-                String.IsNullOrWhiteSpace(queryFilter?.LevelFilter) && (!queryFilter?.ExceptionsOnly ?? true)
+                string.IsNullOrWhiteSpace(queryFilter?.LevelFilter) && (!queryFilter?.ExceptionsOnly ?? true)
                     ? ""
                     : timestampWhereClause.Length > 0 || queryWhereClause.Length > 0
                         ? $" AND ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})"
@@ -106,7 +106,7 @@ ORDER BY l.timestamp DESC, p.name";
         {
             var sp = new StringBuilder();
 
-            if (!String.IsNullOrWhiteSpace(levelFilter))
+            if (!string.IsNullOrWhiteSpace(levelFilter))
             {
                 sp.AppendFormat("level = '{0}'", levelFilter);
             }
@@ -134,29 +134,29 @@ ORDER BY l.timestamp DESC, p.name";
             {
                 // (...) && (...)  -or-  (...) and (...)
                 // (...) || (...)  -or-  (...) or (...)
-                var split = Regex.Split(query, @"(\(.+\))\s*(\|\||&&|and|or)\s*(\(.+\))").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                var split = Regex.Split(query, @"(\(.+\))\s*(\|\||&&|and|or)\s*(\(.+\))").Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
                 if (split.Length != 3)
                 {
                     // ... && (...)  -or-  ... and (...)
                     // ... || (...)  -or-  ... or (...)
-                    split = Regex.Split(query, @"(.+)\s*(\|\||&&|and|or)\s*(\(.+\))").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                    split = Regex.Split(query, @"(.+)\s*(\|\||&&|and|or)\s*(\(.+\))").Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
                     if (split.Length != 3)
                     {
                         // (...) && ...  -or-  (...) and ..
                         // (...) || ...  -or-  (...) or ..
-                        split = Regex.Split(query, @"(\(.+\))\s*(\|\||&&|and|or)\s*(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                        split = Regex.Split(query, @"(\(.+\))\s*(\|\||&&|and|or)\s*(.+)").Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
                         if (split.Length != 3)
                         {
                             // ... && ...  -or-  ... and ...
                             // ... || ...  -or-  ... or ...
-                            split = Regex.Split(query, @"(.+)\s*(\|\||&&|and|or)\s*(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                            split = Regex.Split(query, @"(.+)\s*(\|\||&&|and|or)\s*(.+)").Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
                             if (split.Length != 3)
                             {
                                 // name = value
                                 // name != value
                                 // name like 'value'
                                 // name not like 'value'
-                                split = Regex.Split(query, @"(\w+)\s*(=|!=|\s*like\s*|\s*not like\s*)\s*(.+)").Where(p => !String.IsNullOrWhiteSpace(p)).ToArray();
+                                split = Regex.Split(query, @"(\w+)\s*(=|!=|\s*like\s*|\s*not like\s*)\s*(.+)").Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
                                 if (split.Length == 3)
                                 {
                                     if (nonPropertyColumns.Contains(split[0].ToLower()))

@@ -52,7 +52,7 @@ namespace Sejil
                 routes.MapPost($"{url}/events", async context =>
                 {
                     var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, _camelCaseJson);
-                    Int32.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
+                    int.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                     var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
                     var controller = GetSejilController(context);
