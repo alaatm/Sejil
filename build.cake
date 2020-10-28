@@ -87,7 +87,7 @@ Task("CopyEmbeddedHtml")
 	html = html.Replace("<script type=\"text/javascript\" src=\"/" + relJsPath +"\"></script>", "<script>" + appJs + "</script>");
 	html = html.Replace("<link href=\"/" + relCssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
 	
-	IOFile.WriteAllText(Directory("./src/Sejil.Server/index.html"), html);
+	IOFile.WriteAllText("./src/Sejil.Server/index.html", html);
 });
 
 Task("Restore")
