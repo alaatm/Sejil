@@ -101,6 +101,12 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
 {
+    // Create a dummy index.html so that build doesn't fail only if not the target isn't pack.
+    if (target.ToLower() != "pack" && !FileExists("./src/Sejil.Server/index.html"))
+    {
+        IOFile.WriteAllText("./src/Sejil.Server/index.html", "");
+    }
+
     DotNetCoreBuild(".", new DotNetCoreBuildSettings
     {
         NoRestore = true,
