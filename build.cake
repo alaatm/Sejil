@@ -121,9 +121,9 @@ Task("Test")
 });
 
 Task("Pack")
-	.IsDependentOn("Test")
 	.IsDependentOn("ClientBuild")
 	.IsDependentOn("CopyEmbeddedHtml")
+	.IsDependentOn("Test")
 	.Does(() =>
 {
 	DotNetCorePack(packPrj, new DotNetCorePackSettings 
