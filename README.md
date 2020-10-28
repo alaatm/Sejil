@@ -1,5 +1,3 @@
-**NOTE** The master branch, including this readme, has switched to .netcore 3.0. For .netcore 1/2 based, please go here: [release/1.0.1](https://github.com/alaatm/Sejil/tree/release/1.0.1).
-
 # Sejil
 
 [![Build status](https://ci.appveyor.com/api/projects/status/5eci12hmv92dd8i6?svg=true)](https://ci.appveyor.com/project/alaatm/sejil)
@@ -19,7 +17,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 1. Installing [Sejil](https://www.nuget.org/packages/Sejil/) package
 
     ```powershell
-    dotnet add package Sejil --version 2.0.0-beta1
+    dotnet add package Sejil --version 2.1.0
     ```
 
 2. Adding code

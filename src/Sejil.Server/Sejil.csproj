@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/alaatm/Sejil</PackageProjectUrl>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <VersionPrefix>2.0.0-beta1</VersionPrefix>
+    <VersionPrefix>2.1.0</VersionPrefix>
     <AssemblyName>Sejil</AssemblyName>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <DebugType>full</DebugType>
