@@ -30,7 +30,7 @@ namespace Sejil.Test
             var url = "/sejil";
             var webhostBuilder = new WebHostBuilder()
                 .Configure(app => { })
-                .ConfigureServices(services => services.AddSingleton<IServer>(Mock.Of<IServer>()));
+                .ConfigureServices(services => services.AddSingleton(Mock.Of<IServer>()));
 
             // Act
             webhostBuilder.AddSejil(url, logLevel);
@@ -48,7 +48,7 @@ namespace Sejil.Test
             var webhostBuilder = new WebHostBuilder()
                 .Configure(app => { })
                 .ConfigureServices(services =>
-                    services.AddSingleton<IServer>(Mock.Of<IServer>()));
+                    services.AddSingleton(Mock.Of<IServer>()));
 
             // Act
             webhostBuilder.AddSejil("/sejil", LogLevel.Debug);
@@ -74,7 +74,7 @@ namespace Sejil.Test
             // Arrange
             var webhostBuilder = new WebHostBuilder()
                 .Configure(app => { })
-                .ConfigureServices(services => services.AddSingleton<IServer>(Mock.Of<IServer>()));
+                .ConfigureServices(services => services.AddSingleton(Mock.Of<IServer>()));
 
             // Act & assert
             var ex = Assert.Throws<InvalidOperationException>(() => webhostBuilder.AddSejil("/sejil", LogLevel.None));

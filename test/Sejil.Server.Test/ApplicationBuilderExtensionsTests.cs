@@ -241,7 +241,7 @@ namespace Sejil.Test
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton<ISejilSettings>(new SejilSettings(url, LogEventLevel.Debug));
-                    services.AddSingleton<ISejilController>(controller);
+                    services.AddSingleton(controller);
                     services.AddRouting();
                 });
 
