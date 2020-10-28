@@ -8,7 +8,6 @@ using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Sejil.Test.Data
 {

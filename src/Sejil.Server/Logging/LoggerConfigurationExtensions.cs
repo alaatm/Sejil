@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using Sejil;
 using Sejil.Configuration.Internal;
 using Sejil.Logging.Sinks;
 using Serilog;

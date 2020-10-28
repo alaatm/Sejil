@@ -2,8 +2,6 @@
 using Sejil.Configuration.Internal;
 using Serilog.Events;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Sejil.Test

@@ -2,24 +2,15 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 using Sejil.Configuration.Internal;
-using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Events;
 using Xunit;
 using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Http.Features;
-using System.Threading;
 using Sejil.Data.Internal;
 
 namespace Sejil.Test

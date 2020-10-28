@@ -2,18 +2,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
-using Moq;
 using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
-using Sejil.Models.Internal;
 using Xunit;
-using Xunit.Abstractions;
-using Dapper;
-using System.Linq;
 using Serilog.Events;
 using System.IO;
 

@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Sejil.Models.Internal;
 
 namespace Sejil.Routing.Internal
