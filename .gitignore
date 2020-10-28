@@ -16,10 +16,13 @@ package-lock.json
 .env.production.local
 
 src/Sejil.Server/index.html
-coverage/
+
+# Build output
+.nupkg/
+.coverage/
+lcov.info
 
 ignore/
-
 
 npm-debug.log*
 yarn-debug.log*

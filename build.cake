@@ -1,27 +1,33 @@
-#addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json"
-#tool nuget:?package=OpenCover
-#tool nuget:?package=ReportGenerator
+#addin nuget:?package=Newtonsoft.Json&Version=12.0.3
+#addin nuget:?package=Cake.Coverlet&Version=2.5.1
+#addin nuget:?package=Cake.Git&Version=0.22.0
+#tool nuget:?package=ReportGenerator&Version=4.7.1
 #r "cake-tools\Cake.Npm.dll"
 
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
+using IOFile = System.IO.File;
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
+var configuration = Argument("configuration", "release");
+var rbv = Argument("rbv", "");  // On windows invoke as: ./build -t release -rbv=patch
+                                // On linux invoke as  : ./build.sh -t release --rbv=patch
+
+var clientDir = Directory("./src/Sejil.Client");
+var packPrj = Directory("./src/Sejil.Server/Sejil.csproj");
+var packDir = Directory(".nupkg");
+var coverageDir = Directory(".coverage");
+var lcovFile = "./lcov.info";
+
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-// Define directories.
-const string CLIENT_DIR = "./src/Sejil.Client";
-const string SERVER_DIR = "./src/Sejil.Server";
-const string SERVER_TESTS_DIR = "./test/Sejil.Server.Test";
-
-var _packFolder = "./nuget-build/";
 ICakeContext _context;
 
 Setup(context =>
@@ -38,108 +44,177 @@ Setup(context =>
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-	.Does(() =>
+    .Does(() =>
 {
-	DeleteDir("./src/Sejil.Server/bin");
-	DeleteDir("./src/Sejil.Server/bin");
-	DeleteDir("./src/Sejil.Server/obj");
-	DeleteDir("./test/Sejil.Server.Test/bin");
-	DeleteDir("./test/Sejil.Server.Test/obj");
-
-	DeleteDir(_packFolder);
-	DeleteDir(CombinePaths(CLIENT_DIR, "build"));
+    CleanDirectories("./src/**/bin/" + configuration);
+    CleanDirectories("./src/**/obj");
+	CleanDirectories(clientDir.Path.Combine("build").FullPath);
+    CleanDirectories(packDir);
+    CleanDirectories(coverageDir);
+    if (FileExists(lcovFile)) DeleteFile(lcovFile);    
 });
 
 Task("ClientBuild")
 	.Does(() =>
 {
 	//./src/Sejil.Client/> npm install
-	Npm.FromPath(CLIENT_DIR).Install();
+	Npm.FromPath(clientDir).Install();
 	// ./src/Sejil.Client/> npm run build
-	Npm.FromPath(CLIENT_DIR).RunScript("build");
+	Npm.FromPath(clientDir).RunScript("build");
 });
 
 Task("CopyEmbeddedHtml")
 	.Does(() =>
-{
-	var html = ReadFile(CombinePaths(CLIENT_DIR, "build", "index.html"));
-	var manifest = JObject.Parse(ReadFile(CombinePaths(CLIENT_DIR, "build", "asset-manifest.json")));
-	var cssPath = manifest["main.css"].ToString();
-	var jsPath = manifest["main.js"].ToString();
-	var appCss = ReadFile(CombinePaths(CLIENT_DIR, "build", cssPath));
+{		
+	var clientBuildDir = clientDir.Path.Combine("build");
+	var htmlPath = clientBuildDir.Combine("index.html").FullPath;
+	var manifestPath = clientBuildDir.Combine("asset-manifest.json").FullPath;
+
+	var html = IOFile.ReadAllText(htmlPath);
+	var manifest = JObject.Parse(IOFile.ReadAllText(manifestPath));
+
+    var relCssPath = manifest["main.css"].ToString();
+    var relJsPath = manifest["main.js"].ToString();
+	var cssPath = clientBuildDir.Combine(relCssPath).FullPath;
+	var jsPath = clientBuildDir.Combine(relJsPath).FullPath;
+
+	var appCss = IOFile.ReadAllText(cssPath);
+	var appJs = IOFile.ReadAllText(jsPath);
+
 	appCss = appCss.Substring(0, appCss.IndexOf("/*# sourceMappingURL=main."));
-	var appJs = ReadFile(CombinePaths(CLIENT_DIR, "build", jsPath));
 	appJs = appJs.Substring(0, appJs.IndexOf("//# sourceMappingURL=main"));
 
-	html = html.Replace("<script type=\"text/javascript\" src=\"/" + jsPath +"\"></script>", "<script>" + appJs + "</script>");
-	html = html.Replace("<link href=\"/" + cssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
+	html = html.Replace("<script type=\"text/javascript\" src=\"/" + relJsPath +"\"></script>", "<script>" + appJs + "</script>");
+	html = html.Replace("<link href=\"/" + relCssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
+	
+	IOFile.WriteAllText(Directory("./src/Sejil.Server/index.html"), html);
+});
 
-	System.IO.File.WriteAllText(CombinePaths(SERVER_DIR, "index.html"), html);
+Task("Restore")
+    .IsDependentOn("Clean")
+    .Does(() =>
+{
+    DotNetCoreRestore(".");
 });
 
 Task("Build")
-	.Does(() =>
+    .IsDependentOn("Restore")
+    .Does(() =>
 {
-	DotNetCoreRestore(".");
-	DotNetCoreBuild(".", new DotNetCoreBuildSettings
-	{
-		Configuration = configuration,
-	});
+    DotNetCoreBuild(".", new DotNetCoreBuildSettings
+    {
+        NoRestore = true,
+        Configuration = configuration,
+    });
 });
 
 Task("Test")
-	.Does(() =>
+    .IsDependentOn("Build")
+    .Does(() =>
 {
-	DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings 
-	{ 
-		Configuration = configuration,
-	});
+    DotNetCoreTest(".", new DotNetCoreTestSettings 
+    { 
+        NoRestore = true,
+        NoBuild = true,
+        Configuration = configuration,
+    });
 });
 
 Task("Pack")
-	.IsDependentOn("Clean")
+	.IsDependentOn("Test")
 	.IsDependentOn("ClientBuild")
 	.IsDependentOn("CopyEmbeddedHtml")
-	.IsDependentOn("Build")
 	.Does(() =>
 {
-	DotNetCorePack(SERVER_DIR, new DotNetCorePackSettings 
+	DotNetCorePack(packPrj, new DotNetCorePackSettings 
 	{ 
 		Configuration = configuration,
-		OutputDirectory = Directory(_packFolder),
-		IncludeSymbols = true,
+		OutputDirectory = packDir,
 		NoBuild = true
 	});
 });
 
-Task("CoverageReport")
-	.Does(() =>
+Task("Cover")
+    .IsDependentOn("Build")
+    .Does(() =>
 {
-	var reportFileName = System.DateTime.UtcNow.ToString("ddMMMyy-HHmmss") + ".xml";
+    var testSettings = new DotNetCoreTestSettings 
+    { 
+        NoRestore = true,
+        NoBuild = true,
+        Configuration = configuration,
+    };
 
-	var projName = "Sejil.Test";
-	var coverageRootPath = System.IO.Path.Combine(SERVER_TESTS_DIR, "coverage");
-	var coverageXmlFilePath = System.IO.Path.Combine(coverageRootPath, projName + "-" + reportFileName);
+    var coverletSettings = new CoverletSettings
+    {
+        CollectCoverage = true,
+        CoverletOutputFormat = CoverletOutputFormat.lcov | CoverletOutputFormat.opencover,
+        CoverletOutputDirectory = coverageDir,
+        CoverletOutputName = $"{DateTime.UtcNow.Ticks}",
+    };
 
-	if (!System.IO.Directory.Exists(coverageRootPath)) System.IO.Directory.CreateDirectory(coverageRootPath);
+    DotNetCoreTest(".", testSettings, coverletSettings);
 
-	OpenCover(
-		tool => tool.DotNetCoreTest(SERVER_TESTS_DIR, new DotNetCoreTestSettings 
-		{ 
-			Configuration = configuration, 
-		}),
-		new FilePath(coverageXmlFilePath),
-		new OpenCoverSettings { OldStyle = true }.WithFilter("+[" + projName.Replace(".Test", "") + "*]* -[*.Test]*")
-	);
+    // Copy lcov file to root for code coverage highlight in vscode
+    var lcov = GetFiles(coverageDir.Path + "/*.info").Single();
+    CopyFile(lcov, lcovFile);
 
-	ReportGenerator(
-		coverageXmlFilePath, 
-		System.IO.Path.Combine(coverageRootPath, "report"), 
-		new ReportGeneratorSettings 
-		{ 
-			HistoryDirectory = coverageRootPath,
-			ReportTypes = new List<ReportGeneratorReportType> { ReportGeneratorReportType.Html, ReportGeneratorReportType.Badges }
-		});
+    // Generate coverage report
+    if (IsRunningOnWindows())
+    {
+        var opencover = GetFiles(coverageDir.Path + "/*.opencover.xml").Single();
+        ReportGenerator(File(opencover.FullPath), coverageDir);
+    }
+});
+
+// This will create and push an annotated tagged commit to create a release.
+// The version is determined by the passed rbv argument (major, minor or patch).
+Task("Release")
+    .IsDependentOn("Test")
+    .Does(() =>
+{
+    if (GitHasStagedChanges(".") || GitHasUncommitedChanges(".") || GitHasUntrackedFiles("."))
+    {
+        Error("Cannot release when staged changes, uncommited changes or untracked files exist.");
+        return;
+    }
+
+    var csproj = File("./src/Sejil.Server/Sejil.csproj").Path.FullPath;
+
+    var version = XDocument.Load(csproj).Root
+        .Element("PropertyGroup")
+        .Element("VersionPrefix").Value;
+
+    var split = version.Split('.');
+    var major = int.Parse(split[0]);
+    var minor = int.Parse(split[1]);
+    var patch = int.Parse(split[2]);
+
+    var releaseVersion = "";
+    switch (rbv)
+    {
+        case "major": releaseVersion = $"{major + 1}.0.0"; break;
+        case "minor": releaseVersion = $"{major}.{minor + 1}.0"; break;
+        case "patch": releaseVersion = $"{major}.{minor}.{patch + 1}"; break;
+        default: Error("Invalid rbv switch. Must be one of the following: major, minor, patch."); return;
+    }
+
+    // Using WriteAllText instead of XDocument so that format isn't screwed.
+    IOFile.WriteAllText(
+        csproj,
+        IOFile.ReadAllText(csproj)
+            .Replace(
+                $"<VersionPrefix>{version}</VersionPrefix>",
+                $"<VersionPrefix>{releaseVersion}</VersionPrefix>"));
+
+    var tag = "v" + releaseVersion;
+    var name = "Alaa Masoud";
+    var email = "alaa.masoud@live.com";
+
+    GitAdd(".", csproj);
+    GitCommit(".", name, email, tag);
+    GitTag(".", tag, name, email, tag);
+    GitPush(".");
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -147,34 +222,7 @@ Task("CoverageReport")
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
-    .IsDependentOn("Pack");
-
-//////////////////////////////////////////////////////////////////////
-// HELPER METHODS
-//////////////////////////////////////////////////////////////////////
-
-void DeleteDir(string path)
-{
-	if (_context.DirectoryExists(path))
-	{
-		_context.DeleteDirectory(path, new DeleteDirectorySettings
-		{
-			Force = true,
-			Recursive = true
-		});
-	}
-}
-
-string CombinePaths(params string[] paths)
-{
-	return System.IO.Path.Combine(paths);
-}
-
-string ReadFile(string path)
-{
-	return System.IO.File.ReadAllText(path);
-}
-
+    .IsDependentOn("Test");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
