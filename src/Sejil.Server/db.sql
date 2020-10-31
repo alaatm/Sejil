@@ -2,12 +2,12 @@
 -- See the LICENSE file in the project root for more information.
 
 CREATE TABLE IF NOT EXISTS log(
-	id				TEXT		NOT NULL PRIMARY KEY,
-	message			TEXT		NOT NULL,
+	id				TEXT		NOT NULL	PRIMARY KEY,
+	message			TEXT		NOT NULL	COLLATE NOCASE,
 	messageTemplate TEXT		NOT NULL,
 	level			VARCHAR(64)	NOT NULL,
 	timestamp		DATETIME	NOT NULL,
-	exception		TEXT		NULL
+	exception		TEXT		NULL		COLLATE NOCASE
 );
 
 CREATE INDEX IF NOT EXISTS log_message_idx		ON log(message);
