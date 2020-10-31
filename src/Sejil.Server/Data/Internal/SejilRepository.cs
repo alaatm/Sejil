@@ -28,71 +28,58 @@ namespace Sejil.Data.Internal
 
         public async Task<bool> SaveQueryAsync(LogQuery logQuery)
         {
-            using (var conn = new SqliteConnection(_connectionString))
-            {
-                await conn.OpenAsync();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = _sql.InsertLogQuerySql();
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@name", logQuery.Name);
-                    cmd.Parameters.AddWithValue("@query", logQuery.Query);
-                    return await cmd.ExecuteNonQueryAsync() > 0;
-                }
-            }
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = _sql.InsertLogQuerySql();
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@name", logQuery.Name);
+            cmd.Parameters.AddWithValue("@query", logQuery.Query);
+            return await cmd.ExecuteNonQueryAsync() > 0;
         }
 
         public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
         {
-            using (var conn = new SqliteConnection(_connectionString))
-            {
-                await conn.OpenAsync();
-                return conn.Query<LogQuery>(_sql.GetSavedQueriesSql());
-            }
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+            return conn.Query<LogQuery>(_sql.GetSavedQueriesSql());
         }
 
         public async Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime? startingTimestamp, LogQueryFilter queryFilter)
         {
             var sql = _sql.GetPagedLogEntriesSql(page, _pageSize, startingTimestamp, queryFilter);
 
-            using (var conn = new SqliteConnection(_connectionString))
-            {
-                await conn.OpenAsync();
-                var lookup = new Dictionary<string, LogEntry>();
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+            var lookup = new Dictionary<string, LogEntry>();
 
-                var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
+            var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
+                {
+                    if (!lookup.TryGetValue(l.Id, out var logEntry))
                     {
-                        LogEntry logEntry;
-                        if (!lookup.TryGetValue(l.Id, out logEntry))
-                        {
-                            lookup.Add(l.Id, logEntry = l);
-                        }
+                        lookup.Add(l.Id, logEntry = l);
+                    }
 
-                        if (p != null)
-                        {
-                            logEntry.Properties.Add(p);
-                        }
-                        return logEntry;
+                    if (p != null)
+                    {
+                        logEntry.Properties.Add(p);
+                    }
+                    return logEntry;
 
-                    }).ToList();
+                }).ToList();
 
-                return lookup.Values.AsEnumerable();
-            }
+            return lookup.Values.AsEnumerable();
         }
 
         public async Task<bool> DeleteQueryAsync(string queryName)
         {
-            using (var conn = new SqliteConnection(_connectionString))
-            {
-                await conn.OpenAsync();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = _sql.DeleteQuerySql();
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@name", queryName);
-                    return await cmd.ExecuteNonQueryAsync() > 0;
-                }
-            }
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = _sql.DeleteQuerySql();
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@name", queryName);
+            return await cmd.ExecuteNonQueryAsync() > 0;
         }
     }
 }

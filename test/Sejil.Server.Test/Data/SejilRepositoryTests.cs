@@ -127,7 +127,7 @@ namespace Sejil.Test.Data
                 {
                     using var cmd = conn.CreateCommand();
                     cmd.CommandText = $@"INSERT INTO log (id, message, messageTemplate, level, timestamp) 
-                        VALUES ('{Guid.NewGuid().ToString()}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))";
+                        VALUES ('{Guid.NewGuid()}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))";
                     cmd.ExecuteNonQuery();
                 }
             }

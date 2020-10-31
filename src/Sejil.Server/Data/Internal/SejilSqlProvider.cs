@@ -66,7 +66,7 @@ ORDER BY l.timestamp DESC, p.name";
 
                 if (hasStartingTimestampConstraint)
                 {
-                    sql.Append($@"timestamp <= '{startingTimestamp.Value.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                    sql.Append($@"timestamp <= '{startingTimestamp.Value:yyyy-MM-dd HH:mm:ss.fff}'");
                 }
 
                 if (hasStartingTimestampConstraint && hasDateFilter)
@@ -255,7 +255,7 @@ ORDER BY l.timestamp DESC, p.name";
             }
             else if (queryFilter.DateRangeFilter != null)
             {
-                return $"timestamp >= '{queryFilter.DateRangeFilter[0].ToString("yyyy-MM-dd")}' and timestamp < '{queryFilter.DateRangeFilter[1].ToString("yyyy-MM-dd")}'";
+                return $"timestamp >= '{queryFilter.DateRangeFilter[0]:yyyy-MM-dd}' and timestamp < '{queryFilter.DateRangeFilter[1]:yyyy-MM-dd}'";
             }
 
             return "";

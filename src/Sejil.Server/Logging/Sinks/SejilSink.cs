@@ -17,13 +17,13 @@ namespace Sejil.Logging.Sinks
 {
     internal class SejilSink : PeriodicBatchingSink
     {
-        private static readonly int _defaultBatchSizeLimit = 50;
-        private static TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
+        private const int DefaultBatchSizeLimit = 50;
+        private static readonly TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
 
         private readonly string _connectionString;
         private readonly string _uri;
 
-        public SejilSink(ISejilSettings settings) : base(_defaultBatchSizeLimit, _defaultBatchEmitPeriod)
+        public SejilSink(ISejilSettings settings) : base(DefaultBatchSizeLimit, _defaultBatchEmitPeriod)
         {
             _connectionString = $"DataSource={settings.SqliteDbPath}";
             _uri = settings.Url;
@@ -35,34 +35,32 @@ namespace Sejil.Logging.Sinks
         {
             try
             {
-                using (var conn = new SqliteConnection(_connectionString))
+                using var conn = new SqliteConnection(_connectionString);
+                await conn.OpenAsync();
+                using (var tran = conn.BeginTransaction())
                 {
-                    await conn.OpenAsync();
-                    using (var tran = conn.BeginTransaction())
+                    using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
+                    using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
                     {
-                        using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
-                        using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
+                        foreach (var logEvent in events)
                         {
-                            foreach (var logEvent in events)
+                            // Do not log events that were generated from browsing Sejil URL.
+                            if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
+                                p.Value.ToString().Contains(_uri)))
                             {
-                                // Do not log events that were generated from browsing Sejil URL.
-                                if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
-                                    p.Value.ToString().Contains(_uri)))
-                                {
-                                    continue;
-                                }
+                                continue;
+                            }
 
-                                var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
-                                foreach (var property in logEvent.Properties)
-                                {
-                                    await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
-                                }
+                            var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
+                            foreach (var property in logEvent.Properties)
+                            {
+                                await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
                             }
                         }
-                        tran.Commit();
                     }
-                    conn.Close();
+                    tran.Commit();
                 }
+                conn.Close();
             }
             catch (Exception e)
             {
@@ -132,19 +130,15 @@ namespace Sejil.Logging.Sinks
 
         private void InitializeDatabase()
         {
-            using (var conn = new SqliteConnection(_connectionString))
-            {
-                conn.Open();
-                var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
         }
 
-        private string StripStringQuotes(string value)
+        private static string StripStringQuotes(string value)
             => (value?.Length > 0 && value[0] == '"' && value[value.Length - 1] == '"')
                 ? value.Substring(1, value.Length - 2)
                 : value;
