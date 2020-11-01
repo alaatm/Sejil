@@ -428,17 +428,17 @@ ORDER BY l.timestamp DESC, p.name", sql);
             // Non property columns
             yield return new object[]
             {
-                "SourceContext like '%ClassName%'",
-                "SourceContext LIKE '%ClassName%'",
-                "sourcecontext"
+                "message like '%search%'",
+                "message LIKE '%search%'",
+                "message"
             };
             yield return new object[]
             {
-                "prob1 = value1 || SourceContext like '%ClassName%' && prob2 != value2",
+                "prob1 = value1 || message like '%search%' && prob2 != value2",
                 "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR " +
-                "SourceContext LIKE '%ClassName%' AND " +
+                "message LIKE '%search%' AND " +
                 "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2')",
-                "sourcecontext"
+                "message"
             };
             // General text
             yield return new object[]
