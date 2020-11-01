@@ -114,7 +114,7 @@ namespace Sejil
 
         private static async Task<string> GetRequestBodyAsync(HttpRequest request)
         {
-            var length = request.Body.Length;
+            var length = request.ContentLength;
 
             if (length > 0)
             {
