@@ -3,7 +3,6 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Sample
 {
@@ -13,10 +12,7 @@ namespace Sample
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.AddSejil("/sejil", LogLevel.Debug);
-                    webBuilder.UseStartup<Startup>();
-                });
+                .UseSejil()
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }

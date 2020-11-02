@@ -13,6 +13,7 @@ using Xunit;
 using Microsoft.AspNetCore.Hosting.Server;
 using Sejil.Data.Internal;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 namespace Sejil.Test
 {
     public class WebHostBuilderExtensionsTests
@@ -82,3 +83,4 @@ namespace Sejil.Test
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

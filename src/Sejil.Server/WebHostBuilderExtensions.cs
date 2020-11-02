@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.AspNetCore.Hosting
 {
-    public static class WebHostBuilderExtensions
+    public static class IWebHostBuilderExtensions
     {
         /// <summary>
         /// Adds Sejil services.
@@ -23,7 +23,8 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="builder">The web host builder.</param>
         /// <param name="url">The URL at which Sejil should be available.</param>
         /// <param name="minLogLevel">The minimum log level.</param>
-        /// <returns></returns>
+        /// <returns>The web host builder.</returns>
+        [Obsolete("Use IHostBuilder.UseSejil(string url, LogLevel minLogLevel, bool writeToProviders, Action<LoggerSinkConfiguration> sinks) instead.")]
         public static IWebHostBuilder AddSejil(this IWebHostBuilder builder, string url, LogLevel minLogLevel)
         {
             var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
@@ -47,7 +48,7 @@ namespace Microsoft.AspNetCore.Hosting
                 .WriteTo.Sejil(settings)
                 .CreateLogger();
 
-        private static LogEventLevel MapSerilogLogLevel(LogLevel logLevel)
+        internal static LogEventLevel MapSerilogLogLevel(LogLevel logLevel)
         {
             if (logLevel == LogLevel.None)
             {
