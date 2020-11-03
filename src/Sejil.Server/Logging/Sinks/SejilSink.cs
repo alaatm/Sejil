@@ -87,7 +87,7 @@ namespace Sejil.Logging.Sinks
         {
             cmd.Parameters["@logId"].Value = logId;
             cmd.Parameters["@name"].Value = property.Key;
-            cmd.Parameters["@value"].Value = StripStringQuotes(property.Value?.ToString()) ?? (object)DBNull.Value;
+            cmd.Parameters["@value"].Value = StripStringQuotes(property.Value.ToString());
             await cmd.ExecuteNonQueryAsync();
         }
 
@@ -139,7 +139,7 @@ namespace Sejil.Logging.Sinks
         }
 
         private static string StripStringQuotes(string value)
-            => (value?.Length > 0 && value[0] == '"' && value[value.Length - 1] == '"')
+            => value[0] == '"' && value[value.Length - 1] == '"'
                 ? value.Substring(1, value.Length - 2)
                 : value;
     }
