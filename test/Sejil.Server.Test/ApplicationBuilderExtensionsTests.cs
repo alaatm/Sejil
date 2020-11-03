@@ -242,6 +242,21 @@ namespace Sejil.Test
             Assert.Equal("{\"userName\":\"\"}", result);
         }
 
+        [Fact]
+        public async Task HttpPost_with_empty_content_doesnt_crash()
+        {
+            // Arrange
+            var controllerMoq = new Mock<ISejilController>();
+            var server = CreateServer("/sejil", controllerMoq.Object);
+            var content = new StringContent("");
+
+            // Act
+            await server.CreateClient().PostAsync("/sejil/del-query", content);
+
+            // Assert
+            controllerMoq.Verify(p => p.DeleteQueryAsync(null), Times.Once);
+        }
+
         public static IEnumerable<object[]> HttpPost_events_url_calls_controller_GetEventsAsync_method_TestData()
         {
             yield return new object[]
