@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
-using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 using Sejil.Configuration.Internal;
@@ -33,39 +32,37 @@ namespace Sejil.Logging.Sinks
 
         protected override async Task EmitBatchAsync(IEnumerable<LogEvent> events)
         {
-            try
+            if (events == null)
             {
-                using var conn = new SqliteConnection(_connectionString);
-                await conn.OpenAsync();
-                using (var tran = conn.BeginTransaction())
-                {
-                    using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
-                    using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
-                    {
-                        foreach (var logEvent in events)
-                        {
-                            // Do not log events that were generated from browsing Sejil URL.
-                            if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
-                                p.Value.ToString().Contains(_uri)))
-                            {
-                                continue;
-                            }
+                throw new ArgumentNullException(nameof(events));
+            }
 
-                            var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
-                            foreach (var property in logEvent.Properties)
-                            {
-                                await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
-                            }
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+            using (var tran = conn.BeginTransaction())
+            {
+                using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
+                using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
+                {
+                    foreach (var logEvent in events)
+                    {
+                        // Do not log events that were generated from browsing Sejil URL.
+                        if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
+                            p.Value.ToString().Contains(_uri)))
+                        {
+                            continue;
+                        }
+
+                        var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
+                        foreach (var property in logEvent.Properties)
+                        {
+                            await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
                         }
                     }
-                    tran.Commit();
                 }
-                conn.Close();
+                tran.Commit();
             }
-            catch (Exception e)
-            {
-                SelfLog.WriteLine(e.Message);
-            }
+            conn.Close();
         }
 
         private async Task<string> InsertLogEntryAsync(SqliteCommand cmd, LogEvent log)

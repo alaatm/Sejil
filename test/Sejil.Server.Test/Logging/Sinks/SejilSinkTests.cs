@@ -178,6 +178,23 @@ namespace Sejil.Test.Logging.Sinks
         }
 
         [Fact]
+        public async Task EmitBatchAsync_throws_when_null_events()
+        {
+            // Arrange
+            var db = Guid.NewGuid().ToString();
+            var settingsMoq = new Mock<ISejilSettings>();
+            settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
+            settingsMoq.SetupGet(p => p.PageSize).Returns(100);
+            settingsMoq.SetupGet(p => p.Url).Returns("/sejil");
+            var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+            var sink = new SejilSinkMock(settingsMoq.Object);
+
+            // Act & assert
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(async () => await sink.CallEmitBatchAsync(null));
+            Assert.Equal("events", ex.ParamName);
+        }
+
+        [Fact]
         public async Task EmitBatchAsync_inserts_events_to_database()
         {
             // Arrange
