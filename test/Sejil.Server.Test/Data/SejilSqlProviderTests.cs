@@ -198,7 +198,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
         {
             // Arrange
             var timestamp = new DateTime(2017, 8, 3, 14, 56, 33, 876);
-            var query = "p=v";
+            var query = "p='v'";
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
             // Act
@@ -210,7 +210,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
-    AND (id IN (SELECT logId FROM log_property WHERE name = 'p' AND value = 'v'))
+    AND (id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'p' AND value = 'v') > 0))
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -247,7 +247,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
         public void GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_query_with_specified_filter()
         {
             // Arrange
-            var query = "p=v";
+            var query = "p='v'";
             var levelFilter = "info";
             var provider = new SejilSqlProvider(Mock.Of<ISejilSettings>());
 
@@ -260,7 +260,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     
-    WHERE (id IN (SELECT logId FROM log_property WHERE name = 'p' AND value = 'v')) AND (level = 'info')
+    WHERE (id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'p' AND value = 'v') > 0)) AND (level = 'info')
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -335,95 +335,129 @@ ORDER BY l.timestamp DESC, p.name", sql);
             // ... =|!=|like|not like ...
             yield return new object[]
             {
-                "prob1 = value1",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1')"
+                "prob1 = 'value1'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob1' AND value = 'value1') > 0)"
             };
             yield return new object[]
             {
                 "prob1 != 'value1'",
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1')"
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob1' AND value = 'value1') = 0)"
             };
             yield return new object[]
             {
-                "prob1 like \"value1\"",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value LIKE 'value1')"
+                "prob1 like '%value1'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob1' AND value LIKE '%value1') > 0)"
             };
             yield return new object[]
             {
-                "prob1 not like value1",
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value LIKE 'value1')"
+                "prob1 not like '%value1'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob1' AND value LIKE '%value1') = 0)"
             };
             // ... and|or ...
             yield return new object[]
             {
-                "prob1 = value1 && prob2 = 'value2'",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') AND "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2')"
+                "prob1 = 'value1' and prob2 = 'value2'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "AND SUM(name = 'prob2' AND value = 'value2') > 0)"
             };
             yield return new object[]
             {
-                "prob1 = value1 and prob2 != 'value2'",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') AND "+
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2')"
+                "prob1 = 'value1' and prob2 != 'value2'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "AND SUM(name = 'prob2' AND value = 'value2') = 0)"
             };
             yield return new object[]
             {
-                "prob1 not like value1 or prob2 like 'value2'",
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value LIKE 'value1') OR "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value LIKE 'value2')"
+                "prob1 not like '%value1' or prob2 like '%value2'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value LIKE '%value1') = 0 " +
+                "OR SUM(name = 'prob2' AND value LIKE '%value2') > 0)"
             };
             yield return new object[]
             {
-                "prob1 not like value1 || prob2 not like 'value2'",
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value LIKE 'value1') OR "+
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value LIKE 'value2')"
+                "prob1 not like '%value1' or prob2 not like '%value2'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value LIKE '%value1') = 0 " +
+                "OR SUM(name = 'prob2' AND value LIKE '%value2') = 0)"
             };
             // (...) and|or ...
             yield return new object[]
             {
-                "(prob1 = value1 || prob1 = 'value2') && prob3 like value3",
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value2')) AND "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3')"
+                "(prob1 = 'value1' or prob1 = 'value2') and prob3 like '%value3'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "(SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "OR SUM(name = 'prob1' AND value = 'value2') > 0) " +
+                "AND SUM(name = 'prob3' AND value LIKE '%value3') > 0)"
             };
             yield return new object[]
             {
-                "(prob1 = value1 && prob2 = 'value2') || prob3 not like value3",
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') AND "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2')) OR "+
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3')"
+                "(prob1 = 'value1' and prob2 = 'value2') or prob3 not like '%value3'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "(SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "AND SUM(name = 'prob2' AND value = 'value2') > 0) " +
+                "OR SUM(name = 'prob3' AND value LIKE '%value3') = 0)"
             };
             // ... and|or (...)
             yield return new object[]
             {
-                "prob1 = value1 || (prob1 = 'value2' && prob3 like value3)",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR "+
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value2') AND "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3'))"
+                "prob1 = 'value1' or (prob1 = 'value2' and prob3 like '%value3')",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "OR (SUM(name = 'prob1' AND value = 'value2') > 0 " +
+                "AND SUM(name = 'prob3' AND value LIKE '%value3') > 0))"
             };
             yield return new object[]
             {
-                "prob1 = value1 && (prob2 = 'value2' || prob3 not like value3)",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') AND "+
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2') OR "+
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3'))"
+                "prob1 = 'value1' and (prob2 = 'value2' or prob3 not like '%value3')",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "AND (SUM(name = 'prob2' AND value = 'value2') > 0 " +
+                "OR SUM(name = 'prob3' AND value LIKE '%value3') = 0))"
             };
             // (...) and|or (...)
             yield return new object[]
             {
-                "(prob1 = value1 || prob1 = 'value2') && (prob3 like value3 && prob4 != 5)",
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value2')) AND "+
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3') AND " +
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob4' AND value = '5'))"
+                "(prob1 = 'value1' or prob1 = 'value2') and (prob3 like '%value3' and prob4 != 5)",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "(SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "OR SUM(name = 'prob1' AND value = 'value2') > 0) " +
+                "AND (SUM(name = 'prob3' AND value LIKE '%value3') > 0 " +
+                "AND SUM(name = 'prob4' AND value = '5') = 0))"
             };
             yield return new object[]
             {
-                "(prob1 = value1 || prob1 = 'value2') || (prob3 like value3 && prob4 != 5)",
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR "+
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value2')) OR "+
-                "(id IN (SELECT logId FROM log_property WHERE name = 'prob3' AND value LIKE 'value3') AND " +
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob4' AND value = '5'))"
+                "(prob1 = 'value1' or prob1 = 'value2') or (prob3 like '%value3' and prob4 != 55.55)",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "(SUM(name = 'prob1' AND value = 'value1') > 0 " +
+                "OR SUM(name = 'prob1' AND value = 'value2') > 0) " +
+                "OR (SUM(name = 'prob3' AND value LIKE '%value3') > 0 " +
+                "AND SUM(name = 'prob4' AND value = '55.55') = 0))"
+            };
+            // mixed
+            yield return new object[]
+            {
+                "(p1 = 'v' and message = 'v') or level='dbg'",
+                "(id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'p1' AND value = 'v') > 0) AND message = 'v') OR level = 'dbg'",
+                new [] { "message", "level" }
+            };
+            yield return new object[]
+            {
+                "(message = 'v' and p1 = 'v') or level='dbg'",
+                "(message = 'v' AND id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'p1' AND value = 'v') > 0)) OR level = 'dbg'",
+                new [] { "message", "level" }
+            };
+            yield return new object[]
+            {
+                "(p1 = 'v')",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING (SUM(name = 'p1' AND value = 'v') > 0))",
+            };
+            yield return new object[]
+            {
+                "(message = 'v')",
+                "(message = 'v')",
+                "message"
             };
             // Non property columns
             yield return new object[]
@@ -434,10 +468,10 @@ ORDER BY l.timestamp DESC, p.name", sql);
             };
             yield return new object[]
             {
-                "prob1 = value1 || message like '%search%' && prob2 != value2",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') OR " +
-                "message LIKE '%search%' AND " +
-                "id NOT IN (SELECT logId FROM log_property WHERE name = 'prob2' AND value = 'value2')",
+                "prob1 = 'value1' or message like '%search%' and prob2 != 'value2'",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob1' AND value = 'value1') > 0) " +
+                "OR message LIKE '%search%' " +
+                "AND id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'prob2' AND value = 'value2') = 0)",
                 "message"
             };
             // General text
@@ -447,12 +481,33 @@ ORDER BY l.timestamp DESC, p.name", sql);
                 "(message LIKE '%search%' OR exception LIKE '%search%' OR " +
                 "id in (SELECT logId FROM log_property WHERE value LIKE '%search%'))"
             };
+            // General text
             yield return new object[]
             {
-                "prob1 = value1 && search",
-                "id IN (SELECT logId FROM log_property WHERE name = 'prob1' AND value = 'value1') AND " +
-                "(message LIKE '%search%' OR exception LIKE '%search%' OR " +
-                "id in (SELECT logId FROM log_property WHERE value LIKE '%search%'))"
+                "\"search=;()\"",
+                "(message LIKE '%search=;()%' OR exception LIKE '%search=;()%' OR " +
+                "id in (SELECT logId FROM log_property WHERE value LIKE '%search=;()%'))"
+            };
+            // Quote escaping for a search string
+            yield return new object[]
+            {
+                @"'searchstr'",
+                "(message LIKE '%''searchstr''%' OR exception LIKE '%''searchstr''%' OR " +
+                "id in (SELECT logId FROM log_property WHERE value LIKE '%''searchstr''%'))"
+            };
+            // Quote escaping for a parsed query
+            yield return new object[]
+            {
+                @"message = 'This is a \'quote\''",
+                "message = 'This is a ''quote'''",
+                "message"
+            };
+            // Booleans
+            yield return new object[]
+            {
+                @"loggedIn = true or loggedIn = false",
+                "loggedIn = 'True' OR loggedIn = 'False'",
+                "loggedIn"
             };
         }
 

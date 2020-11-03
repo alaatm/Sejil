@@ -9,6 +9,7 @@ using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
 using System.Text.Json;
+using Sejil.Data.Query.Internal;
 
 namespace Sejil.Routing.Internal
 {
@@ -36,10 +37,18 @@ namespace Sejil.Routing.Internal
 
         public async Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter)
         {
-            var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
-
-            _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions._camelCaseJson));
+            try
+            {
+                var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
+                _context.Response.ContentType = "application/json";
+                await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions._camelCaseJson));
+            }
+            catch (QueryEngineException ex)
+            {
+                _context.Response.ContentType = "application/json";
+                _context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await _context.Response.WriteAsync(JsonSerializer.Serialize(new { error = ex.Message }, ApplicationBuilderExtensions._camelCaseJson));
+            }
         }
 
         public async Task SaveQueryAsync(LogQuery logQuery) => 

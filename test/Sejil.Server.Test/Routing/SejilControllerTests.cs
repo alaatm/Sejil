@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
+using Sejil.Data.Query.Internal;
 using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Core;
@@ -116,6 +117,25 @@ namespace Sejil.Test.Routing
             // Assert
             Assert.Equal("application/json", context.Response.ContentType);
             AssertResponseContent(logEntriesJson, context.Response);
+        }
+
+        [Fact]
+        public async Task GetEventsAsync_returns_404_when_bad_query()
+        {
+            // Arrange
+            var ex = new QueryEngineException("malformed query.");
+            var repositoryMoq = new Mock<ISejilRepository>();
+            repositoryMoq.Setup(p => p.GetEventsPageAsync(1, null, null)).ThrowsAsync(ex);
+            var context = CreateContext();
+            var controller = CreateController(context, repositoryMoq.Object, Mock.Of<ISejilSettings>());
+
+            // Act
+            await controller.GetEventsAsync(1, null, null);
+
+            // Assert
+            Assert.Equal("application/json", context.Response.ContentType);
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            AssertResponseContent(@"{""error"":""malformed query.""}", context.Response);
         }
 
         [Fact]
