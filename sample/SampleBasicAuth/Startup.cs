@@ -49,11 +49,12 @@ namespace Sample
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSejil();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSejil();
 
             app.UseEndpoints(endpoints =>
             {
