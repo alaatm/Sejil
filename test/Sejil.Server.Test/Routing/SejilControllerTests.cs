@@ -120,7 +120,7 @@ namespace Sejil.Test.Routing
         }
 
         [Fact]
-        public async Task GetEventsAsync_returns_404_when_bad_query()
+        public async Task GetEventsAsync_returns_404_when_GetEventsPageAsync_throws_QueryEngineException()
         {
             // Arrange
             var ex = new QueryEngineException("malformed query.");
