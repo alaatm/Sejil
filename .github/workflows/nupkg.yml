@@ -28,4 +28,4 @@ jobs:
 
       - name: publish nuget package
         run: |
-          dotnet nuget push .nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://nuget.org
+          dotnet nuget push .nupkg/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
