@@ -115,15 +115,10 @@ Task("Restore")
 });
 
 Task("Build")
+	.IsDependentOn("CopyEmbeddedHtml")
     .IsDependentOn("Restore")
     .Does(() =>
 {
-    // Create a dummy index.html so that build doesn't fail only if the target isn't pack.
-    if (target.ToLower() != "pack" && !FileExists("./src/Sejil.Server/index.html"))
-    {
-        IOFile.WriteAllText("./src/Sejil.Server/index.html", "");
-    }
-
     DotNetCoreBuild(".", new DotNetCoreBuildSettings
     {
         NoRestore = true,
@@ -144,7 +139,6 @@ Task("Test")
 });
 
 Task("Pack")	
-	.IsDependentOn("CopyEmbeddedHtml")
 	.IsDependentOn("Test")
 	.Does(() =>
 {
