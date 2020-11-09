@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
@@ -15,7 +15,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
 
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <PackageId>Sejil</PackageId>
     <AssemblyName>Sejil</AssemblyName>
 
