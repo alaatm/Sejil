@@ -96,6 +96,20 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());            
     ```
 
+* You can use Serilog's configuration to specifiy minimum log level overrides for certain namespaces. For example, to limit logging from `Microsoft.AspNetCore` to `Warning`:
+
+    ```json
+    {
+        "Serilog": {
+            "MinimumLevel": {
+                "Override": {
+                    "Microsoft.AspNetCore": "Warning"
+                }
+            }
+        },
+        "AllowedHosts": "*"
+    }    
+    ```
 
 ## Features and Screenshots
 
