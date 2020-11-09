@@ -26,11 +26,8 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     ```csharp
     public static IWebHost BuildWebHost(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.AddSejil("/sejil", LogLevel.Debug);
-                // ...
-            });            
+            .UseSejil()
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());            
     ```
 
     Add below code to **Startup.cs**
@@ -42,6 +39,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     {    
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // ...
             app.UseSejil();
             // ...
         }
@@ -107,8 +105,7 @@ To build the project, you just need to clone the repo then run the build command
 ```powershell
 git clone https://github.com/alaatm/Sejil.git
 cd ./Sejil
-./build.ps1  # If running Windows
-./build.sh   # If running Linux/OSX
+./build
 ```
 
 You can run one of the sample apps afterwards:
