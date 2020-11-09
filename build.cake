@@ -43,23 +43,29 @@ Setup(context =>
 // TASKS
 //////////////////////////////////////////////////////////////////////
 
+Task("ClientClean")
+    .Does(() =>
+{
+	CleanDirectories(clientDir.Path.Combine("build").FullPath);
+});
+
 Task("Clean")
     .Does(() =>
 {
     CleanDirectories("./src/**/bin/" + configuration);
     CleanDirectories("./src/**/obj");
-	CleanDirectories(clientDir.Path.Combine("build").FullPath);
     CleanDirectories(packDir);
     CleanDirectories(coverageDir);
     if (FileExists(lcovFile)) DeleteFile(lcovFile);    
 });
 
 Task("ClientBuild")
+    .IsDependentOn("ClientClean")
 	.Does(() =>
 {
 	//./src/Sejil.Client/> npm install
     NpmInstall(settings => settings.FromPath(clientDir));
-	// ./src/Sejil.Client/> npm run build
+	//./src/Sejil.Client/> npm run build
     NpmRunScript("build", settings => settings.FromPath(clientDir));
 });
 
