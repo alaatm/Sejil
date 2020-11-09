@@ -21,6 +21,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
     ```
 
 2. Adding code
+
     Add below code to **Program.cs**:
 
     ```csharp
@@ -68,9 +69,33 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
                 options.Title = "My title";
             });
         }
-    ```
+    ```    
 
 3. Navigate to *http://your-app-url/sejil* to view your app's logs.
+
+## Additional logging configuration
+
+* If you want to enable loggers registered through the Microsoft.Extensions.Logging API. Specify `true` to the `writeToProviders` parameter:
+
+    ```csharp
+    public static IWebHost BuildWebHost(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSejil(writeToProviders: true)
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());            
+    ```
+
+* If you want to enable other Serilog sinks, use the `sinks` parameter to do that. For exmaple, the following code adds the console Serilog sink:
+
+    ```csharp
+    public static IWebHost BuildWebHost(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSejil(sinks: sinks =>
+            {
+                sinks.Console();
+            }
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());            
+    ```
+
 
 ## Features and Screenshots
 
