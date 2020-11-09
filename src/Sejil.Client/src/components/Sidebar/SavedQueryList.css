@@ -1,0 +1,20 @@
+.sidebar .saved-query-list .item {
+    display: flex;
+    padding-left: 10px;
+}
+
+.sidebar .saved-query-list .item:not(:last-of-type) {
+    margin-bottom: 5px;
+}
+
+.sidebar .saved-query-list .item>.name {
+    flex: 1 1;
+}
+
+.sidebar .saved-query-list .item>.name:hover {
+    color: wheat;
+}
+
+.sidebar .saved-query-list .empty {
+    padding-left: 10px;
+}

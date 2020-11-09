@@ -1,0 +1,7 @@
+.sidebar .settings .min-log-level {
+    padding-left: 10px;
+}
+
+.sidebar .settings .min-log-level .ant-select {
+    width: 100%;
+}

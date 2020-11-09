@@ -1,0 +1,23 @@
+.ant-layout {
+  height: 100vh;
+}
+
+.ant-layout-header {
+  background: #fff;
+  padding: 10px;
+  line-height: unset;
+  height: unset;
+  border-bottom: 1px solid #ccc;
+}
+
+.ant-layout-sider {
+  color: #a8a8a8;
+  background: #3a3633;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.ant-layout-content {
+  background: #fff;
+  padding: 10px 0 0 0;
+}

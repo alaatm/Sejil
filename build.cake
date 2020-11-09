@@ -1,11 +1,11 @@
-#addin nuget:?package=Newtonsoft.Json&Version=12.0.3
+#addin nuget:?package=AngleSharp&Version=0.14.0
 #addin nuget:?package=Cake.Coverlet&Version=2.5.1
 #addin nuget:?package=Cake.Git&Version=0.22.0
+#addin nuget:?package=Cake.Npm&Version=0.17.0
 #tool nuget:?package=ReportGenerator&Version=4.7.1
-#r "cake-tools\Cake.Npm.dll"
 
 using System.Xml.Linq;
-using Newtonsoft.Json.Linq;
+using AngleSharp.Html.Parser;
 using IOFile = System.IO.File;
 
 //////////////////////////////////////////////////////////////////////
@@ -58,34 +58,45 @@ Task("ClientBuild")
 	.Does(() =>
 {
 	//./src/Sejil.Client/> npm install
-	Npm.FromPath(clientDir).Install();
+    NpmInstall(settings => settings.FromPath(clientDir));
 	// ./src/Sejil.Client/> npm run build
-	Npm.FromPath(clientDir).RunScript("build");
+    NpmRunScript("build", settings => settings.FromPath(clientDir));
 });
 
 Task("CopyEmbeddedHtml")
+    .IsDependentOn("ClientBuild")
 	.Does(() =>
-{		
+{
 	var clientBuildDir = clientDir.Path.Combine("build");
-	var htmlPath = clientBuildDir.Combine("index.html").FullPath;
-	var manifestPath = clientBuildDir.Combine("asset-manifest.json").FullPath;
-
+    var htmlPath = clientBuildDir.Combine("index.html").FullPath;
 	var html = IOFile.ReadAllText(htmlPath);
-	var manifest = JObject.Parse(IOFile.ReadAllText(manifestPath));
 
-    var relCssPath = manifest["main.css"].ToString();
-    var relJsPath = manifest["main.js"].ToString();
-	var cssPath = clientBuildDir.Combine(relCssPath).FullPath;
-	var jsPath = clientBuildDir.Combine(relJsPath).FullPath;
+    var tagValueList = new Dictionary<string, string>();
 
-	var appCss = IOFile.ReadAllText(cssPath);
-	var appJs = IOFile.ReadAllText(jsPath);
+    var parser = new HtmlParser();
+    var doc = parser.ParseDocument(html);
 
-	appCss = appCss.Substring(0, appCss.IndexOf("/*# sourceMappingURL=main."));
-	appJs = appJs.Substring(0, appJs.IndexOf("//# sourceMappingURL=main"));
+    foreach (var css in doc.All.Where(p => p.TagName == "LINK" && p.Attributes["href"].Value.StartsWith("/static")))
+    {
+        var tag = css.OuterHtml;
+        var relPath = css.Attributes["href"].Value.Substring(1);
+        var fullPath = clientBuildDir.Combine(relPath).FullPath;
 
-	html = html.Replace("<script type=\"text/javascript\" src=\"/" + relJsPath +"\"></script>", "<script>" + appJs + "</script>");
-	html = html.Replace("<link href=\"/" + relCssPath  +"\" rel=\"stylesheet\">", "<style>" + appCss + "</style>");
+        tagValueList.Add(tag, "<style>" + IOFile.ReadAllText(fullPath) + "</style>");
+    }
+    foreach (var js in doc.Scripts.Where(p => p.Source?.StartsWith("/static") ?? false))
+    {
+        var tag = js.OuterHtml;
+        var relPath = js.Source.Substring(1);
+        var fullPath = clientBuildDir.Combine(relPath).FullPath;
+
+        tagValueList.Add(tag, "<script>" + IOFile.ReadAllText(fullPath) + "</script>");
+    }
+
+    foreach (var kvp in tagValueList)
+    {
+        html = html.Replace(kvp.Key, kvp.Value);
+    }
 	
 	IOFile.WriteAllText("./src/Sejil.Server/index.html", html);
 });
@@ -101,7 +112,7 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
 {
-    // Create a dummy index.html so that build doesn't fail only if not the target isn't pack.
+    // Create a dummy index.html so that build doesn't fail only if the target isn't pack.
     if (target.ToLower() != "pack" && !FileExists("./src/Sejil.Server/index.html"))
     {
         IOFile.WriteAllText("./src/Sejil.Server/index.html", "");
@@ -126,8 +137,7 @@ Task("Test")
     });
 });
 
-Task("Pack")
-	.IsDependentOn("ClientBuild")
+Task("Pack")	
 	.IsDependentOn("CopyEmbeddedHtml")
 	.IsDependentOn("Test")
 	.Does(() =>

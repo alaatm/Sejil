@@ -1,0 +1,129 @@
+.content .log-entry {
+    padding: 4px 0 4px 16px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 12px;
+}
+
+.content .log-entry:not(.expanded):hover {
+    background: rgba(60, 90, 100, .04);
+}
+
+.content .log-entry>.summary {
+    display: inline-flex;
+    width: 100%;
+}
+
+.content .log-entry>.summary>.date {
+    width: 165px;
+    min-width: 165px;
+    margin-right: 10px;
+}
+
+.content .log-entry>.summary .ant-badge-status-dot {
+    width: 9px;
+    height: 9px;
+}
+
+.content .log-entry>.summary>.message {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.content .log-entry.expanded {
+    margin-bottom: 2px;
+}
+
+.content .log-entry.expanded.level-verbose {
+    background-color: #f7f7f7;
+}
+
+.content .log-entry.expanded.level-debug {
+    background-color: #eeeeee;
+}
+
+.content .log-entry.expanded.level-information {
+    background-color: #e6f7ff;
+}
+
+.content .log-entry.expanded.level-warning {
+    background-color: #fffbe6;
+}
+
+.content .log-entry.expanded.level-error {
+    background-color: #fff2f0;
+}
+
+.content .log-entry.expanded.level-critical {
+    background-color: #fce4ec;
+}
+
+.content .log-entry>.details {
+    padding-left: 175px;
+    width: 100%;
+}
+
+/* Animation */
+.content .log-entry>.details.enter {
+    max-height: 0;
+    opacity: 0;
+}
+
+.content .log-entry>.details.enter-active {
+    max-height: 2000px;
+    opacity: 1;
+    transition: opacity 200ms, max-height 200ms ease-in;
+}
+
+.content .log-entry>.details.exit {
+    max-height: 2000px;
+    opacity: 1;
+}
+
+.content .log-entry>.details.exit-active {
+    max-height: 0;
+    opacity: 0;
+    transition: opacity 200ms, max-height 200ms ease-out;
+}
+
+/* Animation */
+
+.content .log-entry>.details>.properties {
+    margin-top: 5px;
+}
+
+.content .log-entry>.details>.properties>.property {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.content .log-entry>.details>.properties>.property>.name,
+.content .log-entry>.details>.properties>.property>.value {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+}
+
+.content .log-entry>.details>.properties>.property>.name {
+    flex: 0 0 245px;
+    font-weight: bold;
+}
+
+.content .log-entry>.details>.properties>.property>.value {
+    flex: 1 1;
+    word-break: break-word;
+}
+
+.content .log-entry>.details>.exception {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    color: #fff;
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #bb312f;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

@@ -1,0 +1,18 @@
+.content {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.content .ant-list-item {
+    padding: 0px;
+}
+
+.content .ant-spin-nested-loading>div>.ant-spin {
+    position: fixed;
+    top: calc(50% - 200px);
+}
+
+.content .ant-spin-nested-loading>div>.ant-spin .ant-spin-dot {
+    left: calc(50% + 125px);
+}

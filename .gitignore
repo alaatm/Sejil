@@ -1,13 +1,9 @@
 .vs/
-node_modules/
 tools/
 dist/
-nuget-build/
 [Bb]in/
 [Oo]bj/
 build/
-
-package-lock.json
 
 .DS_Store
 .env.local
@@ -23,8 +19,4 @@ src/Sejil.Server/index.html
 lcov.info
 
 ignore/
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 *.user

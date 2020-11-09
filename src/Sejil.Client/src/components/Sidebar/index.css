@@ -1,0 +1,51 @@
+.sidebar .ant-typography {
+    color: #a8a8a8;
+}
+
+.sidebar h5>button.ant-btn {
+    float: right;
+}
+
+.sidebar .ant-divider {
+    border-color: #a8a8a8;
+}
+
+.sidebar .ant-btn:hover,
+.sidebar .ant-btn:focus {
+    color: wheat;
+    border-color: wheat;
+}
+
+.sidebar .ant-radio-group {
+    width: 100%;
+}
+
+.sidebar .ant-radio-button-wrapper {
+    display: block;
+    background-color: unset;
+    color: #a8a8a8;
+    border: 0px;
+}
+
+.sidebar .ant-radio-button-wrapper:hover {
+    color: wheat;
+}
+
+.sidebar .ant-radio-group-solid .ant-radio-button-wrapper-checked,
+.sidebar .ant-radio-group-solid .ant-radio-button-wrapper-checked:hover {
+    background-color: wheat;
+    color: #222;
+}
+
+.sidebar .ant-radio-button-wrapper:first-child {
+    border: 0px;
+}
+
+.sidebar .ant-radio-button-wrapper:not(:first-child)::before {
+    width: 0;
+}
+
+.sidebar button.clear,
+.sidebar button.delete {
+    border: 0;
+}

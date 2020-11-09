@@ -1,0 +1,28 @@
+.header .ant-row {
+    display: flex;
+}
+
+.header .ant-row:first-of-type {
+    margin-bottom: 10px;
+}
+
+.header .ant-row .query {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+    flex: 1 1;
+}
+
+.header .ant-row .ant-btn {
+    width: 91px;
+    min-width: 91px;
+    margin-left: 10px;
+}
+
+.header .ant-row .ant-radio-button-wrapper {
+    width: 62px;
+    text-align: center;
+}
+
+.header .ant-row .float-right {
+    display: flex;
+    justify-content: flex-end;
+}
