@@ -67,6 +67,7 @@ export default class InfiniteScroll extends Component {
         let passive = false;
 
         const testOptions = {
+            // eslint-disable-next-line getter-return
             get passive() {
                 passive = true;
             }
