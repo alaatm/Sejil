@@ -4,8 +4,7 @@ export type QueryFilterActions =
     | { type: 'SET_QUERY_FILTER', payload: Partial<LogQueryFilter> }
     | { type: 'CLEAR_LEVEL' }
     | { type: 'CLEAR_EX' }
-    | { type: 'CLEAR_QUERY_AND_DATE' }
-    | { type: 'SET_PAGE', payload: number };
+    | { type: 'CLEAR_QUERY_AND_DATE' };
 
 export const logQueryFilterReducer = (state: LogQueryFilter, action: QueryFilterActions): LogQueryFilter => {
     switch (action.type) {
