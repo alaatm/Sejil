@@ -28,15 +28,8 @@ var lcovFile = "./lcov.info";
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
-ICakeContext _context;
-
 Setup(context =>
 {
-	_context = context;
-	var env = configuration.ToLower() == "debug"
-		? "development"
-		: "production";
-	System.Environment.SetEnvironmentVariable("BUILD_ENV", env);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -146,7 +139,8 @@ Task("Pack")
 	{ 
 		Configuration = configuration,
 		OutputDirectory = packDir,
-		NoBuild = true
+        NoRestore = true,
+        NoBuild = true,
 	});
 });
 
