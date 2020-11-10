@@ -136,7 +136,7 @@ In addition to filtering logs by level; exceptions only; and date range via the 
         StatusCode = 200
         ```
 
-* You can combine multiple search expressions with `and` `or` and uses `(` `)` for precedence.
+* You can combine multiple search expressions with `and` `or` and use `(` `)` for precedence.
 
     Examples:
     ```sql
