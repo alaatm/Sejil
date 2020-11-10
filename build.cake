@@ -217,11 +217,19 @@ Task("Release")
                 $"<VersionPrefix>{version}</VersionPrefix>",
                 $"<VersionPrefix>{releaseVersion}</VersionPrefix>"));
 
+    IOFile.WriteAllText(
+        "./README.md",
+        IOFile.ReadAllText("./README.md")
+            .Replace(
+                $"dotnet add package Sejil --version {version}",
+                $"dotnet add package Sejil --version {releaseVersion}"));
+
     var tag = "v" + releaseVersion;
     var name = "Alaa Masoud";
     var email = "alaa.masoud@live.com";
 
     GitAdd(".", csproj);
+    GitAdd(".", "./README.md");
     GitCommit(".", name, email, tag);
     GitTag(".", tag, name, email, tag);
     GitPush(".");
