@@ -11,7 +11,13 @@
     flex: 1 1;
 }
 
-.header .ant-row .ant-btn {
+.header .ant-row .query.active button.ant-btn {
+    background-color: #2e7d32;
+    color: #fff;
+}
+
+.header .ant-row .ant-btn.save,
+.header .ant-row .ant-btn.clear {
     width: 91px;
     min-width: 91px;
     margin-left: 10px;
