@@ -15,7 +15,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
 
-    <VersionPrefix>3.0.1</VersionPrefix>
+    <VersionPrefix>3.0.2</VersionPrefix>
     <PackageId>Sejil</PackageId>
     <AssemblyName>Sejil</AssemblyName>
 
