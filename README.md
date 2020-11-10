@@ -110,6 +110,36 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
         "AllowedHosts": "*"
     }    
     ```
+## Filtering logs
+
+In addition to filtering logs by level; exceptions only; and date range via the UI, you can also search by text to filter your logs:
+
+* To filter logs by a specific search term, just type it in the search box and hit enter. If the search term contains spaces or any of the following [ "=", "!", "(", ")"], make sure to enclose it in double quotes.
+
+    Examples:
+    ```
+    AboutController
+    "some message"
+    "ZGFzZGE="
+    ```
+
+* To filter logs by a specific property, use the following pattern:
+
+    * `property-name` [ ` = | != | like | not like ` ] `search-term`
+
+        Examples:
+        ```sql
+        SourceContext = 'Microsoft.AspNetCore.Hosting.Internal.WebHost'
+        SourceContext like '%Hosting%'
+        StatusCode = 200
+        ```
+
+* You can combine multiple search expressions with `and` `or` and uses `(` `)` for precedence.
+
+    Examples:
+    ```sql
+    StatusCode like '%' and StatusCode != 200   -- Get all logs that contain a 'StatusCode' property and that the property value does not equal 200.    
+    ```
 
 ## Features and Screenshots
 
