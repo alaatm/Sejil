@@ -116,7 +116,7 @@ Sejil is a library that enables you to capture, view and filter your ASP.net cor
 
 In addition to filtering logs by level; exceptions only; and date range via the UI, you can also search by text to filter your logs:
 
-* To filter logs by a specific search term, just type it in the search box and hit enter. If the search term contains spaces or any of the following [ "=", "!", "(", ")"], make sure to enclose it in double quotes.
+* To filter logs by a specific search term, just type it in the search box and hit enter. If the search term contains spaces or any of the following `=`, `!`, `(`, `)` then make sure to enclose it in double quotes.
 
     Examples:
     ```
