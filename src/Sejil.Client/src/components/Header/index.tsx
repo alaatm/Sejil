@@ -20,7 +20,6 @@ const Header = () => {
         setCanSave(queryText !== undefined);
     }, [queryText]);
 
-
     useEffect(() => {
         setCanClear(queryText !== undefined || dateFilter !== undefined || dateRangeFilter !== undefined);
     }, [queryText, dateFilter, dateRangeFilter]);
