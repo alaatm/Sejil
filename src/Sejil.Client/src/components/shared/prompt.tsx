@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from "react-dom";
 import { Form, Input, Modal } from 'antd';
+import { Rule } from 'antd/lib/form';
 
 
 type PromptProps = {
@@ -9,10 +10,11 @@ type PromptProps = {
     visible: boolean;
     close: (value?: string) => void;
     afterClose?: () => void;
+    validators: Rule[];
 }
 
 const Prompt = (props: PromptProps) => {
-    const { title, placeholder, visible, close, afterClose } = props;
+    const { title, placeholder, visible, close, afterClose, validators } = props;
     const [form] = Form.useForm();
 
     const handleOk = async () => {
@@ -32,7 +34,12 @@ const Prompt = (props: PromptProps) => {
             afterClose={afterClose}
         >
             <Form name="prompt" form={form}>
-                <Form.Item name="value" rules={[{ required: true, message: title }]}>
+                <Form.Item name="value" rules={
+                    [
+                        { required: true, message: title },
+                        { whitespace: true, message: title },
+                        ...validators
+                    ]}>
                     <Input placeholder={placeholder} />
                 </Form.Item>
             </Form>
@@ -43,6 +50,7 @@ const Prompt = (props: PromptProps) => {
 type Props = {
     title: string;
     placeholder: string;
+    validators: Rule[];
 }
 
 export default function prompt(props: Props): Promise<string | undefined> {

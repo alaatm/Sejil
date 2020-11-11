@@ -25,9 +25,19 @@ const Header = () => {
     }, [queryText, dateFilter, dateRangeFilter]);
 
     const handleQuerySave = async () => {
-        const value = await prompt({ title: 'Please enter query name', placeholder: 'Query name' });
+        const value = await prompt({
+            title: 'Please enter query name',
+            placeholder: 'Query name',
+            validators: [
+                {
+                    validator: (_, v: string) => state.savedQueries.filter(p => p.name === v.trim()).length < 1
+                        ? Promise.resolve()
+                        : Promise.reject('Query name already exist.')
+                }
+            ]
+        });
         if (value) {
-            const query = { name: value, query: queryText! };
+            const query = { name: value.trim(), query: queryText! };
             await api.saveQuery(query);
             dispatch({ type: 'SAVE_QUERY', payload: query });
         }
