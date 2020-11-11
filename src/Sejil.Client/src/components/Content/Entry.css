@@ -31,6 +31,19 @@
     overflow: hidden;
 }
 
+.content .log-entry>.summary>.message .prop-value {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.content .log-entry>.summary>.message .prop-value.str {
+    color: #a31515;
+}
+
+.content .log-entry>.summary>.message .prop-value.num {
+    color: #09885a;
+}
+
 .content .log-entry.expanded {
     margin-bottom: 2px;
 }

@@ -1,5 +1,10 @@
 import dayjs from 'dayjs'
 
+type Span = {
+    kind: 'str' | 'num' | null;
+    text: string;
+}
+
 export type LogEntry = {
     id: string;
     message: string;
@@ -8,6 +13,7 @@ export type LogEntry = {
     timestamp: string;
     exception?: string;
     properties: LogEntryProperty[];
+    spans: Span[];
 }
 
 export type LogEntryProperty = {
