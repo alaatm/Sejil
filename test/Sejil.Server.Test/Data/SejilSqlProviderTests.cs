@@ -577,7 +577,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
             };
         }
 
-        private string GetInnerPredicate(string sql) => sql.Replace(
+        private static string GetInnerPredicate(string sql) => sql.Replace(
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
@@ -590,7 +590,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name", "");
 
-        private string GetInnerPredicate_ts(string sql) => sql.Replace(
+        private static string GetInnerPredicate_ts(string sql) => sql.Replace(
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log

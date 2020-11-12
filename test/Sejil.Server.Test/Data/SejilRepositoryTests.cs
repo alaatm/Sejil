@@ -188,7 +188,7 @@ namespace Sejil.Test.Data
             Assert.Equal("0_1", logs.ElementAt(0).Properties.ElementAt(1).Value);
         }
 
-        private void InitializeDatabse(string path)
+        private static void InitializeDatabse(string path)
         {
             using var conn = new SqliteConnection($"DataSource={path}");
             conn.Open();

@@ -343,7 +343,7 @@ namespace Sejil.Test
             return new TestServer(builder);
         }
 
-        string Join(List<DateTime> dateList)
+        static string Join(List<DateTime> dateList)
         {
             if (dateList == null || dateList?.Count == 0)
             {

@@ -244,7 +244,7 @@ namespace Sejil.Test.Logging.Sinks
             Assert.Equal("Information", logEvent1.Level);
             Assert.Equal(timestamp1, logEvent1.Timestamp);
             Assert.Null(logEvent1.Exception);
-            Assert.Equal(2, logEvent1.Properties.Count());
+            Assert.Equal(2, logEvent1.Properties.Count);
             Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(0).LogId);
             Assert.Equal("name", logEvent1.Properties.ElementAt(0).Name);
             Assert.Equal("world", logEvent1.Properties.ElementAt(0).Value);
@@ -258,7 +258,7 @@ namespace Sejil.Test.Logging.Sinks
             Assert.Equal("Debug", logEvent2.Level);
             Assert.Equal(timestamp2, logEvent2.Timestamp);
             Assert.Equal("System.Exception: error", logEvent2.Exception);
-            Assert.Equal(2, logEvent2.Properties.Count());
+            Assert.Equal(2, logEvent2.Properties.Count);
             Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(0).LogId);
             Assert.Equal("name", logEvent2.Properties.ElementAt(0).Name);
             Assert.Equal("world", logEvent2.Properties.ElementAt(0).Value);
@@ -306,21 +306,21 @@ namespace Sejil.Test.Logging.Sinks
             Assert.Empty(logEvents);
         }
 
-        private IEnumerable<string> GetTables(string db)
+        private static IEnumerable<string> GetTables(string db)
         {
             using var conn = new SqliteConnection($"DataSource={db}");
             conn.Open();
             return conn.Query<string>("SELECT name FROM sqlite_master WHERE type='table';");
         }
 
-        private IEnumerable<ColumnInfo> GetColumns(string db, string tableName)
+        private static IEnumerable<ColumnInfo> GetColumns(string db, string tableName)
         {
             using var conn = new SqliteConnection($"DataSource={db}");
             conn.Open();
             return conn.Query<ColumnInfo>($"pragma table_info('{tableName}');");
         }
 
-        private IEnumerable<ForeignKeyColumnInfo> GetForeignKeyColumns(string db, string tableName)
+        private static IEnumerable<ForeignKeyColumnInfo> GetForeignKeyColumns(string db, string tableName)
         {
             using var conn = new SqliteConnection($"DataSource={db}");
             conn.Open();

@@ -318,10 +318,10 @@ namespace Sejil.Test.Routing
             AssertResponseContent(responseJson, context.Response);
         }
 
-        private ISejilController CreateController(HttpContext context, ISejilRepository repository, ISejilSettings settings)
+        private static ISejilController CreateController(HttpContext context, ISejilRepository repository, ISejilSettings settings)
             => new SejilController(new HttpContextAccessor { HttpContext = context }, repository, settings);
 
-        private (IEnumerable<LogEntry> logEntries, string logEntriesJson) GetTestLogEntries()
+        private static (IEnumerable<LogEntry> logEntries, string logEntriesJson) GetTestLogEntries()
         {
             var events = new List<LogEntry>()
             {
@@ -347,7 +347,7 @@ namespace Sejil.Test.Routing
             return (events, json);
         }
 
-        private (IEnumerable<LogQuery> logQueries, string logQueriesJson) GetTestLogQueries()
+        private static (IEnumerable<LogQuery> logQueries, string logQueriesJson) GetTestLogQueries()
         {
             var queries = new List<LogQuery>
             {
