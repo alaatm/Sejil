@@ -17,8 +17,9 @@ namespace Sejil.Test.Configuration
         public void Ctor_sets_db_path_to_localAppData_when_running_outside_Azure()
         {
             // Arrange & act
+            var appName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
             var basePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "testhost");
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), appName);
             var settings = new SejilSettings("", LogEventLevel.Debug);
 
             // Assert

@@ -13,7 +13,6 @@
     <PackageTags>sejil;logging;structured</PackageTags>
     <PackageProjectUrl>https://github.com/alaatm/Sejil</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
 
     <VersionPrefix>3.0.3</VersionPrefix>
     <PackageId>Sejil</PackageId>
@@ -37,12 +36,22 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.21" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <!-- Microsoft.Data.Sqlite v6.0 which uses sqlite-pcl-raw 2.06 causes 'the type initializer threw an exception' -->
     <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.12" />
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
@@ -60,6 +69,12 @@
   <ItemGroup>
     <EmbeddedResource Include="index.html" />
     <EmbeddedResource Include="db.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>
