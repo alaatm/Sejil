@@ -11,7 +11,6 @@ using Sejil.Models.Internal;
 using Xunit;
 using System.Linq;
 
-#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
 namespace Sejil.Test.Data
 {
     public class SejilRepositoryTests
@@ -198,4 +197,3 @@ namespace Sejil.Test.Data
         }
     }
 }
-#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities

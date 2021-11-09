@@ -10,7 +10,7 @@ namespace Sejil.Models.Internal
 {
     public class LogEntry
     {
-        private readonly Regex _propRegex = new Regex("{([^{][^}]+)}", RegexOptions.Compiled);
+        private readonly Regex _propRegex = new("{([^{][^}]+)}", RegexOptions.Compiled);
 
         private List<TextSpan> _spans;
 

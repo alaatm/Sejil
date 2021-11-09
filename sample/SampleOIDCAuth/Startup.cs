@@ -46,10 +46,7 @@ namespace Sample
                 };
             });
 
-            services.ConfigureSejil(options =>
-            {
-                options.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            });
+            services.ConfigureSejil(cfg => cfg.AuthenticationScheme = OpenIdConnectDefaults.AuthenticationScheme);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

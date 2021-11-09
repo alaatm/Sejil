@@ -18,7 +18,7 @@ namespace Sejil
 {
     public static class ApplicationBuilderExtensions
     {
-        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         /// <summary>
         /// Adds Sejil to the request pipeline.

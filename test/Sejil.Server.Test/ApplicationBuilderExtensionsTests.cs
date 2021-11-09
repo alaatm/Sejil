@@ -31,7 +31,7 @@ namespace Sejil.Test
 {
     public class ApplicationBuilderExtensionsTests
     {
-        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         [Fact]
         public async Task HttpGet_root_url_calls_controller_GetIndexAsync_method()

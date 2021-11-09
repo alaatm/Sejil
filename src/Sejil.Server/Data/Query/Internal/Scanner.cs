@@ -8,8 +8,8 @@ namespace Sejil.Data.Query.Internal
     internal class Scanner
     {
         private readonly string _source;
-        private readonly List<Token> _tokens = new List<Token>();
-        private readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
+        private readonly List<Token> _tokens = new();
+        private readonly Dictionary<string, TokenType> _keywords = new()
         {
             { "and", TokenType.And },
             { "or", TokenType.Or },

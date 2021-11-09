@@ -16,7 +16,7 @@ jobs:
       - name: setup .net
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.100"
+          dotnet-version: "6.0.x"
 
       - name: run build script
         run: |
