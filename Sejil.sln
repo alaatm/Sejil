@@ -1,6 +1,7 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3939D1C9-9491-4B7F-B78B-E518084C2C38}"
 EndProject
@@ -17,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleBasicAuth", "sample\SampleBasicAuth\SampleBasicAuth.csproj", "{34C18432-F683-49B4-A307-39493EBADFCD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleOIDCAuth", "sample\SampleOIDCAuth\SampleOIDCAuth.csproj", "{8CE372CF-3ABE-4D28-9500-DBE8BC76D8AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleNet6", "sample\SampleNet6\SampleNet6.csproj", "{31D3BE87-EC28-445F-89CA-71B83B7B220F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,6 +91,18 @@ Global
 		{8CE372CF-3ABE-4D28-9500-DBE8BC76D8AE}.Release|x64.Build.0 = Release|Any CPU
 		{8CE372CF-3ABE-4D28-9500-DBE8BC76D8AE}.Release|x86.ActiveCfg = Release|Any CPU
 		{8CE372CF-3ABE-4D28-9500-DBE8BC76D8AE}.Release|x86.Build.0 = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|x64.Build.0 = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Debug|x86.Build.0 = Debug|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|x64.ActiveCfg = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|x64.Build.0 = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|x86.ActiveCfg = Release|Any CPU
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +113,7 @@ Global
 		{1947CB18-FFAF-4198-956D-78205A898F44} = {D4AEA8DD-AE51-457C-BB4C-0E1C9369FE88}
 		{34C18432-F683-49B4-A307-39493EBADFCD} = {31E93A58-DC73-4ED1-94CC-F0B7497A056D}
 		{8CE372CF-3ABE-4D28-9500-DBE8BC76D8AE} = {31E93A58-DC73-4ED1-94CC-F0B7497A056D}
+		{31D3BE87-EC28-445F-89CA-71B83B7B220F} = {31E93A58-DC73-4ED1-94CC-F0B7497A056D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FFBB6D79-6434-4DE1-9503-9330D749DC91}
