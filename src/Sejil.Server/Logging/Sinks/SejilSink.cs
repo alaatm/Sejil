@@ -65,7 +65,7 @@ namespace Sejil.Logging.Sinks
             conn.Close();
         }
 
-        private async Task<string> InsertLogEntryAsync(SqliteCommand cmd, LogEvent log)
+        private static async Task<string> InsertLogEntryAsync(SqliteCommand cmd, LogEvent log)
         {
             var id = Guid.NewGuid().ToString();
 
@@ -80,7 +80,7 @@ namespace Sejil.Logging.Sinks
             return id;
         }
 
-        private async Task InsertLogEntryPropertyAsync(SqliteCommand cmd, string logId, KeyValuePair<string, LogEventPropertyValue> property)
+        private static async Task InsertLogEntryPropertyAsync(SqliteCommand cmd, string logId, KeyValuePair<string, LogEventPropertyValue> property)
         {
             cmd.Parameters["@logId"].Value = logId;
             cmd.Parameters["@name"].Value = property.Key;
@@ -88,7 +88,7 @@ namespace Sejil.Logging.Sinks
             await cmd.ExecuteNonQueryAsync();
         }
 
-        private SqliteCommand CreateLogEntryInsertCommand(SqliteConnection conn, SqliteTransaction tran)
+        private static SqliteCommand CreateLogEntryInsertCommand(SqliteConnection conn, SqliteTransaction tran)
         {
             var sql = "INSERT INTO log (id, message, messageTemplate, level, timestamp, exception)" +
                 "VALUES (@id, @message, @messageTemplate, @level, @timestamp, @exception);";
@@ -108,7 +108,7 @@ namespace Sejil.Logging.Sinks
             return cmd;
         }
 
-        private SqliteCommand CreateLogEntryPropertyInsertCommand(SqliteConnection conn, SqliteTransaction tran)
+        private static SqliteCommand CreateLogEntryPropertyInsertCommand(SqliteConnection conn, SqliteTransaction tran)
         {
             var sql = "INSERT INTO log_property (logId, name, value)" +
                 "VALUES (@logId, @name, @value);";

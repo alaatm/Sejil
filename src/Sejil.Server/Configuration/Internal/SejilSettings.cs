@@ -85,7 +85,7 @@ namespace Sejil.Configuration.Internal
             return false;
         }
 
-        private bool IsRunningInAzure()
+        private static bool IsRunningInAzure()
             => !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
     }
 }
