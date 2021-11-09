@@ -32,7 +32,7 @@ namespace Sejil.Models.Internal
             {
                 var prop = m.Groups[0].Value;
                 var name = m.Groups[1].Value;
-                name = name.Contains(":") ? name.Substring(0, name.IndexOf(":")) : name;
+                name = name.Contains(':') ? name.Substring(0, name.IndexOf(':')) : name;
 
                 var value = Properties.FirstOrDefault(p => p.Name == name)?.Value;
 

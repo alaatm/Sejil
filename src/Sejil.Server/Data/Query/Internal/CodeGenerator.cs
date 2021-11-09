@@ -26,7 +26,7 @@ namespace Sejil.Data.Query.Internal
             Resolve(expr);
             if (_insidePropBlock)
             {
-                _sql.Append(")");
+                _sql.Append(')');
             }
             return _sql.ToString();
         }
@@ -73,9 +73,9 @@ namespace Sejil.Data.Query.Internal
         {
             CheckPropertyScope(expr);
 
-            _sql.Append("(");
+            _sql.Append('(');
             Resolve(expr.Expression);
-            _sql.Append(")");
+            _sql.Append(')');
         }
 
         public void Visit(Expr.Literal expr) => _sql.Append($"'{expr.Value}'");
@@ -85,7 +85,7 @@ namespace Sejil.Data.Query.Internal
             Resolve(expr.Left);
             if (_insidePropBlock && !expr.Right.IsProperty)
             {
-                _sql.Append(")");
+                _sql.Append(')');
             }
             _sql.Append($" {expr.Operator.Text.ToUpper()} ");
             Resolve(expr.Right);

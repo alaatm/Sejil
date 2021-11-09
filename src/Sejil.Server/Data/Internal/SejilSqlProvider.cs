@@ -80,7 +80,7 @@ ORDER BY l.timestamp DESC, p.name";
 
                 if (hasStartingTimestampConstraint || hasDateFilter)
                 {
-                    sql.Append(")");
+                    sql.Append(')');
                 }
 
                 return sql.ToString();
