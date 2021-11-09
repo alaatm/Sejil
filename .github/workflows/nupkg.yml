@@ -11,20 +11,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: setup .net
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      - name: run build script
-        run: |
-          chmod +x ./build.sh
-          ./build.sh -c Release -t pack
+      - name: restore cake tool
+        run: dotnet tool restore
         env:
           DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
           DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+      - name: run build script
+        run: dotnet cake --configuration Release --target Pack
 
       - name: publish nuget package
         run: |
