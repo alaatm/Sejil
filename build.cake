@@ -1,8 +1,8 @@
-#addin nuget:?package=AngleSharp&Version=0.14.0
-#addin nuget:?package=Cake.Coverlet&Version=2.5.1
-#addin nuget:?package=Cake.Git&Version=0.22.0
-#addin nuget:?package=Cake.Npm&Version=0.17.0
-#tool nuget:?package=ReportGenerator&Version=4.7.1
+#addin nuget:?package=AngleSharp&Version=0.16.1
+#addin nuget:?package=Cake.Coverlet&Version=2.5.4
+#addin nuget:?package=Cake.Git&Version=1.1.0
+#addin nuget:?package=Cake.Npm&Version=1.0.0
+#tool nuget:?package=ReportGenerator&Version=4.8.13
 
 using System.Xml.Linq;
 using AngleSharp.Html.Parser;
@@ -47,8 +47,8 @@ Task("Clean")
 {
     CleanDirectories("./src/**/bin/" + configuration);
     CleanDirectories("./src/**/obj");
-    CleanDirectories(packDir);
-    CleanDirectories(coverageDir);
+    CleanDirectory(packDir);
+    CleanDirectory(coverageDir);
     if (FileExists(lcovFile)) DeleteFile(lcovFile);    
 });
 

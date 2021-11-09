@@ -171,12 +171,13 @@ In addition to filtering logs by level; exceptions only; and date range via the 
 
 ## Building
 
-To build the project, you just need to clone the repo then run the build command:
+To build the project, you just need to clone the repo then run the following commands:
 
 ```powershell
 git clone https://github.com/alaatm/Sejil.git
 cd ./Sejil
-./build
+dotnet tool restore
+dotnet cake
 ```
 
 You can run one of the sample apps afterwards:
