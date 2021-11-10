@@ -178,7 +178,7 @@ namespace Sejil.Data.Query.Internal
             }
             if (op.Type is TokenType.Like or TokenType.NotLike && l.Value is not string)
             {
-                throw new QueryEngineException(Error(token, "Expect string."));
+                throw new QueryEngineException(Error(token, "Expect string literal."));
             }
         }
 
