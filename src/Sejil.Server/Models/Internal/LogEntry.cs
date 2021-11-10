@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Sejil.Models.Internal
 {
-    public class LogEntry
+    public sealed class LogEntry
     {
         private readonly Regex _propRegex = new("{([^{][^}]+)}", RegexOptions.Compiled);
 

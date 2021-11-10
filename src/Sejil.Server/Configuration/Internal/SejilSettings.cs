@@ -9,7 +9,7 @@ using Serilog.Core;
 
 namespace Sejil.Configuration.Internal
 {
-    public class SejilSettings : ISejilSettings
+    public sealed class SejilSettings : ISejilSettings
     {
         private const string UUID = "59A8F730-6AC5-427A-9492-A3A9EAD9556F";
 

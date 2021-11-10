@@ -3,7 +3,7 @@
 
 namespace Sejil.Models.Internal
 {
-    public class LogEntryProperty
+    public sealed class LogEntryProperty
     {
         public int Id { get; set; }
         public string LogId { get; set; }

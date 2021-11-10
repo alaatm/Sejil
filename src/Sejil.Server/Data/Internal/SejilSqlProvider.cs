@@ -9,7 +9,7 @@ using Sejil.Data.Query.Internal;
 
 namespace Sejil.Data.Internal
 {
-    public class SejilSqlProvider : ISejilSqlProvider
+    public sealed class SejilSqlProvider : ISejilSqlProvider
     {
         private readonly string[] _nonPropertyColumns;
 

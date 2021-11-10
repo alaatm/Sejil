@@ -13,7 +13,7 @@ using Sejil.Data.Query.Internal;
 
 namespace Sejil.Routing.Internal
 {
-    public class SejilController : ISejilController
+    public sealed class SejilController : ISejilController
     {
         private readonly ISejilRepository _repository;
         private readonly ISejilSettings _settings;

@@ -20,7 +20,7 @@ namespace Sejil.Data.Query.Internal
             void Visit(Variable expr);
         }
 
-        public class Binary : Expr
+        public sealed class Binary : Expr
         {
             public Expr Left { get; }
             public Token Operator { get; }
@@ -32,7 +32,7 @@ namespace Sejil.Data.Query.Internal
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
 
-        public class Grouping : Expr
+        public sealed class Grouping : Expr
         {
             public Expr Expression { get; }
 
@@ -41,7 +41,7 @@ namespace Sejil.Data.Query.Internal
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
 
-        public class Literal : Expr
+        public sealed class Literal : Expr
         {
             public object Value { get; }
 
@@ -50,7 +50,7 @@ namespace Sejil.Data.Query.Internal
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
 
-        public class Logical : Expr
+        public sealed class Logical : Expr
         {
             public Expr Left { get; }
             public Token Operator { get; }
@@ -63,7 +63,7 @@ namespace Sejil.Data.Query.Internal
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
 
-        public class Variable : Expr
+        public sealed class Variable : Expr
         {
             public Token Token { get; }
 

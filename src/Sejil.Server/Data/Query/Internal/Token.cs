@@ -3,7 +3,7 @@
 
 namespace Sejil.Data.Query.Internal
 {
-    internal class Token
+    internal sealed class Token
     {
         public TokenType Type { get; }
         public int Position { get; }

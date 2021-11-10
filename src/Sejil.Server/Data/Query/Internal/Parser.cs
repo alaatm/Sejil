@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Sejil.Data.Query.Internal
 {
-    internal class Parser
+    internal sealed class Parser
     {
         private readonly List<Token> _tokens;
         private readonly string[] _nonPropertyColumns;
@@ -154,7 +154,7 @@ namespace Sejil.Data.Query.Internal
 
         private Token Previous() => _tokens[_current - 1];
 
-        private void CheckLogicalLeftRight(Expr expr, Token token)
+        private static void CheckLogicalLeftRight(Expr expr, Token token)
         {
             if (expr is not (Expr.Binary or Expr.Grouping or Expr.Logical))
             {
@@ -162,7 +162,7 @@ namespace Sejil.Data.Query.Internal
             }
         }
 
-        private void CheckBinaryLeft(Expr expr, Token token)
+        private static void CheckBinaryLeft(Expr expr, Token token)
         {
             if (expr is not Expr.Variable)
             {
@@ -170,7 +170,7 @@ namespace Sejil.Data.Query.Internal
             }
         }
 
-        private void CheckBinaryRight(Expr expr, Token op, Token token)
+        private static void CheckBinaryRight(Expr expr, Token op, Token token)
         {
             if (expr is not Expr.Literal l)
             {

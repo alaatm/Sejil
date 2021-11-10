@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Sejil.Data.Query.Internal
 {
-    internal class Scanner
+    internal sealed class Scanner
     {
         private readonly string _source;
         private readonly List<Token> _tokens = new();

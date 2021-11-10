@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Sejil.Data.Query.Internal
 {
-    internal class QueryEngine
+    internal static class QueryEngine
     {
         public static string Translate(string filter, string[] nonPropertyColumns)
         {

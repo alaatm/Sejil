@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Sejil.Models.Internal
 {
-    public class LogQueryFilter
+    public sealed class LogQueryFilter
     {
         public string QueryText { get; set; }
         public string DateFilter { get; set; }

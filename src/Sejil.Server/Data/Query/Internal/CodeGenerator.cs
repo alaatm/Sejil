@@ -16,7 +16,7 @@ namespace Sejil.Data.Query.Internal
         public static bool IsExluding(this Token token) => token.Type is TokenType.NotEqual or TokenType.NotLike;
     }
 
-    internal class CodeGenerator : Expr.IVisitor
+    internal sealed class CodeGenerator : Expr.IVisitor
     {
         private readonly StringBuilder _sql = new();
         private bool _insidePropBlock;

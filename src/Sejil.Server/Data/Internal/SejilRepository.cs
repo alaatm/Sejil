@@ -13,7 +13,7 @@ using Sejil.Models.Internal;
 
 namespace Sejil.Data.Internal
 {
-    public class SejilRepository : ISejilRepository
+    public sealed class SejilRepository : ISejilRepository
     {
         private readonly ISejilSqlProvider _sql;
         private readonly string _connectionString;
