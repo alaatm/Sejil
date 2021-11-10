@@ -33,8 +33,10 @@ namespace Sejil.Data.Query.Internal
 
             while (Match(TokenType.Or))
             {
+                CheckLogicalLeftRight(expr, _tokens[_current - 2]);
                 var op = Previous();
                 var right = And();
+                CheckLogicalLeftRight(right, Previous());
                 expr = new Expr.Logical(expr, op, right, expr.IsProperty, right.IsProperty);
             }
 
@@ -43,40 +45,34 @@ namespace Sejil.Data.Query.Internal
 
         private Expr And()
         {
-            var expr = Equality();
+            var expr = Binary();
 
             while (Match(TokenType.And))
             {
+                CheckLogicalLeftRight(expr, _tokens[_current - 2]);
                 var op = Previous();
-                var right = Equality();
+                var right = Binary(expr.IsProperty);
+                CheckLogicalLeftRight(right, Previous());
                 expr = new Expr.Logical(expr, op, right, expr.IsProperty, right.IsProperty);
             }
 
             return expr;
         }
 
-        private Expr Equality()
-        {
-            var expr = Comparison();
-
-            while (Match(TokenType.NotEqual, TokenType.Equal))
-            {
-                var op = Previous();
-                var right = Comparison(expr.IsProperty);
-                expr = new Expr.Binary(expr, op, right, expr.IsProperty);
-            }
-
-            return expr;
-        }
-
-        private Expr Comparison(bool isProperty = false)
+        private Expr Binary(bool isProperty = false)
         {
             var expr = Primary(isProperty);
 
-            while (Match(TokenType.Like, TokenType.NotLike))
+            while (Match(
+                TokenType.NotEqual,
+                TokenType.Equal,
+                TokenType.Like,
+                TokenType.NotLike))
             {
+                CheckBinaryLeft(expr, _tokens[_current - 2]);
                 var op = Previous();
                 var right = Primary(expr.IsProperty);
+                CheckBinaryRight(right, op, Previous());
                 expr = new Expr.Binary(expr, op, right, expr.IsProperty);
             }
 
@@ -158,8 +154,36 @@ namespace Sejil.Data.Query.Internal
 
         private Token Previous() => _tokens[_current - 1];
 
+        private void CheckLogicalLeftRight(Expr expr, Token token)
+        {
+            if (expr is not (Expr.Binary or Expr.Grouping or Expr.Logical))
+            {
+                throw new QueryEngineException(Error(token, "Expect binary, grouping or logical expression."));
+            }
+        }
+
+        private void CheckBinaryLeft(Expr expr, Token token)
+        {
+            if (expr is not Expr.Variable)
+            {
+                throw new QueryEngineException(Error(token, "Expect identifier."));
+            }
+        }
+
+        private void CheckBinaryRight(Expr expr, Token op, Token token)
+        {
+            if (expr is not Expr.Literal l)
+            {
+                throw new QueryEngineException(Error(token, "Expect literal."));
+            }
+            if (op.Type is TokenType.Like or TokenType.NotLike && l.Value is not string)
+            {
+                throw new QueryEngineException(Error(token, "Expect string."));
+            }
+        }
+
         static string Error(Token token, string message) => token.Type == TokenType.Eol
             ? $"Error at position '{token.Position + 1}': {message}"
-            : $"Error at position '{token.Position + 1}' '{token.Text}': {message}";
+            : $"Error at position '{token.Position + 1}' -> {token.Text}: {message}";
     }
 }

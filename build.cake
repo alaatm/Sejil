@@ -56,6 +56,8 @@ Task("ClientBuild")
     .IsDependentOn("ClientClean")
 	.Does(() =>
 {
+    if (target.ToUpper() == "COVER") { return; }
+
 	//./src/Sejil.Client/> npm install
     NpmInstall(settings => settings.FromPath(clientDir));
 	//./src/Sejil.Client/> npm run build
@@ -66,6 +68,8 @@ Task("CopyEmbeddedHtml")
     .IsDependentOn("ClientBuild")
 	.Does(() =>
 {
+    if (target.ToUpper() == "COVER") { return; }
+    
 	var clientBuildDir = clientDir.Path.Combine("build");
     var htmlPath = clientBuildDir.Combine("index.html").FullPath;
 	var html = IOFile.ReadAllText(htmlPath);
@@ -166,13 +170,13 @@ Task("Cover")
     DotNetCoreTest(".", testSettings, coverletSettings);
 
     // Copy lcov file to root for code coverage highlight in vscode
-    var lcov = GetFiles(coverageDir.Path + "/*.info").Single();
+    var lcov = GetFiles(coverageDir.Path + "/*.info").First();
     CopyFile(lcov, lcovFile);
 
     // Generate coverage report
     if (IsRunningOnWindows())
     {
-        var opencover = GetFiles(coverageDir.Path + "/*.opencover.xml").Single();
+        var opencover = GetFiles(coverageDir.Path + "/*.opencover.xml").First();
         ReportGenerator(File(opencover.FullPath), coverageDir);
     }
 });

@@ -35,24 +35,6 @@ namespace Sejil.Data.Query.Internal
 
         public void Visit(Expr.Binary expr)
         {
-            if (expr.Left is not Expr.Variable)
-            {
-                throw new QueryEngineException($"Error at position '{expr.Operator.Position - 1}': Left side of comparison can only be a property/non property name.");
-            }
-
-            if (expr.Right is not Expr.Literal)
-            {
-                throw new QueryEngineException($"Error at position '{expr.Operator.Position + expr.Operator.Text.Length + 1}': Right side of comparison can only be a value.");
-            }
-
-            if (expr.Operator.Type is TokenType.Like or TokenType.NotLike)
-            {
-                if (expr.Right is not Expr.Literal literal || literal.Value is not string)
-                {
-                    throw new QueryEngineException($"Error at position '{expr.Operator.Position + expr.Operator.Text.Length + 2}': 'like'/'not like' keywords can only be used with strings.");
-                }
-            }
-
             CheckPropertyScope(expr);
 
             Resolve(expr.Left);
