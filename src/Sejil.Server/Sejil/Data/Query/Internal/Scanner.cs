@@ -11,11 +11,11 @@ internal sealed class Scanner
     private readonly List<Token> _tokens = new();
     private readonly Dictionary<string, TokenType> _keywords = new()
     {
-        { "and", TokenType.And },
-        { "or", TokenType.Or },
-        { "like", TokenType.Like },
-        { "true", TokenType.True },
-        { "false", TokenType.False },
+        { "AND", TokenType.And },
+        { "OR", TokenType.Or },
+        { "LIKE", TokenType.Like },
+        { "TRUE", TokenType.True },
+        { "FALSE", TokenType.False },
     };
 
     private int _start;
@@ -171,10 +171,10 @@ internal sealed class Scanner
             Advance();
         }
 
-        var text = _source[_start.._current];
+        var text = _source[_start.._current].ToUpperInvariant();
 
         // "not" can only be used with "like"
-        if (text.ToLowerInvariant() == "not")
+        if (text == "NOT")
         {
             while (char.IsWhiteSpace(Peek()))
             {
@@ -188,8 +188,8 @@ internal sealed class Scanner
                 Advance();
             }
 
-            text = _source[start.._current].ToLowerInvariant();
-            if (text == "like")
+            text = _source[start.._current].ToUpperInvariant();
+            if (text == "LIKE")
             {
                 AddToken(TokenType.NotLike);
             }
@@ -200,7 +200,7 @@ internal sealed class Scanner
         }
         else
         {
-            var type = _keywords.ContainsKey(text.ToLowerInvariant()) ? _keywords[text.ToLowerInvariant()] : (TokenType?)null;
+            var type = _keywords.ContainsKey(text) ? _keywords[text] : (TokenType?)null;
             AddToken(type is null ? TokenType.Identifier : type.Value);
         }
     }

@@ -1,6 +1,7 @@
-﻿// Copyright (C) 2017 Alaa Masoud
+// Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using System.Text;
 
 namespace Sejil.Data.Query.Internal;
@@ -37,7 +38,7 @@ internal sealed class CodeGenerator : Expr.IVisitor
     {
         Resolve(expr.Left);
         CheckClosePropertyScope(expr.Right);
-        _sql.Append($" {expr.Operator.Text.ToUpperInvariant()} ");
+        _sql.AppendFormat(CultureInfo.InvariantCulture, " {0} ", expr.Operator.Text.ToUpperInvariant());
         Resolve(expr.Right);
     }
 

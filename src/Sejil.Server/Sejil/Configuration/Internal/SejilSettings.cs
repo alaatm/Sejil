@@ -30,7 +30,7 @@ public sealed class SejilSettings : ISejilSettings
     public SejilSettings(string uri, LogEventLevel minLogLevel)
     {
         SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
-        Url = uri.StartsWith("/") ? uri : "/" + uri;
+        Url = uri.StartsWith("/", StringComparison.OrdinalIgnoreCase) ? uri : "/" + uri;
         LoggingLevelSwitch = new LoggingLevelSwitch
         {
             MinimumLevel = minLogLevel

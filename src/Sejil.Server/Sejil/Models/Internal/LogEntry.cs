@@ -33,7 +33,7 @@ public sealed class LogEntry
 
             var value = Properties.FirstOrDefault(p => p.Name == name)?.Value;
 
-            var startIdx = MessageTemplate.IndexOf(prop, current);
+            var startIdx = MessageTemplate.IndexOf(prop, current, StringComparison.OrdinalIgnoreCase);
             var endIdx = startIdx + prop.Length;
             var section = MessageTemplate[current..startIdx];
 

@@ -5,6 +5,7 @@ using System.Text;
 using Sejil.Configuration.Internal;
 using Sejil.Models.Internal;
 using Sejil.Data.Query.Internal;
+using System.Globalization;
 
 namespace Sejil.Data.Internal;
 
@@ -62,7 +63,7 @@ ORDER BY l.timestamp DESC, p.name";
 
             if (hasStartingTimestampConstraint)
             {
-                sql.Append($@"timestamp <= '{startingTimestamp.Value:yyyy-MM-dd HH:mm:ss.fff}'");
+                sql.AppendFormat(CultureInfo.InvariantCulture, "timestamp <= '{0:yyyy-MM-dd HH:mm:ss.fff}'", startingTimestamp.Value);
             }
 
             if (hasStartingTimestampConstraint && hasDateFilter)
@@ -104,7 +105,7 @@ ORDER BY l.timestamp DESC, p.name";
 
         if (!string.IsNullOrWhiteSpace(levelFilter))
         {
-            sp.AppendFormat("level = '{0}'", levelFilter);
+            sp.AppendFormat(CultureInfo.InvariantCulture, "level = '{0}'", levelFilter);
         }
 
         if (exceptionsOnly && sp.Length > 0)

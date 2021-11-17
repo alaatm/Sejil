@@ -10,6 +10,7 @@ using Sejil.Models.Internal;
 using Serilog.Context;
 using Microsoft.AspNetCore.Routing;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Sejil;
 
@@ -49,7 +50,7 @@ public static class ApplicationBuilderExtensions
             routes.MapPost($"{url}/events", async context =>
             {
                 var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, CamelCaseJson);
-                int.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
+                _ = int.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                 var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
                 var controller = GetSejilController(context);
@@ -107,7 +108,7 @@ public static class ApplicationBuilderExtensions
     }
 
     private static ISejilController GetSejilController(HttpContext context)
-        => context.RequestServices.GetService(typeof(ISejilController)) as ISejilController;
+        => context.RequestServices.GetRequiredService<ISejilController>();
 
     private static async Task<string> GetRequestBodyAsync(HttpRequest request)
     {

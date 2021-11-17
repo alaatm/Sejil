@@ -16,7 +16,7 @@ namespace Sejil.Test.Routing;
 
 public class SejilControllerTests
 {
-    internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [Fact]
     public async Task GetIndexAsync_writes_app_html_to_response_stream()

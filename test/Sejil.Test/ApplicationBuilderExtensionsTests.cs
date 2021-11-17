@@ -24,7 +24,7 @@ namespace Sejil.Test;
 
 public class ApplicationBuilderExtensionsTests
 {
-    internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [Fact]
     public async Task HttpGet_root_url_calls_controller_GetIndexAsync_method()
@@ -280,9 +280,9 @@ public class ApplicationBuilderExtensionsTests
         var builder = new WebHostBuilder()
             .Configure(app =>
             {
-                    // Workaround for https://github.com/dotnet/aspnetcore/issues/18463
-                    // so that ContentLength gets properly set for the test server.
-                    app.Use(async (context, next) =>
+                // Workaround for https://github.com/dotnet/aspnetcore/issues/18463
+                // so that ContentLength gets properly set for the test server.
+                app.Use(async (context, next) =>
                 {
                     context.Request.EnableBuffering();
                     using var ms = new MemoryStream();
