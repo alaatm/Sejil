@@ -8,9 +8,9 @@
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
 
-    <!--<AnalysisLevel>latest</AnalysisLevel>
+    <!-- <AnalysisLevel>latest</AnalysisLevel>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>-->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers> -->
 
     <Summary>A pluggable logs viewer</Summary>
     <Description>Capture, view and filter your ASP.net core log events right from your app</Description>

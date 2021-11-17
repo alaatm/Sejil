@@ -48,15 +48,15 @@ internal sealed class CodeGenerator : Expr.IVisitor
         CheckOpenPropertyScope(expr.Left);
 
         Resolve(expr.Left);
-        _template = _template.Replace("|OP|", expr.Operator.Negate());
+        _template = _template.Replace("|OP|", expr.Operator.Negate(), StringComparison.Ordinal);
         Resolve(expr.Right);
 
         _sql.Append(_template);
     }
 
-    public void Visit(Expr.Variable expr) => _template = _template.Replace("|PNAME|", expr.Token.Text);
+    public void Visit(Expr.Variable expr) => _template = _template.Replace("|PNAME|", expr.Token.Text, StringComparison.Ordinal);
 
-    public void Visit(Expr.Literal expr) => _template = _template.Replace("|PVAL|", expr.Value.ToString());
+    public void Visit(Expr.Literal expr) => _template = _template.Replace("|PVAL|", expr.Value.ToString(), StringComparison.Ordinal);
 
     private void CheckOpenPropertyScope(Expr expr)
     {

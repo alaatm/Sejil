@@ -47,9 +47,23 @@ public static partial class IHostBuilderExtensions
         LogLevel minLogLevel = LogLevel.Information,
         bool writeToProviders = false,
         Action<LoggerSinkConfiguration>? sinks = null,
+        Action<ISejilSettings>? setupAction = null) => UseSejil(
+            builder,
+            new Uri(url, UriKind.Relative),
+            minLogLevel,
+            writeToProviders,
+            sinks,
+            setupAction);
+
+    private static IHostBuilder UseSejil(
+        this IHostBuilder builder,
+        Uri uri,
+        LogLevel minLogLevel = LogLevel.Information,
+        bool writeToProviders = false,
+        Action<LoggerSinkConfiguration>? sinks = null,
         Action<ISejilSettings>? setupAction = null)
     {
-        var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
+        var settings = new SejilSettings(uri, MapSerilogLogLevel(minLogLevel));
         setupAction?.Invoke(settings);
 
         return builder

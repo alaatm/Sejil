@@ -44,7 +44,7 @@ internal class SejilSink : PeriodicBatchingSink
                 {
                     // Do not log events that were generated from browsing Sejil URL.
                     if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
-                        p.Value.ToString().Contains(_uri)))
+                        p.Value.ToString().Contains(_uri, StringComparison.Ordinal)))
                     {
                         continue;
                     }
@@ -56,9 +56,9 @@ internal class SejilSink : PeriodicBatchingSink
                     }
                 }
             }
-            tran.Commit();
+            await tran.CommitAsync();
         }
-        conn.Close();
+        await conn.CloseAsync();
     }
 
     private static async Task<string> InsertLogEntryAsync(SqliteCommand cmd, LogEvent log)

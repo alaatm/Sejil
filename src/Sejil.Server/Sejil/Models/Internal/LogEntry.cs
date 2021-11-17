@@ -30,7 +30,7 @@ public sealed class LogEntry
         {
             var prop = m!.Groups[0].Value;
             var name = m!.Groups[1].Value;
-            name = name.Contains(':') ? name[..name.IndexOf(':')] : name;
+            name = name.Contains(':', StringComparison.Ordinal) ? name[..name.IndexOf(':', StringComparison.Ordinal)] : name;
 
             var value = Properties.FirstOrDefault(p => p.Name == name)?.Value;
 

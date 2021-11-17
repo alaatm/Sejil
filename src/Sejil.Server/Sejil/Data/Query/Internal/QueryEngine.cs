@@ -15,7 +15,7 @@ internal static class QueryEngine
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter[1..^1].Replace("'", "''"));
+                "(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter[1..^1].Replace("'", "''", StringComparison.Ordinal));
         }
 
         // If has no whitespace, "=", "!", "(", ")" then treat as a search string
@@ -23,7 +23,7 @@ internal static class QueryEngine
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter.Replace("'", "''"));
+                "(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter.Replace("'", "''", StringComparison.Ordinal));
         }
 
         var scanner = new Scanner(filter);

@@ -222,7 +222,7 @@ internal sealed class Scanner
 
     private void AddToken(TokenType type, object? literal)
     {
-        Debug.Assert(literal is not null || (literal is null && type is not TokenType.Number or TokenType.String));
+        Debug.Assert(literal is not null || (type is not TokenType.Number or TokenType.String));
 
         var text = _source[_start.._current];
         _tokens.Add(new Token(type, _start, text, literal!));

@@ -30,7 +30,7 @@ public sealed class SejilSettings : ISejilSettings
     public SejilSettings(string uri, LogEventLevel minLogLevel)
         : this(new Uri(uri, UriKind.Relative), minLogLevel) { }
 
-    private SejilSettings(Uri uri, LogEventLevel minLogLevel)
+    public SejilSettings(Uri uri, LogEventLevel minLogLevel)
     {
         Url = uri.OriginalString.StartsWith("/", StringComparison.Ordinal)
             ? uri

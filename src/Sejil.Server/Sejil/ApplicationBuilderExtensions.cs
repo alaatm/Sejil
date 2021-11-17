@@ -25,6 +25,8 @@ public static class ApplicationBuilderExtensions
     /// <returns></returns>
     public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
     {
+        _ = app ?? throw new ArgumentNullException(nameof(app));
+
         var settings = app.ApplicationServices.GetRequiredService<ISejilSettings>();
         var url = settings.Url.OriginalString[1..]; // Skip the '/'
 
