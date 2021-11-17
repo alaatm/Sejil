@@ -3,7 +3,7 @@
 
 namespace Sejil.Data.Query.Internal
 {
-    internal sealed class QueryEngineException: Exception
+    internal sealed class QueryEngineException : Exception
     {
         public QueryEngineException() { }
         public QueryEngineException(string message) : base(message) { }

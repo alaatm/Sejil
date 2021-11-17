@@ -132,8 +132,8 @@ namespace Sejil.Logging.Sinks
         }
 
         private static string StripStringQuotes(string value)
-            => value[0] == '"' && value[value.Length - 1] == '"'
-                ? value.Substring(1, value.Length - 2)
+            => value[0] == '"' && value[^1] == '"'
+                ? value[1..^1]
                 : value;
     }
 }

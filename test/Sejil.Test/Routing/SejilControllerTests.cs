@@ -230,7 +230,6 @@ namespace Sejil.Test.Routing
                 MinimumLogLevel = levelSwitch.MinimumLevel.ToString()
             }, _camelCaseJson);
 
-
             var context = CreateContext();
             var controller = CreateController(context, Mock.Of<ISejilRepository>(), settingsMoq.Object);
 

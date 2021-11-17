@@ -37,7 +37,7 @@ namespace Sejil.Data.Query.Internal
         {
             Resolve(expr.Left);
             CheckClosePropertyScope(expr.Right);
-            _sql.Append($" {expr.Operator.Text.ToUpper()} ");
+            _sql.Append($" {expr.Operator.Text.ToUpperInvariant()} ");
             Resolve(expr.Right);
         }
 

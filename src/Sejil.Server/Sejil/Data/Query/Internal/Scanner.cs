@@ -1,6 +1,8 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
+
 namespace Sejil.Data.Query.Internal
 {
     internal sealed class Scanner
@@ -136,7 +138,7 @@ namespace Sejil.Data.Query.Internal
                 }
             }
 
-            var value = _source.Substring(_start, _current - _start);
+            var value = _source[_start.._current];
             AddToken(TokenType.String, value);
         }
 
@@ -158,8 +160,8 @@ namespace Sejil.Data.Query.Internal
                 }
             }
 
-            var value = _source.Substring(_start, _current - _start);
-            AddToken(TokenType.Number, decimal.Parse(value));
+            var value = _source[_start.._current];
+            AddToken(TokenType.Number, decimal.Parse(value, CultureInfo.InvariantCulture));
         }
 
         private void ReadIdentifier()
@@ -169,10 +171,10 @@ namespace Sejil.Data.Query.Internal
                 Advance();
             }
 
-            var text = _source.Substring(_start, _current - _start);
+            var text = _source[_start.._current];
 
             // "not" can only be used with "like"
-            if (text.ToLower() == "not")
+            if (text.ToLowerInvariant() == "not")
             {
                 while (char.IsWhiteSpace(Peek()))
                 {
@@ -186,7 +188,7 @@ namespace Sejil.Data.Query.Internal
                     Advance();
                 }
 
-                text = _source.Substring(start, _current - start).ToLower();
+                text = _source[start.._current].ToLowerInvariant();
                 if (text == "like")
                 {
                     AddToken(TokenType.NotLike);
@@ -198,7 +200,7 @@ namespace Sejil.Data.Query.Internal
             }
             else
             {
-                var type = _keywords.ContainsKey(text.ToLower()) ? _keywords[text.ToLower()] : (TokenType?)null;
+                var type = _keywords.ContainsKey(text.ToLowerInvariant()) ? _keywords[text.ToLowerInvariant()] : (TokenType?)null;
                 AddToken(type is null ? TokenType.Identifier : type.Value);
             }
         }
@@ -219,7 +221,7 @@ namespace Sejil.Data.Query.Internal
 
         private void AddToken(TokenType type, object literal)
         {
-            var text = _source.Substring(_start, _current - _start);
+            var text = _source[_start.._current];
             _tokens.Add(new Token(type, _start, text, literal));
         }
 

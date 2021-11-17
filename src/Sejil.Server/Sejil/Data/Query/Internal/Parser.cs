@@ -183,7 +183,7 @@ namespace Sejil.Data.Query.Internal
             }
         }
 
-        static string Error(Token token, string message) => token.Type == TokenType.Eol
+        private static string Error(Token token, string message) => token.Type == TokenType.Eol
             ? $"Error at position '{token.Position + 1}': {message}"
             : $"Error at position '{token.Position + 1}' -> {token.Text}: {message}";
     }

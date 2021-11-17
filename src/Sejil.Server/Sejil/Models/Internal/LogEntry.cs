@@ -20,7 +20,7 @@ namespace Sejil.Models.Internal
         public List<LogEntryProperty> Properties { get; set; } = new List<LogEntryProperty>();
         public List<TextSpan> Spans => _spans ??= ExtractSpans();
 
-        List<TextSpan> ExtractSpans()
+        private List<TextSpan> ExtractSpans()
         {
             var spans = new List<TextSpan>();
             var current = 0;
@@ -29,13 +29,13 @@ namespace Sejil.Models.Internal
             {
                 var prop = m.Groups[0].Value;
                 var name = m.Groups[1].Value;
-                name = name.Contains(':') ? name.Substring(0, name.IndexOf(':')) : name;
+                name = name.Contains(':') ? name[..name.IndexOf(':')] : name;
 
                 var value = Properties.FirstOrDefault(p => p.Name == name)?.Value;
 
                 var startIdx = MessageTemplate.IndexOf(prop, current);
                 var endIdx = startIdx + prop.Length;
-                var section = MessageTemplate.Substring(current, startIdx - current);
+                var section = MessageTemplate[current..startIdx];
 
                 spans.Add(new TextSpan
                 {
@@ -64,7 +64,7 @@ namespace Sejil.Models.Internal
 
             spans.Add(new TextSpan
             {
-                Text = MessageTemplate.Substring(current),
+                Text = MessageTemplate[current..],
             });
 
             var result = spans.Where(p => !string.IsNullOrEmpty(p.Text)).ToList();

@@ -5,5 +5,9 @@
 dotnet_diagnostic.CA1707.severity = none
 # CA1711: Identifiers should not have incorrect suffix
 dotnet_diagnostic.CA1711.severity = none
-# Add accessibility modifiers (IDE0040)
+# IDE0040: Add accessibility modifiers
 dotnet_diagnostic.IDE0040.severity = none
+# CA1848: Use the LoggerMessage delegates instead of calling 'LoggerExtensions.LogInformation(ILogger, string?, params object?[])'
+dotnet_diagnostic.CA1848.severity = none
+# CA2201: Exception type System.Exception is not sufficiently specific
+dotnet_diagnostic.CA2201.severity = none

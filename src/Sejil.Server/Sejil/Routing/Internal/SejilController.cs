@@ -39,17 +39,17 @@ namespace Sejil.Routing.Internal
             {
                 var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
                 _context.Response.ContentType = "application/json";
-                await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions._camelCaseJson));
+                await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions.CamelCaseJson));
             }
             catch (QueryEngineException ex)
             {
                 _context.Response.ContentType = "application/json";
                 _context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await _context.Response.WriteAsync(JsonSerializer.Serialize(new { error = ex.Message }, ApplicationBuilderExtensions._camelCaseJson));
+                await _context.Response.WriteAsync(JsonSerializer.Serialize(new { error = ex.Message }, ApplicationBuilderExtensions.CamelCaseJson));
             }
         }
 
-        public async Task SaveQueryAsync(LogQuery logQuery) => 
+        public async Task SaveQueryAsync(LogQuery logQuery) =>
             _context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
                 ? StatusCodes.Status201Created
                 : StatusCodes.Status500InternalServerError;
@@ -58,7 +58,7 @@ namespace Sejil.Routing.Internal
         {
             var logQueryList = await _repository.GetSavedQueriesAsync();
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(logQueryList, ApplicationBuilderExtensions._camelCaseJson));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(logQueryList, ApplicationBuilderExtensions.CamelCaseJson));
         }
 
         public async Task GetMinimumLogLevelAsync()
@@ -68,7 +68,7 @@ namespace Sejil.Routing.Internal
                 MinimumLogLevel = _settings.LoggingLevelSwitch.MinimumLevel.ToString()
             };
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
         }
 
         public async Task GetUserNameAsync()
@@ -81,10 +81,10 @@ namespace Sejil.Routing.Internal
             };
 
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
         }
 
-        public void SetMinimumLogLevel(string minLogLevel) => 
+        public void SetMinimumLogLevel(string minLogLevel) =>
             _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
                 ? StatusCodes.Status200OK
                 : StatusCodes.Status400BadRequest;
@@ -99,7 +99,7 @@ namespace Sejil.Routing.Internal
                 _settings.Title
             };
             _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions._camelCaseJson));
+            await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
         }
     }
 }

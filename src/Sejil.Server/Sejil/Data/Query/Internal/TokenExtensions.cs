@@ -9,7 +9,7 @@ namespace Sejil.Data.Query.Internal
             ? "="
             : token.Type == TokenType.NotLike
                 ? "LIKE"
-                : token.Text.ToUpper();
+                : token.Text.ToUpperInvariant();
 
         public static bool IsExluding(this Token token) => token.Type is TokenType.NotEqual or TokenType.NotLike;
     }

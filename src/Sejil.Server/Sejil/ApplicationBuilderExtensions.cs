@@ -15,7 +15,7 @@ namespace Sejil
 {
     public static class ApplicationBuilderExtensions
     {
-        internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        internal static readonly JsonSerializerOptions CamelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         /// <summary>
         /// Adds Sejil to the request pipeline.
@@ -25,7 +25,7 @@ namespace Sejil
         public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
         {
             var settings = app.ApplicationServices.GetService(typeof(ISejilSettings)) as SejilSettings;
-            var url = settings.Url.Substring(1); // Skip the '/'
+            var url = settings.Url[1..]; // Skip the '/'
 
             app.Use(async (context, next) =>
             {
@@ -48,17 +48,17 @@ namespace Sejil
 
                 routes.MapPost($"{url}/events", async context =>
                 {
-                    var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, _camelCaseJson);
+                    var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, CamelCaseJson);
                     int.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                     var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
                     var controller = GetSejilController(context);
-                    await controller.GetEventsAsync(page, dateParsed ? startingTs : (DateTime?)null, query);
+                    await controller.GetEventsAsync(page, dateParsed ? startingTs : null, query);
                 });
 
                 routes.MapPost($"{url}/log-query", async context =>
                 {
-                    var logQuery = await JsonSerializer.DeserializeAsync<LogQuery>(context.Request.Body, _camelCaseJson);
+                    var logQuery = await JsonSerializer.DeserializeAsync<LogQuery>(context.Request.Body, CamelCaseJson);
 
                     var controller = GetSejilController(context);
                     await controller.SaveQueryAsync(logQuery);
@@ -115,9 +115,9 @@ namespace Sejil
 
             if (length > 0)
             {
-                var buffer = new byte[(int)length];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length);
-                return Encoding.UTF8.GetString(buffer);
+                var mem = new Memory<byte>(new byte[(int)length]);
+                await request.Body.ReadAsync(mem);
+                return Encoding.UTF8.GetString(mem.Span);
             }
 
             return null;

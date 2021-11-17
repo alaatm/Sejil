@@ -54,7 +54,7 @@ namespace Sejil.Configuration.Internal
 
         public bool TrySetMinimumLogLevel(string minLogLevel)
         {
-            switch (minLogLevel.ToLower())
+            switch (minLogLevel.ToLowerInvariant())
             {
                 case "trace":
                 case "verbose":
@@ -76,9 +76,9 @@ namespace Sejil.Configuration.Internal
                 case "fatal":
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Fatal;
                     return true;
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         private static bool IsRunningInAzure()

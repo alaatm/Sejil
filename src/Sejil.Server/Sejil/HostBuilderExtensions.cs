@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.Hosting
                 throw new InvalidOperationException("Minimum log level cannot be set to None.");
             }
 
-            return (LogEventLevel)((int)logLevel);
+            return (LogEventLevel)(int)logLevel;
         }
     }
 }

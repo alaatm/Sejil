@@ -10,9 +10,9 @@ namespace Sejil.Data.Query.Internal
         public static string Translate(string filter)
         {
             // If enclosed in quotes then treat as a search string
-            if (filter[0] == '"' && filter[filter.Length - 1] == '"')
+            if (filter[0] == '"' && filter[^1] == '"')
             {
-                return string.Format("(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter.Substring(1, filter.Length - 2).Replace("'", "''"));
+                return string.Format("(message LIKE '%{0}%' OR exception LIKE '%{0}%' OR id in (SELECT logId FROM log_property WHERE value LIKE '%{0}%'))", filter[1..^1].Replace("'", "''"));
             }
 
             // If has no whitespace, "=", "!", "(", ")" then treat as a search string

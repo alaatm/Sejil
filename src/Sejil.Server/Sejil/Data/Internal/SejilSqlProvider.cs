@@ -124,25 +124,18 @@ ORDER BY l.timestamp DESC, p.name";
         {
             if (queryFilter.DateFilter != null)
             {
-                switch (queryFilter.DateFilter)
+                return queryFilter.DateFilter switch
                 {
-                    case "5m":
-                        return "timestamp >= datetime('now', '-5 Minute')";
-                    case "15m":
-                        return "timestamp >= datetime('now', '-15 Minute')";
-                    case "1h":
-                        return "timestamp >= datetime('now', '-1 Hour')";
-                    case "6h":
-                        return "timestamp >= datetime('now', '-6 Hour')";
-                    case "12h":
-                        return "timestamp >= datetime('now', '-12 Hour')";
-                    case "24h":
-                        return "timestamp >= datetime('now', '-24 Hour')";
-                    case "2d":
-                        return "timestamp >= datetime('now', '-2 Day')";
-                    case "5d":
-                        return "timestamp >= datetime('now', '-5 Day')";
-                }
+                    "5m" => "timestamp >= datetime('now', '-5 Minute')",
+                    "15m" => "timestamp >= datetime('now', '-15 Minute')",
+                    "1h" => "timestamp >= datetime('now', '-1 Hour')",
+                    "6h" => "timestamp >= datetime('now', '-6 Hour')",
+                    "12h" => "timestamp >= datetime('now', '-12 Hour')",
+                    "24h" => "timestamp >= datetime('now', '-24 Hour')",
+                    "2d" => "timestamp >= datetime('now', '-2 Day')",
+                    "5d" => "timestamp >= datetime('now', '-5 Day')",
+                    _ => "",
+                };
             }
             else if (queryFilter.DateRangeFilter != null)
             {
