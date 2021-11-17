@@ -22,7 +22,7 @@ public sealed class SejilController : ISejilController
 
     public async Task GetIndexAsync()
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && (!context.User.Identity?.IsAuthenticated ?? false))
         {
@@ -37,7 +37,7 @@ public sealed class SejilController : ISejilController
 
     public async Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter)
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         try
         {
@@ -54,13 +54,13 @@ public sealed class SejilController : ISejilController
     }
 
     public async Task SaveQueryAsync(LogQuery logQuery) =>
-        _contextAcessor.HttpContext.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
+        _contextAcessor.HttpContext!.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
             ? StatusCodes.Status201Created
             : StatusCodes.Status500InternalServerError;
 
     public async Task GetQueriesAsync()
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         var logQueryList = await _repository.GetSavedQueriesAsync();
         context.Response.ContentType = "application/json";
@@ -69,7 +69,7 @@ public sealed class SejilController : ISejilController
 
     public async Task GetMinimumLogLevelAsync()
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         var response = new
         {
@@ -81,7 +81,7 @@ public sealed class SejilController : ISejilController
 
     public async Task GetUserNameAsync()
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         var response = new
         {
@@ -95,7 +95,7 @@ public sealed class SejilController : ISejilController
     }
 
     public void SetMinimumLogLevel(string minLogLevel) =>
-        _contextAcessor.HttpContext.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
+        _contextAcessor.HttpContext!.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
             ? StatusCodes.Status200OK
             : StatusCodes.Status400BadRequest;
 
@@ -104,7 +104,7 @@ public sealed class SejilController : ISejilController
 
     public async Task GetTitleAsync()
     {
-        var context = _contextAcessor.HttpContext;
+        var context = _contextAcessor.HttpContext!;
 
         var response = new
         {

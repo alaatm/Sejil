@@ -49,7 +49,7 @@ public static class ApplicationBuilderExtensions
 
             routes.MapPost($"{url}/events", async context =>
             {
-                var query = await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, CamelCaseJson);
+                var query = (await JsonSerializer.DeserializeAsync<LogQueryFilter>(context.Request.Body, CamelCaseJson))!;
                 _ = int.TryParse(context.Request.Query["page"].FirstOrDefault(), out var page);
                 var dateParsed = DateTime.TryParse(context.Request.Query["startingTs"].FirstOrDefault(), out var startingTs);
 
@@ -59,7 +59,7 @@ public static class ApplicationBuilderExtensions
 
             routes.MapPost($"{url}/log-query", async context =>
             {
-                var logQuery = await JsonSerializer.DeserializeAsync<LogQuery>(context.Request.Body, CamelCaseJson);
+                var logQuery = (await JsonSerializer.DeserializeAsync<LogQuery>(context.Request.Body, CamelCaseJson))!;
 
                 var controller = GetSejilController(context);
                 await controller.SaveQueryAsync(logQuery);
@@ -85,14 +85,14 @@ public static class ApplicationBuilderExtensions
 
             routes.MapPost($"{url}/min-log-level", async context =>
             {
-                var minLogLevel = await GetRequestBodyAsync(context.Request);
+                var minLogLevel = (await GetRequestBodyAsync(context.Request))!;
                 var controller = GetSejilController(context);
                 controller.SetMinimumLogLevel(minLogLevel);
             });
 
             routes.MapPost($"{url}/del-query", async context =>
             {
-                var queryName = await GetRequestBodyAsync(context.Request);
+                var queryName = (await GetRequestBodyAsync(context.Request))!;
                 var controller = GetSejilController(context);
                 await controller.DeleteQueryAsync(queryName);
             });
@@ -110,7 +110,7 @@ public static class ApplicationBuilderExtensions
     private static ISejilController GetSejilController(HttpContext context)
         => context.RequestServices.GetRequiredService<ISejilController>();
 
-    private static async Task<string> GetRequestBodyAsync(HttpRequest request)
+    private static async Task<string?> GetRequestBodyAsync(HttpRequest request)
     {
         var length = request.ContentLength;
 

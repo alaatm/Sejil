@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Logging.Sinks;
+using Sejil.Models.Internal;
 using Serilog.Events;
 using Serilog.Parsing;
 
@@ -234,7 +235,7 @@ public class SejilSinkTests
         await sink.CallEmitBatchAsync(events);
 
         // Assert
-        var logEvents = await repository.GetEventsPageAsync(1, null, null);
+        var logEvents = await repository.GetEventsPageAsync(1, null, new LogQueryFilter());
         Assert.Equal(2, logEvents.Count());
 
         var logEvent1 = logEvents.FirstOrDefault(p => p.Level == "Information");
@@ -301,7 +302,7 @@ public class SejilSinkTests
         await sink.CallEmitBatchAsync(events);
 
         // Assert
-        var logEvents = await repository.GetEventsPageAsync(1, null, null);
+        var logEvents = await repository.GetEventsPageAsync(1, null, new LogQueryFilter());
         Assert.Empty(logEvents);
     }
 

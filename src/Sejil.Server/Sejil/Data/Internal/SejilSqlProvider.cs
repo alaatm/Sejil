@@ -51,55 +51,49 @@ ORDER BY l.timestamp DESC, p.name";
 
         string TimestampWhereClause()
         {
-            var hasStartingTimestampConstraint = startingTimestamp.HasValue;
-            var hasDateFilter = queryFilter?.DateFilter != null || queryFilter?.DateRangeFilter != null;
+            var hasDateFilter = queryFilter.DateFilter is not null || queryFilter.DateRangeFilter is not null;
 
-            var sql = new StringBuilder();
-
-            if (hasStartingTimestampConstraint || hasDateFilter)
+            if (startingTimestamp.HasValue || hasDateFilter)
             {
+                var sql = new StringBuilder();
                 sql.Append("WHERE (");
-            }
 
-            if (hasStartingTimestampConstraint)
-            {
-                sql.AppendFormat(CultureInfo.InvariantCulture, "timestamp <= '{0:yyyy-MM-dd HH:mm:ss.fff}'", startingTimestamp.Value);
-            }
+                if (startingTimestamp.HasValue)
+                {
+                    sql.AppendFormat(CultureInfo.InvariantCulture, "timestamp <= '{0:yyyy-MM-dd HH:mm:ss.fff}'", startingTimestamp.Value);
+                }
+                if (startingTimestamp.HasValue && hasDateFilter)
+                {
+                    sql.Append(" AND ");
+                }
+                if (hasDateFilter)
+                {
+                    sql.Append(BuildDateFilter(queryFilter));
+                }
 
-            if (hasStartingTimestampConstraint && hasDateFilter)
-            {
-                sql.Append(" AND ");
-            }
-
-            if (hasDateFilter)
-            {
-                sql.Append(BuildDateFilter(queryFilter));
-            }
-
-            if (hasStartingTimestampConstraint || hasDateFilter)
-            {
                 sql.Append(')');
+                return sql.ToString();
             }
 
-            return sql.ToString();
+            return string.Empty;
         }
 
         string QueryWhereClause() =>
-            string.IsNullOrWhiteSpace(queryFilter?.QueryText)
+            string.IsNullOrWhiteSpace(queryFilter.QueryText)
                 ? ""
                 : timestampWhereClause.Length > 0
                     ? $"AND ({QueryEngine.Translate(queryFilter.QueryText)})"
                     : $"WHERE ({QueryEngine.Translate(queryFilter.QueryText)})";
 
         string FiltersWhereClause() =>
-            string.IsNullOrWhiteSpace(queryFilter?.LevelFilter) && (!queryFilter?.ExceptionsOnly ?? true)
+            string.IsNullOrWhiteSpace(queryFilter.LevelFilter) && (!queryFilter.ExceptionsOnly)
                 ? ""
                 : timestampWhereClause.Length > 0 || queryWhereClause.Length > 0
                     ? $" AND ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})"
                     : $"WHERE ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})";
     }
 
-    private static string BuildFilterWhereClause(string levelFilter, bool exceptionsOnly)
+    private static string BuildFilterWhereClause(string? levelFilter, bool exceptionsOnly)
     {
         var sp = new StringBuilder();
 

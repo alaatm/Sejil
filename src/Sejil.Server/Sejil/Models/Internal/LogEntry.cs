@@ -9,14 +9,14 @@ public sealed class LogEntry
 {
     private readonly Regex _propRegex = new("{([^{][^}]+)}", RegexOptions.Compiled);
 
-    private List<TextSpan> _spans;
+    private List<TextSpan>? _spans;
 
-    public string Id { get; set; }
-    public string Message { get; set; }
-    public string MessageTemplate { get; set; }
-    public string Level { get; set; }
-    public DateTime Timestamp { get; set; }
-    public string Exception { get; set; }
+    public string Id { get; set; } = default!;
+    public string Message { get; set; } = default!;
+    public string MessageTemplate { get; set; } = default!;
+    public string Level { get; set; } = default!;
+    public DateTime Timestamp { get; set; } = default!;
+    public string? Exception { get; set; }
     public List<LogEntryProperty> Properties { get; set; } = new List<LogEntryProperty>();
     public List<TextSpan> Spans => _spans ??= ExtractSpans();
 
@@ -25,10 +25,11 @@ public sealed class LogEntry
         var spans = new List<TextSpan>();
         var current = 0;
 
-        foreach (Match m in _propRegex.Matches(MessageTemplate))
+        IList<Match> matches = _propRegex.Matches(MessageTemplate);
+        foreach (var m in matches)
         {
-            var prop = m.Groups[0].Value;
-            var name = m.Groups[1].Value;
+            var prop = m!.Groups[0].Value;
+            var name = m!.Groups[1].Value;
             name = name.Contains(':') ? name[..name.IndexOf(':')] : name;
 
             var value = Properties.FirstOrDefault(p => p.Name == name)?.Value;
@@ -74,6 +75,6 @@ public sealed class LogEntry
 
 public class TextSpan
 {
-    public string Kind { get; set; }
-    public string Text { get; set; }
+    public string? Kind { get; set; }
+    public string Text { get; set; } = default!;
 }

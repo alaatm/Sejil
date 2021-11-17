@@ -25,7 +25,7 @@ public sealed class SejilSettings : ISejilSettings
     /// <summary>
     /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
     /// </summary>
-    public string AuthenticationScheme { get; set; }
+    public string? AuthenticationScheme { get; set; }
 
     public SejilSettings(string uri, LogEventLevel minLogLevel)
         : this(new Uri(uri, UriKind.Relative), minLogLevel) { }
@@ -51,7 +51,8 @@ public sealed class SejilSettings : ISejilSettings
         else
         {
             var localAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var appName = Assembly.GetEntryAssembly().GetName().Name;
+            // GetEntryAssembly and Name can never be null in this context
+            var appName = Assembly.GetEntryAssembly()!.GetName().Name!;
             SqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{UUID}.sqlite");
         }
 

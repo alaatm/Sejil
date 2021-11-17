@@ -20,7 +20,7 @@ internal static class LoggerConfigurationExtensions
         try
         {
             var sqliteDbFile = new FileInfo(settings.SqliteDbPath);
-            sqliteDbFile.Directory.Create();
+            sqliteDbFile.Directory!.Create();
 
             return loggerConfiguration.Sink(
                 new SejilSink(settings),

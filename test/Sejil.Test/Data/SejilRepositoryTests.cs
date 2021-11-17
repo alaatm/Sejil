@@ -128,7 +128,7 @@ public class SejilRepositoryTests
         }
 
         // Act
-        var logs = await repository.GetEventsPageAsync(2, null, null);
+        var logs = await repository.GetEventsPageAsync(2, null, new LogQueryFilter());
 
         // Assert
         Assert.Equal(3, logs.Count());
@@ -171,7 +171,7 @@ public class SejilRepositoryTests
         }
 
         // Act
-        var logs = await repository.GetEventsPageAsync(4, null, null);
+        var logs = await repository.GetEventsPageAsync(4, null, new LogQueryFilter());
 
         // Assert
         Assert.Single(logs);

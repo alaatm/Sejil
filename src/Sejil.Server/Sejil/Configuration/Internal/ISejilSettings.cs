@@ -22,5 +22,5 @@ public interface ISejilSettings
     /// <summary>
     /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
     /// </summary>
-    string AuthenticationScheme { get; set; }
+    string? AuthenticationScheme { get; set; }
 }

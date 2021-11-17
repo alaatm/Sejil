@@ -10,7 +10,7 @@ internal sealed class CodeGenerator : Expr.IVisitor
 {
     private readonly StringBuilder _sql = new();
 
-    private string _template;
+    private string _template = string.Empty;
     private bool _insidePropBlock;
 
     public string Generate(Expr expr)

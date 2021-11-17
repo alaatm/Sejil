@@ -1,6 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Sejil.Data.Query.Internal;
@@ -33,7 +34,7 @@ internal sealed class Scanner
             ScanToken();
         }
 
-        _tokens.Add(new Token(TokenType.Eol, _current, "", null));
+        _tokens.Add(new Token(TokenType.Eol, _current, "", null!));
         return _tokens;
     }
 
@@ -219,10 +220,12 @@ internal sealed class Scanner
 
     private void AddToken(TokenType type) => AddToken(type, null);
 
-    private void AddToken(TokenType type, object literal)
+    private void AddToken(TokenType type, object? literal)
     {
+        Debug.Assert(literal is not null || (literal is null && type is not TokenType.Number or TokenType.String));
+
         var text = _source[_start.._current];
-        _tokens.Add(new Token(type, _start, text, literal));
+        _tokens.Add(new Token(type, _start, text, literal!));
     }
 
     private char Advance() => _source[_current++];

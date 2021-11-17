@@ -6,6 +6,6 @@ namespace Sejil.Models.Internal;
 public sealed class LogQuery
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Query { get; set; }
+    public string Name { get; set; } = default!;
+    public string Query { get; set; } = default!;
 }
