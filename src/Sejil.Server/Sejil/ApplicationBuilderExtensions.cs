@@ -25,12 +25,12 @@ public static class ApplicationBuilderExtensions
     /// <returns></returns>
     public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
     {
-        var settings = app.ApplicationServices.GetService(typeof(ISejilSettings)) as SejilSettings;
+        var settings = app.ApplicationServices.GetRequiredService<ISejilSettings>();
         var url = settings.Url[1..]; // Skip the '/'
 
         app.Use(async (context, next) =>
         {
-            var userName = context.User.Identity.IsAuthenticated
+            var userName = context.User.Identity?.IsAuthenticated ?? false
                 ? context.User.Identity.Name
                 : context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
             using (LogContext.PushProperty("Username", userName))

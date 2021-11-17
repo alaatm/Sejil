@@ -24,7 +24,7 @@ public sealed class SejilController : ISejilController
     {
         var context = _contextAcessor.HttpContext;
 
-        if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !context.User.Identity.IsAuthenticated)
+        if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && (!context.User.Identity?.IsAuthenticated ?? false))
         {
             await context.ChallengeAsync(_settings.AuthenticationScheme);
         }
@@ -85,7 +85,7 @@ public sealed class SejilController : ISejilController
 
         var response = new
         {
-            UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && context.User.Identity.IsAuthenticated
+            UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && (context.User.Identity?.IsAuthenticated ?? false)
                 ? context.User.Identity.Name
                 : ""
         };

@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
     /// Configure Sejil
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="setupAction">Delegate to configure the settings.</param>		
+    /// <param name="setupAction">Delegate to configure the settings.</param>
     public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
     {
         if (setupAction == null)
@@ -19,7 +19,9 @@ public static class ServiceCollectionExtensions
             throw new ArgumentNullException(nameof(setupAction));
         }
 
-        var settings = services.BuildServiceProvider().GetService<ISejilSettings>();
+        var settings = services
+            .BuildServiceProvider()
+            .GetRequiredService<ISejilSettings>();
 
         setupAction(settings);
     }
