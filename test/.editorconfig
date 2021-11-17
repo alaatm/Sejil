@@ -1,0 +1,9 @@
+[*.cs]
+
+# CA1707: Identifiers should not contain underscores
+# This is our code style for unit test method names
+dotnet_diagnostic.CA1707.severity = none
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = none
+# Add accessibility modifiers (IDE0040)
+dotnet_diagnostic.IDE0040.severity = none
