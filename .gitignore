@@ -11,7 +11,7 @@ build/
 .env.test.local
 .env.production.local
 
-src/Sejil.Server/index.html
+src/Sejil.Server/Sejil/index.html
 
 # Build output
 .nupkg/

@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Sejil.Server\Sejil.csproj" />
+    <ProjectReference Include="..\..\src\Sejil.Server\Sejil\Sejil.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Sejil.Sqlite</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft.Data.Sqlite v6.0 which uses sqlite-pcl-raw 2.06 causes 'the type initializer threw an exception' -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sejil\Sejil.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="db.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sejil.Sqlite.Test" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+</Project>

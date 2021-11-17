@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Sejil.Server\Sejil.Sqlite\Sejil.Sqlite.csproj" />
+	</ItemGroup>
+
+</Project>

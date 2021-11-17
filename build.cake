@@ -18,7 +18,6 @@ var rbv = Argument("rbv", "");  // On windows invoke as: ./build -t release -rbv
                                 // On linux invoke as  : ./build.sh -t release --rbv=patch
 
 var clientDir = Directory("./src/Sejil.Client");
-var packPrj = Directory("./src/Sejil.Server/Sejil.csproj");
 var packDir = Directory(".nupkg");
 var coverageDir = Directory(".coverage");
 var lcovFile = "./lcov.info";
@@ -101,7 +100,7 @@ Task("CopyEmbeddedHtml")
         html = html.Replace(kvp.Key, kvp.Value);
     }
 	
-	IOFile.WriteAllText("./src/Sejil.Server/index.html", html);
+	IOFile.WriteAllText("./src/Sejil.Server/Sejil/index.html", html);
 });
 
 Task("Restore")
@@ -139,7 +138,7 @@ Task("Pack")
 	.IsDependentOn("Test")
 	.Does(() =>
 {
-	DotNetCorePack(packPrj, new DotNetCorePackSettings 
+	DotNetCorePack(".", new DotNetCorePackSettings 
 	{ 
 		Configuration = configuration,
 		OutputDirectory = packDir,

@@ -1,0 +1,41 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>Latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
+
+    <Summary>A pluggable logs viewer</Summary>
+    <Description>Capture, view and filter your ASP.net core log events right from your app</Description>
+    <Authors>Alaa Masoud</Authors>
+    <Copyright>Copyright © Alaa Masoud</Copyright>
+    <PackageTags>sejil;logging;structured</PackageTags>
+    <PackageProjectUrl>https://github.com/alaatm/Sejil</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+    <VersionPrefix>4.0.0</VersionPrefix>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="CLSCompliantAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
