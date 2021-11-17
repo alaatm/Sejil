@@ -17,11 +17,33 @@ namespace Sejil.Test.Data.Query
             Assert.Equal($"Unexpected character at position '{pos}'.", ex.Message);
         }
 
-        [Fact]
-        public void Scan_throws_when_unterminated_string()
+        [Theory]
+        [InlineData("p = 'unterminated", 18)]
+        [InlineData("p = 'unes'caped'", 17)]
+        [InlineData("p = 'unes'''caped'", 19)]
+        [InlineData("p = 'unes'''''caped'", 21)]
+        [InlineData("p = 'unes''''c'aped'", 21)]
+        [InlineData("p = 'unes''''c'''aped'", 23)]
+        [InlineData("p = '''", 8)]
+        [InlineData("p = '''''", 10)]
+        public void Scan_throws_when_unterminated_string(string input, int pos)
         {
-            var ex = Assert.Throws<QueryEngineException>(() => new Scanner("p = 'unterminated").Scan());
-            Assert.Equal("Unterminated string at position '18'.", ex.Message);
+            var ex = Assert.Throws<QueryEngineException>(() => new Scanner(input).Scan());
+            Assert.Equal($"Unterminated string at position '{pos}'.", ex.Message);
+        }
+
+        [Theory]
+        [InlineData("p = 'string'", "'string'")]
+        [InlineData("p = 'es''caped'", "'es''caped'")]
+        [InlineData("p = 'es''''caped'", "'es''''caped'")]
+        [InlineData("p = 'es''''c''aped'", "'es''''c''aped'")]
+        [InlineData("p = ''''", "''''")]
+        [InlineData("p = ''''''", "''''''")]
+        public void Scan_scans_strings(string input, string expectedValue)
+        {
+            var tokens = new Scanner(input).Scan();
+            Assert.Equal(TokenType.String, tokens[2].Type);
+            Assert.Equal(expectedValue, tokens[2].Text);
         }
 
         [Fact]

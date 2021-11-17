@@ -5,20 +5,11 @@ using System.Text;
 
 namespace Sejil.Data.Query.Internal
 {
-    internal static class TokenExtensions
-    {
-        public static string NegateIfNonInclusion(this Token token) => token.Type == TokenType.NotEqual
-            ? "="
-            : token.Type == TokenType.NotLike
-                ? "LIKE"
-                : token.Text;
-
-        public static bool IsExluding(this Token token) => token.Type is TokenType.NotEqual or TokenType.NotLike;
-    }
-
     internal sealed class CodeGenerator : Expr.IVisitor
     {
         private readonly StringBuilder _sql = new();
+
+        private string _template;
         private bool _insidePropBlock;
 
         public string Generate(Expr expr)
@@ -33,60 +24,76 @@ namespace Sejil.Data.Query.Internal
 
         private void Resolve(Expr expr) => expr.Accept(this);
 
-        public void Visit(Expr.Binary expr)
-        {
-            CheckPropertyScope(expr);
-
-            Resolve(expr.Left);
-
-            _sql.Append(expr.IsProperty
-                ? $"value {expr.Operator.NegateIfNonInclusion().ToUpper()} "
-                : $" {expr.Operator.Text.ToUpper()} ");
-
-            Resolve(expr.Right);
-
-            if (expr.Left.IsProperty)
-            {
-                _sql.Append($") {(expr.Operator.IsExluding() ? "=" : ">")} 0");
-            }
-        }
-
         public void Visit(Expr.Grouping expr)
         {
-            CheckPropertyScope(expr);
+            CheckOpenPropertyScope(expr);
 
             _sql.Append('(');
             Resolve(expr.Expression);
             _sql.Append(')');
         }
 
-        public void Visit(Expr.Literal expr) => _sql.Append($"'{expr.Value}'");
-
         public void Visit(Expr.Logical expr)
         {
             Resolve(expr.Left);
-            if (_insidePropBlock && !expr.Right.IsProperty)
-            {
-                _sql.Append(')');
-            }
+            CheckClosePropertyScope(expr.Right);
             _sql.Append($" {expr.Operator.Text.ToUpper()} ");
             Resolve(expr.Right);
         }
 
-        public void Visit(Expr.Variable expr) => _sql.Append(expr.IsProperty
-            ? $"SUM(name = '{expr.Token.Text}' AND "
-            : expr.Token.Text);
-
-        private void CheckPropertyScope(Expr expr)
+        public void Visit(Expr.Binary expr)
         {
-            if (expr.IsProperty && !_insidePropBlock)
+            SetSqlConditionTemplate(expr);
+            CheckOpenPropertyScope(expr.Left);
+
+            Resolve(expr.Left);
+            _template = _template.Replace("|OP|", expr.Operator.Negate());
+            Resolve(expr.Right);
+
+            _sql.Append(_template);
+        }
+
+        public void Visit(Expr.Variable expr) => _template = _template.Replace("|PNAME|", expr.Token.Text);
+
+        public void Visit(Expr.Literal expr) => _template = _template.Replace("|PVAL|", expr.Value.ToString());
+
+        private void CheckOpenPropertyScope(Expr expr)
+        {
+            var isProp = expr.HasAllProperty();
+
+            if (isProp && !_insidePropBlock)
             {
                 _sql.Append("id IN (SELECT logId FROM log_property GROUP BY logId HAVING ");
                 _insidePropBlock = true;
             }
-            else if (!expr.IsProperty)
+        }
+
+        private void CheckClosePropertyScope(Expr expr)
+        {
+            if (_insidePropBlock && !expr.HasAllProperty())
             {
+                _sql.Append(')');
                 _insidePropBlock = false;
+            }
+        }
+
+        private void SetSqlConditionTemplate(Expr.Binary expr)
+        {
+            var valueCol = ((Expr.Literal)expr.Right).Value switch
+            {
+                decimal => "CAST(value AS NUMERIC)",
+                _ => "value",
+            };
+
+            if (expr.HasAllProperty())
+            {
+                _template = expr.Operator.IsExluding()
+                    ? $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) = 0"
+                    : $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) > 0";
+            }
+            else
+            {
+                _template = "|PNAME| |OP| |PVAL|";
             }
         }
     }

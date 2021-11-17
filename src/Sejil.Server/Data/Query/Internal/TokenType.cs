@@ -6,6 +6,7 @@ namespace Sejil.Data.Query.Internal
     internal enum TokenType
     {
         Identifier,
+        BuiltInIdentifier,
         String,
         Number,
 

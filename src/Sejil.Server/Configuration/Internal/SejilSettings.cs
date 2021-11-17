@@ -17,7 +17,6 @@ namespace Sejil.Configuration.Internal
         public string Url { get; private set; }
         public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
         public string SqliteDbPath { get; private set; }
-        public string[] NonPropertyColumns { get; private set; }
         public int PageSize { get; private set; }
 
         /// <summary>
@@ -52,7 +51,6 @@ namespace Sejil.Configuration.Internal
                 SqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{UUID}.sqlite");
             }
 
-            NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
             PageSize = 100;
         }
 

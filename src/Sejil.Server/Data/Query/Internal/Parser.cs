@@ -9,12 +9,11 @@ namespace Sejil.Data.Query.Internal
     internal sealed class Parser
     {
         private readonly List<Token> _tokens;
-        private readonly string[] _nonPropertyColumns;
         private int _current;
 
         private bool IsAtEnd => Peek().Type == TokenType.Eol;
 
-        public Parser(List<Token> tokens, string[] nonPropertyColumns) => (_tokens, _nonPropertyColumns) = (tokens, nonPropertyColumns.Select(p => p.ToLower()).ToArray());
+        public Parser(List<Token> tokens) => _tokens = tokens;
 
         public Expr Parse()
         {
@@ -37,7 +36,7 @@ namespace Sejil.Data.Query.Internal
                 var op = Previous();
                 var right = And();
                 CheckLogicalLeftRight(right, Previous());
-                expr = new Expr.Logical(expr, op, right, expr.IsProperty, right.IsProperty);
+                expr = new Expr.Logical(expr, op, right);
             }
 
             return expr;
@@ -51,17 +50,17 @@ namespace Sejil.Data.Query.Internal
             {
                 CheckLogicalLeftRight(expr, _tokens[_current - 2]);
                 var op = Previous();
-                var right = Binary(expr.IsProperty);
+                var right = Binary();
                 CheckLogicalLeftRight(right, Previous());
-                expr = new Expr.Logical(expr, op, right, expr.IsProperty, right.IsProperty);
+                expr = new Expr.Logical(expr, op, right);
             }
 
             return expr;
         }
 
-        private Expr Binary(bool isProperty = false)
+        private Expr Binary()
         {
-            var expr = Primary(isProperty);
+            var expr = Primary();
 
             while (Match(
                 TokenType.NotEqual,
@@ -71,44 +70,41 @@ namespace Sejil.Data.Query.Internal
             {
                 CheckBinaryLeft(expr, _tokens[_current - 2]);
                 var op = Previous();
-                var right = Primary(expr.IsProperty);
+                var right = Primary();
                 CheckBinaryRight(right, op, Previous());
-                expr = new Expr.Binary(expr, op, right, expr.IsProperty);
+                expr = new Expr.Binary(expr, op, right);
             }
 
             return expr;
         }
 
-        private Expr Primary(bool isProperty)
+        private Expr Primary()
         {
             if (Match(TokenType.False))
             {
-                return new Expr.Literal(false, isProperty);
+                return new Expr.Literal("'False'");
             }
 
             if (Match(TokenType.True))
             {
-                return new Expr.Literal(true, isProperty);
+                return new Expr.Literal("'True'");
             }
 
             if (Match(TokenType.Number, TokenType.String))
             {
-                return new Expr.Literal(Previous().Value, isProperty);
+                return new Expr.Literal(Previous().Value);
             }
 
-            if (Match(TokenType.Identifier))
+            if (Match(TokenType.Identifier, TokenType.BuiltInIdentifier))
             {
-                var prev = Previous();
-                isProperty = !_nonPropertyColumns.Contains(prev.Text.ToLower());
-                return new Expr.Variable(Previous(), isProperty);
+                return new Expr.Variable(Previous());
             }
 
             if (Match(TokenType.OpenParenthesis))
             {
                 var expr = Or();
-                isProperty = expr is Expr.Logical logExpr ? logExpr.IsProperty && logExpr.IsRightProperty : expr.IsProperty;
                 Consume(TokenType.CloseParenthesis, "Expect ')' after expression.");
-                return new Expr.Grouping(expr, isProperty);
+                return new Expr.Grouping(expr);
             }
 
             throw new QueryEngineException(Error(Peek(), "Expect expression."));

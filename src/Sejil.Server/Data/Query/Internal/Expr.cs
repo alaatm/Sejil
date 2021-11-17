@@ -5,10 +5,6 @@ namespace Sejil.Data.Query.Internal
 {
     internal abstract class Expr
     {
-        public bool IsProperty { get; }
-
-        public Expr(bool isProperty) => IsProperty = isProperty;
-
         public abstract void Accept(IVisitor visitor);
 
         public interface IVisitor
@@ -26,7 +22,7 @@ namespace Sejil.Data.Query.Internal
             public Token Operator { get; }
             public Expr Right { get; }
 
-            public Binary(Expr left, Token @operator, Expr right, bool isProperty) : base(isProperty)
+            public Binary(Expr left, Token @operator, Expr right)
                 => (Left, Operator, Right) = (left, @operator, right);
 
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
@@ -36,7 +32,7 @@ namespace Sejil.Data.Query.Internal
         {
             public Expr Expression { get; }
 
-            public Grouping(Expr expression, bool isProperty) : base(isProperty) => Expression = expression;
+            public Grouping(Expr expression) => Expression = expression;
 
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
@@ -45,7 +41,7 @@ namespace Sejil.Data.Query.Internal
         {
             public object Value { get; }
 
-            public Literal(object value, bool isProperty) : base(isProperty) => Value = value;
+            public Literal(object value) : base() => Value = value;
 
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
@@ -55,10 +51,9 @@ namespace Sejil.Data.Query.Internal
             public Expr Left { get; }
             public Token Operator { get; }
             public Expr Right { get; }
-            public bool IsRightProperty { get; }
 
-            public Logical(Expr left, Token @operator, Expr right, bool isLeftProperty, bool isRightProperty) : base(isLeftProperty)
-                => (Left, Operator, Right, IsRightProperty) = (left, @operator, right, isRightProperty);
+            public Logical(Expr left, Token @operator, Expr right)
+                => (Left, Operator, Right) = (left, @operator, right);
 
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }
@@ -67,7 +62,7 @@ namespace Sejil.Data.Query.Internal
         {
             public Token Token { get; }
 
-            public Variable(Token token, bool isProperty) : base(isProperty) => Token = token;
+            public Variable(Token token) => Token = token;
 
             public override void Accept(IVisitor visitor) => visitor.Visit(this);
         }

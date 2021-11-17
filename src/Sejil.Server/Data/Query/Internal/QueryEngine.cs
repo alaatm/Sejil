@@ -7,7 +7,7 @@ namespace Sejil.Data.Query.Internal
 {
     internal static class QueryEngine
     {
-        public static string Translate(string filter, string[] nonPropertyColumns)
+        public static string Translate(string filter)
         {
             // If enclosed in quotes then treat as a search string
             if (filter[0] == '"' && filter[filter.Length - 1] == '"')
@@ -24,7 +24,7 @@ namespace Sejil.Data.Query.Internal
             var scanner = new Scanner(filter);
             var tokens = scanner.Scan();
 
-            return new CodeGenerator().Generate(new Parser(tokens, nonPropertyColumns).Parse());
+            return new CodeGenerator().Generate(new Parser(tokens).Parse());
         }
     }
 }

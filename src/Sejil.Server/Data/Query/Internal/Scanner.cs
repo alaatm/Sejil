@@ -78,6 +78,10 @@ namespace Sejil.Data.Query.Internal
                     {
                         ReadIdentifier();
                     }
+                    else if (c == '@')
+                    {
+                        ReadBuiltInIdentifier();
+                    }
                     else
                     {
                         throw new QueryEngineException($"Unexpected character at position '{_current}'.");
@@ -88,20 +92,33 @@ namespace Sejil.Data.Query.Internal
 
         private void ReadString()
         {
-            while (!IsAtEnd && (Peek() != '\'' || (Peek() == '\'' && PeekPrev() == '\\')))
+            var done = false;
+
+            while (!done)
             {
-                Advance();
+                switch (Peek())
+                {
+                    case '\0':
+                        throw new QueryEngineException($"Unterminated string at position '{_current + 1}'.");
+                    case '\'':
+                        if (PeekNext() == '\'')
+                        {
+                            Advance();
+                            Advance();
+                        }
+                        else
+                        {
+                            Advance();
+                            done = true;
+                        }
+                        break;
+                    default:
+                        Advance();
+                        break;
+                }
             }
 
-            if (IsAtEnd)
-            {
-                throw new QueryEngineException($"Unterminated string at position '{_current + 1}'.");
-            }
-
-            // Consume the closing "'"
-            Advance();
-
-            var value = _source.Substring(_start + 1, _current - _start - 2).Replace(@"\'", "''");
+            var value = _source.Substring(_start, _current - _start);
             AddToken(TokenType.String, value);
         }
 
@@ -168,6 +185,18 @@ namespace Sejil.Data.Query.Internal
             }
         }
 
+        private void ReadBuiltInIdentifier()
+        {
+            while (char.IsLetterOrDigit(Peek()))
+            {
+                Advance();
+            }
+
+            // Skip the @
+            _start++;
+            AddToken(TokenType.BuiltInIdentifier);
+        }
+
         private void AddToken(TokenType type) => AddToken(type, null);
 
         private void AddToken(TokenType type, object literal)
@@ -177,10 +206,6 @@ namespace Sejil.Data.Query.Internal
         }
 
         private char Advance() => _source[_current++];
-
-        private char PeekPrev() => _current - 1 < 0
-            ? '\0'
-            : _source[_current - 1];
 
         private char Peek() => IsAtEnd
             ? '\0'

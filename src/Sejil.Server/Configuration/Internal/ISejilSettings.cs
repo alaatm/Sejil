@@ -11,7 +11,6 @@ namespace Sejil.Configuration.Internal
         string Url { get; }
         LoggingLevelSwitch LoggingLevelSwitch { get; }
         string SqliteDbPath { get; }
-        string[] NonPropertyColumns { get; }
         int PageSize { get; }
         bool TrySetMinimumLogLevel(string minLogLevel);
 
