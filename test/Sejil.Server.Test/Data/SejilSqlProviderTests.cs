@@ -501,6 +501,14 @@ ORDER BY l.timestamp DESC, p.name", sql);
                 "@loggedIn = true or @loggedIn = false",
                 "loggedIn = 'True' OR loggedIn = 'False'",
             };
+            // Numerics, >, <, >=, <=
+            yield return new object[]
+            {
+                "ElapsedMilliseconds >= 100 and ElapsedMilliseconds < 500",
+                "id IN (SELECT logId FROM log_property GROUP BY logId HAVING " +
+                "SUM(name = 'ElapsedMilliseconds' AND CAST(value AS NUMERIC) >= 100) > 0 AND " +
+                "SUM(name = 'ElapsedMilliseconds' AND CAST(value AS NUMERIC) < 500) > 0)",
+            };
         }
 
         public static IEnumerable<object[]> GetPagedLogEntriesSql_returns_correct_sql_for_events_with_specified_dateFilter_TestData()

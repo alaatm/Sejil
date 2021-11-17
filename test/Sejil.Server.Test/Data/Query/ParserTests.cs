@@ -54,6 +54,17 @@ namespace Sejil.Test.Data.Query
         }
 
         [Theory]
+        [InlineData("p > '5'", 5)]
+        [InlineData("p >= '5'", 6)]
+        [InlineData("p < '5'", 5)]
+        [InlineData("p <= '5'", 6)]
+        public void Parse_throws_when_gt_gte_lt_lte_op_used_with_non_numeric_value(string source, int pos)
+        {
+            var ex = Assert.Throws<QueryEngineException>(() => new Parser(new Scanner(source).Scan()).Parse());
+            Assert.Equal($"Error at position '{pos}' -> '5': Expect numeric literal.", ex.Message);
+        }
+
+        [Theory]
         [InlineData("l and x = 5", 1)]
         [InlineData("l or x = 5", 1)]
         public void Parse_throws_when_left_side_of_logical_is_not_binary_grouping_or_logical(string source, int pos)

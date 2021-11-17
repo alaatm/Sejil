@@ -61,6 +61,26 @@ namespace Sejil.Data.Query.Internal
                         throw new QueryEngineException($"Unexpected character at position '{_current}'.");
                     }
                     break;
+                case '>':
+                    if (Match('='))
+                    {
+                        AddToken(TokenType.GreaterThanOrEqual);
+                    }
+                    else
+                    {
+                        AddToken(TokenType.GreaterThan);
+                    }
+                    break;
+                case '<':
+                    if (Match('='))
+                    {
+                        AddToken(TokenType.LessThanOrEqual);
+                    }
+                    else
+                    {
+                        AddToken(TokenType.LessThan);
+                    }
+                    break;
                 case '\'':
                     ReadString();
                     break;

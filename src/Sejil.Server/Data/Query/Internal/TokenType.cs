@@ -22,6 +22,10 @@ namespace Sejil.Data.Query.Internal
 
         Equal,
         NotEqual,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
 
         Eol,
     }

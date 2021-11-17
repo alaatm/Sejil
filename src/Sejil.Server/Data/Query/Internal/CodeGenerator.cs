@@ -85,16 +85,11 @@ namespace Sejil.Data.Query.Internal
                 _ => "value",
             };
 
-            if (expr.HasAllProperty())
-            {
-                _template = expr.Operator.IsExluding()
+            _template = expr.HasAllProperty()
+                ? expr.Operator.IsExluding()
                     ? $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) = 0"
-                    : $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) > 0";
-            }
-            else
-            {
-                _template = "|PNAME| |OP| |PVAL|";
-            }
+                    : $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) > 0"
+                : "|PNAME| |OP| |PVAL|";
         }
     }
 }

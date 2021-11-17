@@ -66,7 +66,11 @@ namespace Sejil.Data.Query.Internal
                 TokenType.NotEqual,
                 TokenType.Equal,
                 TokenType.Like,
-                TokenType.NotLike))
+                TokenType.NotLike,
+                TokenType.GreaterThan,
+                TokenType.GreaterThanOrEqual,
+                TokenType.LessThan,
+                TokenType.LessThanOrEqual))
             {
                 CheckBinaryLeft(expr, _tokens[_current - 2]);
                 var op = Previous();
@@ -175,6 +179,10 @@ namespace Sejil.Data.Query.Internal
             if (op.Type is TokenType.Like or TokenType.NotLike && l.Value is not string)
             {
                 throw new QueryEngineException(Error(token, "Expect string literal."));
+            }
+            if (op.Type is TokenType.GreaterThan or TokenType.GreaterThanOrEqual or TokenType.LessThan or TokenType.LessThanOrEqual && l.Value is not decimal)
+            {
+                throw new QueryEngineException(Error(token, "Expect numeric literal."));
             }
         }
 

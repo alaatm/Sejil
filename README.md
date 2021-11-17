@@ -133,8 +133,16 @@ In addition to filtering logs by level; exceptions only; and date range via the 
         ```sql
         SourceContext = 'Microsoft.AspNetCore.Hosting.Internal.WebHost'
         SourceContext like '%Hosting%'
-        StatusCode = 200
+        ElapsedMilliseconds >= 500
         ```
+
+* To filter logs by a built-in property (`message`, `messageTemplate`, `level`, `timestamp`, `exception`), prefix it with `@`
+
+    Examples:
+    ```sql
+    @message = 'Request did not match any routes'
+    @exception like '%ArgumentNullException%'
+    ```
 
 * You can combine multiple search expressions with `and` `or` and use `(` `)` for precedence.
 
