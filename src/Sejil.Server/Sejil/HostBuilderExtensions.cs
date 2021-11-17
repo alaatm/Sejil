@@ -13,6 +13,7 @@ using Sejil.Data.Internal;
 using Sejil.Routing.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serilog.Events;
 
 namespace Microsoft.AspNetCore.Hosting
 {
@@ -48,7 +49,7 @@ namespace Microsoft.AspNetCore.Hosting
             bool writeToProviders = false,
             Action<LoggerSinkConfiguration> sinks = null)
         {
-            var settings = new SejilSettings(url, IWebHostBuilderExtensions.MapSerilogLogLevel(minLogLevel));
+            var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
 
             return builder
                 .UseSerilog((context, cfg) =>
@@ -68,6 +69,16 @@ namespace Microsoft.AspNetCore.Hosting
                     services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                     services.AddScoped<ISejilController, SejilController>();
                 });
+        }
+
+        internal static LogEventLevel MapSerilogLogLevel(LogLevel logLevel)
+        {
+            if (logLevel == LogLevel.None)
+            {
+                throw new InvalidOperationException("Minimum log level cannot be set to None.");
+            }
+
+            return (LogEventLevel)((int)logLevel);
         }
     }
 }
