@@ -1,20 +1,16 @@
-﻿// Copyright (C) 2017 Alaa Masoud
+// Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Events;
-using Xunit;
 using Microsoft.AspNetCore.Hosting.Server;
 using Sejil.Data.Internal;
 using Microsoft.Extensions.Hosting;
 using Serilog.Core;
-using System.Collections.Generic;
 
 namespace Sejil.Test
 {

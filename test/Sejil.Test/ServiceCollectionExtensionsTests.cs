@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sejil.Configuration.Internal;
 using Serilog.Events;
-using System;
-using Xunit;
 
 namespace Sejil.Test
 {

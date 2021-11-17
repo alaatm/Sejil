@@ -1,18 +1,12 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
 using Microsoft.Data.Sqlite;
-using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Logging.Sinks;
-using Xunit;
 using Dapper;
-using System.Collections.Generic;
-using System.Linq;
 using Serilog.Events;
 using Serilog.Parsing;
-using System.Threading.Tasks;
 using Sejil.Data.Internal;
 
 namespace Sejil.Test.Logging.Sinks

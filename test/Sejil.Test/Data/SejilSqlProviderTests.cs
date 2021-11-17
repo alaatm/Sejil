@@ -1,13 +1,9 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Models.Internal;
-using Xunit;
 
 namespace Sejil.Test.Data
 {

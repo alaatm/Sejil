@@ -1,8 +1,6 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
-
 namespace Sejil.Data.Query.Internal
 {
     internal sealed class Scanner

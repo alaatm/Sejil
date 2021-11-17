@@ -1,20 +1,14 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Events;
-using Xunit;
 using Microsoft.AspNetCore.Builder;
 using Sejil.Data.Internal;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -25,13 +19,12 @@ using System.Text.Encodings.Web;
 using System.Security.Claims;
 using System.Net;
 using System.Text.Json;
-using System.IO;
 
 namespace Sejil.Test
 {
     public class ApplicationBuilderExtensionsTests
     {
-        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         [Fact]
         public async Task HttpGet_root_url_calls_controller_GetIndexAsync_method()

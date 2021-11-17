@@ -1,6 +1,4 @@
-﻿using System;
-using Sejil.Data.Query.Internal;
-using Xunit;
+﻿using Sejil.Data.Query.Internal;
 
 namespace Sejil.Test.Data.Query
 {

@@ -1,11 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;

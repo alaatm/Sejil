@@ -1,5 +1,4 @@
 ﻿using Sejil.Configuration.Internal;
-using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

@@ -1,14 +1,9 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Moq;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Data.Query.Internal;
@@ -16,14 +11,13 @@ using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Core;
 using Serilog.Events;
-using Xunit;
 
 namespace Sejil.Test.Routing
 {
 
     public class SejilControllerTests
     {
-        internal static readonly JsonSerializerOptions _camelCaseJson = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        internal static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         [Fact]
         public async Task GetIndexAsync_writes_app_html_to_response_stream()

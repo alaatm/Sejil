@@ -1,8 +1,6 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System.IO;
-
 namespace Sejil
 {
     public static class ResourceHelper

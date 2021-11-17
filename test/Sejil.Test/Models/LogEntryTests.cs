@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Sejil.Models.Internal;
-using Xunit;
+﻿using Sejil.Models.Internal;
 
 namespace Sejil.Test.Models
 {
