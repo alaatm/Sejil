@@ -7,9 +7,8 @@ builder.Services.AddRazorPages();
 // Configure Sejil
 builder.Host.UseSejil(
     minLogLevel: LogLevel.Information,
-    writeToProviders: true);
-
-builder.Services.ConfigureSejil(cfg => cfg.Title = "My App Logs");
+    writeToProviders: true,
+    setupAction: cfg => cfg.Title = "My App Logs");
 //////////////////
 
 var app = builder.Build();

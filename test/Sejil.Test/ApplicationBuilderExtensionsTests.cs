@@ -324,13 +324,16 @@ public class ApplicationBuilderExtensionsTests
                 }
                 services.AddRouting();
 
+                var settings = new SejilSettings(url, LogEventLevel.Debug)
+                {
+                    AuthenticationScheme = TestAuthDefaults.AuthenticationScheme,
+                };
+
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                services.AddSingleton<ISejilSettings>(new SejilSettings(url, LogEventLevel.Debug));
+                services.AddSingleton<ISejilSettings>(settings);
                 services.AddScoped<ISejilRepository, SejilRepository>();
                 services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                 services.AddScoped<ISejilController, SejilController>();
-
-                services.ConfigureSejil(options => options.AuthenticationScheme = TestAuthDefaults.AuthenticationScheme);
             });
 
         return new TestServer(builder);

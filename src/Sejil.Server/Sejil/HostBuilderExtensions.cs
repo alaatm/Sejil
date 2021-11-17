@@ -46,9 +46,11 @@ public static partial class IHostBuilderExtensions
         string url = "/sejil",
         LogLevel minLogLevel = LogLevel.Information,
         bool writeToProviders = false,
-        Action<LoggerSinkConfiguration> sinks = null)
+        Action<LoggerSinkConfiguration> sinks = null,
+        Action<ISejilSettings> setupAction = null)
     {
         var settings = new SejilSettings(url, MapSerilogLogLevel(minLogLevel));
+        setupAction?.Invoke(settings);
 
         return builder
             .UseSerilog((context, cfg) =>

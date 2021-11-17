@@ -27,8 +27,6 @@ namespace Sample
                 .AddBasicAuthentication(credentials =>
                     Task.FromResult(credentials.username == "myUsername" && credentials.password == "myPassword")
                 );
-
-            services.ConfigureSejil(cfg => cfg.AuthenticationScheme = BasicAuthenticationDefaults.AuthenticationScheme);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
