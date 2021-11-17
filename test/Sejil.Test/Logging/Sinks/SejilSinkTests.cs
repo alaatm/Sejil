@@ -18,7 +18,8 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
 
         // Act
@@ -36,7 +37,8 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
 
         // Act
@@ -91,7 +93,8 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
 
         // Act
@@ -139,7 +142,8 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
 
         // Act
@@ -176,10 +180,10 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
         settingsMoq.SetupGet(p => p.PageSize).Returns(100);
-        settingsMoq.SetupGet(p => p.Url).Returns("/sejil");
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
         var sink = new SejilSinkMock(settingsMoq.Object);
 
@@ -193,7 +197,8 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
         settingsMoq.SetupGet(p => p.PageSize).Returns(100);
         var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
@@ -268,29 +273,29 @@ public class SejilSinkTests
     {
         // Arrange
         var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
+        var settingsMoq = new Mock<ISejilSettings>(MockBehavior.Strict);
         settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
         settingsMoq.SetupGet(p => p.PageSize).Returns(100);
-        settingsMoq.SetupGet(p => p.Url).Returns("/sejil");
+        settingsMoq.SetupGet(p => p.Url).Returns(new Uri("/sejil", UriKind.Relative));
         var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
         var sink = new SejilSinkMock(settingsMoq.Object);
 
         var tokens = new List<MessageTemplateToken>
-            {
-                new PropertyToken(propertyName, "{"+propertyName+"}"),
-            };
+        {
+            new PropertyToken(propertyName, "{" + propertyName + "}"),
+        };
 
         var properties = new List<LogEventProperty>
-            {
-                new LogEventProperty(propertyName, new ScalarValue("/sejil/events")),
-            };
+        {
+            new LogEventProperty(propertyName, new ScalarValue("/sejil/events")),
+        };
 
         var messageTemplate = new MessageTemplate(tokens);
 
         var events = new List<LogEvent>
-            {
-                new LogEvent(DateTime.Now, LogEventLevel.Information, null, messageTemplate, properties),
-            };
+        {
+            new LogEvent(DateTime.Now, LogEventLevel.Information, null, messageTemplate, properties),
+        };
 
         // Act
         await sink.CallEmitBatchAsync(events);

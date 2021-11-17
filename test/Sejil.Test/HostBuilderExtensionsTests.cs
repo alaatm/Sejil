@@ -35,7 +35,7 @@ public class HostBuilderExtensionsTests
 
         // Assert
         var settings = hostBuilder.Build().Services.GetRequiredService<ISejilSettings>();
-        Assert.Equal(url, settings.Url);
+        Assert.Equal(url, settings.Url.OriginalString);
         Assert.Equal(expectedMappedLogLevel, settings.LoggingLevelSwitch.MinimumLevel);
     }
 

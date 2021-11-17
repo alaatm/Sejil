@@ -25,7 +25,7 @@ public class SejilSettingsTests
         var settings = new SejilSettings("url", LogEventLevel.Debug);
 
         // Assert
-        Assert.Equal("/url", settings.Url);
+        Assert.Equal("/url", settings.Url.OriginalString);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class SejilSettingsTests
         var settings = new SejilSettings("/url", LogEventLevel.Debug);
 
         // Assert
-        Assert.Equal("/url", settings.Url);
+        Assert.Equal("/url", settings.Url.OriginalString);
     }
 
     [Fact]

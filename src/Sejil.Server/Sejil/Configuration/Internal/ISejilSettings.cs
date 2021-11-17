@@ -8,7 +8,7 @@ namespace Sejil.Configuration.Internal;
 public interface ISejilSettings
 {
     string SejilAppHtml { get; }
-    string Url { get; }
+    Uri Url { get; }
     LoggingLevelSwitch LoggingLevelSwitch { get; }
     string SqliteDbPath { get; }
     int PageSize { get; }

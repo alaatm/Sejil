@@ -26,7 +26,7 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseSejil(this IApplicationBuilder app)
     {
         var settings = app.ApplicationServices.GetRequiredService<ISejilSettings>();
-        var url = settings.Url[1..]; // Skip the '/'
+        var url = settings.Url.OriginalString[1..]; // Skip the '/'
 
         app.Use(async (context, next) =>
         {

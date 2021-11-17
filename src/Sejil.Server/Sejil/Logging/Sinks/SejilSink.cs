@@ -21,7 +21,7 @@ internal class SejilSink : PeriodicBatchingSink
     public SejilSink(ISejilSettings settings) : base(DefaultBatchSizeLimit, _defaultBatchEmitPeriod)
     {
         _connectionString = $"DataSource={settings.SqliteDbPath}";
-        _uri = settings.Url;
+        _uri = settings.Url.OriginalString;
 
         InitializeDatabase();
     }

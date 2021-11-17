@@ -12,7 +12,7 @@ public sealed class SejilSettings : ISejilSettings
     private const string UUID = "59A8F730-6AC5-427A-9492-A3A9EAD9556F";
 
     public string SejilAppHtml { get; private set; }
-    public string Url { get; private set; }
+    public Uri Url { get; private set; }
     public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
     public string SqliteDbPath { get; private set; }
     public int PageSize { get; private set; }
@@ -28,9 +28,15 @@ public sealed class SejilSettings : ISejilSettings
     public string AuthenticationScheme { get; set; }
 
     public SejilSettings(string uri, LogEventLevel minLogLevel)
+        : this(new Uri(uri, UriKind.Relative), minLogLevel) { }
+
+    private SejilSettings(Uri uri, LogEventLevel minLogLevel)
     {
+        Url = uri.OriginalString.StartsWith("/", StringComparison.Ordinal)
+            ? uri
+            : new Uri($"/{uri.OriginalString}", UriKind.Relative);
+
         SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
-        Url = uri.StartsWith("/", StringComparison.OrdinalIgnoreCase) ? uri : "/" + uri;
         LoggingLevelSwitch = new LoggingLevelSwitch
         {
             MinimumLevel = minLogLevel
@@ -54,26 +60,26 @@ public sealed class SejilSettings : ISejilSettings
 
     public bool TrySetMinimumLogLevel(string minLogLevel)
     {
-        switch (minLogLevel.ToLowerInvariant())
+        switch (minLogLevel.ToUpperInvariant())
         {
-            case "trace":
-            case "verbose":
+            case "TRACE":
+            case "VERBOSE":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
                 return true;
-            case "debug":
+            case "DEBUG":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Debug;
                 return true;
-            case "information":
+            case "INFORMATION":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Information;
                 return true;
-            case "warning":
+            case "WARNING":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Warning;
                 return true;
-            case "error":
+            case "ERROR":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Error;
                 return true;
-            case "critical":
-            case "fatal":
+            case "CRITICAL":
+            case "FATAL":
                 LoggingLevelSwitch.MinimumLevel = LogEventLevel.Fatal;
                 return true;
             default:
