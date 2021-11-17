@@ -2,37 +2,36 @@
 using Sejil.Configuration.Internal;
 using Serilog.Events;
 
-namespace Sejil.Test
+namespace Sejil.Test;
+
+public class ServiceCollectionExtensionsTests
 {
-    public class ServiceCollectionExtensionsTests
+    [Fact]
+    public void ConfigureSejil_throws_when_setupAction_is_null()
     {
-        [Fact]
-        public void ConfigureSejil_throws_when_setupAction_is_null()
+        // Arrange, act & assert
+        var ex = Assert.Throws<ArgumentNullException>(() => new ServiceCollection().ConfigureSejil(null));
+        Assert.Equal("setupAction", ex.ParamName);
+    }
+
+    [Fact]
+    public void ConfigureSejil_executes_setupAction()
+    {
+        // Arrange
+        var authScheme = "authScheme";
+        var title = "title";
+        var settings = new SejilSettings("/sejil", LogEventLevel.Debug);
+        var services = new ServiceCollection().AddSingleton<ISejilSettings>(settings);
+
+        // Act
+        services.ConfigureSejil(options =>
         {
-            // Arrange, act & assert
-            var ex = Assert.Throws<ArgumentNullException>(() => new ServiceCollection().ConfigureSejil(null));
-            Assert.Equal("setupAction", ex.ParamName);
-        }
+            options.AuthenticationScheme = authScheme;
+            options.Title = title;
+        });
 
-        [Fact]
-        public void ConfigureSejil_executes_setupAction()
-        {
-            // Arrange
-            var authScheme = "authScheme";
-            var title = "title";
-            var settings = new SejilSettings("/sejil", LogEventLevel.Debug);
-            var services = new ServiceCollection().AddSingleton<ISejilSettings>(settings);
-
-            // Act
-            services.ConfigureSejil(options =>
-            {
-                options.AuthenticationScheme = authScheme;
-                options.Title = title;
-            });
-
-            // Assert
-            Assert.Equal(authScheme, settings.AuthenticationScheme);
-            Assert.Equal(title, settings.Title);
-        }
+        // Assert
+        Assert.Equal(authScheme, settings.AuthenticationScheme);
+        Assert.Equal(title, settings.Title);
     }
 }

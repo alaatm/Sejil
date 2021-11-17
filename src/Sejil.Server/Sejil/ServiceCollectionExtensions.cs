@@ -1,27 +1,26 @@
 ﻿using Sejil.Configuration.Internal;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+/// <summary>
+/// Extension to conf
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Extension to conf
+    /// Configure Sejil
     /// </summary>
-    public static class ServiceCollectionExtensions
+    /// <param name="services">The service collection.</param>
+    /// <param name="setupAction">Delegate to configure the settings.</param>		
+    public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
     {
-        /// <summary>
-        /// Configure Sejil
-        /// </summary>
-        /// <param name="services">The service collection.</param>
-        /// <param name="setupAction">Delegate to configure the settings.</param>		
-        public static void ConfigureSejil(this IServiceCollection services, Action<ISejilSettings> setupAction)
+        if (setupAction == null)
         {
-            if (setupAction == null)
-            {
-                throw new ArgumentNullException(nameof(setupAction));
-            }
-
-            var settings = services.BuildServiceProvider().GetService<ISejilSettings>();
-
-            setupAction(settings);
+            throw new ArgumentNullException(nameof(setupAction));
         }
+
+        var settings = services.BuildServiceProvider().GetService<ISejilSettings>();
+
+        setupAction(settings);
     }
 }

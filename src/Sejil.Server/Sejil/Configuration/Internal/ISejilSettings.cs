@@ -3,25 +3,24 @@
 
 using Serilog.Core;
 
-namespace Sejil.Configuration.Internal
+namespace Sejil.Configuration.Internal;
+
+public interface ISejilSettings
 {
-    public interface ISejilSettings
-    {
-        string SejilAppHtml { get; }
-        string Url { get; }
-        LoggingLevelSwitch LoggingLevelSwitch { get; }
-        string SqliteDbPath { get; }
-        int PageSize { get; }
-        bool TrySetMinimumLogLevel(string minLogLevel);
+    string SejilAppHtml { get; }
+    string Url { get; }
+    LoggingLevelSwitch LoggingLevelSwitch { get; }
+    string SqliteDbPath { get; }
+    int PageSize { get; }
+    bool TrySetMinimumLogLevel(string minLogLevel);
 
-        /// <summary>
-        /// Gets or sets the title shown in the front end
-        /// </summary>
-        string Title { get; set; }
+    /// <summary>
+    /// Gets or sets the title shown in the front end
+    /// </summary>
+    string Title { get; set; }
 
-        /// <summary>
-        /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
-        /// </summary>
-        string AuthenticationScheme { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
+    /// </summary>
+    string AuthenticationScheme { get; set; }
 }

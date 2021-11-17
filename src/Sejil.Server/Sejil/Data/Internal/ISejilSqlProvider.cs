@@ -3,13 +3,12 @@
 
 using Sejil.Models.Internal;
 
-namespace Sejil.Data.Internal
+namespace Sejil.Data.Internal;
+
+public interface ISejilSqlProvider
 {
-    public interface ISejilSqlProvider
-    {
-        string InsertLogQuerySql();
-        string GetSavedQueriesSql();
-        string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, LogQueryFilter queryFilter);
-        string DeleteQuerySql();
-    }
+    string InsertLogQuerySql();
+    string GetSavedQueriesSql();
+    string GetPagedLogEntriesSql(int page, int pageSize, DateTime? startingTimestamp, LogQueryFilter queryFilter);
+    string DeleteQuerySql();
 }

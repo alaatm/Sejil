@@ -1,32 +1,31 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-namespace Sejil.Data.Query.Internal
+namespace Sejil.Data.Query.Internal;
+
+internal enum TokenType
 {
-    internal enum TokenType
-    {
-        Identifier,
-        BuiltInIdentifier,
-        String,
-        Number,
+    Identifier,
+    BuiltInIdentifier,
+    String,
+    Number,
 
-        OpenParenthesis,
-        CloseParenthesis,
+    OpenParenthesis,
+    CloseParenthesis,
 
-        And,
-        Or,
-        Like,
-        NotLike,
-        True,
-        False,
+    And,
+    Or,
+    Like,
+    NotLike,
+    True,
+    False,
 
-        Equal,
-        NotEqual,
-        GreaterThan,
-        GreaterThanOrEqual,
-        LessThan,
-        LessThanOrEqual,
+    Equal,
+    NotEqual,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
 
-        Eol,
-    }
+    Eol,
 }

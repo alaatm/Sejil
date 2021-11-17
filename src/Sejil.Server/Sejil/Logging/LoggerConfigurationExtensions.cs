@@ -8,29 +8,28 @@ using Serilog.Configuration;
 using Serilog.Debugging;
 using Serilog.Events;
 
-namespace Sejil.Logging
-{
-    internal static class LoggerConfigurationExtensions
-    {
-        public static LoggerConfiguration Sejil(
-            this LoggerSinkConfiguration loggerConfiguration,
-            ISejilSettings settings,
-            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
-        {
-            try
-            {
-                var sqliteDbFile = new FileInfo(settings.SqliteDbPath);
-                sqliteDbFile.Directory.Create();
+namespace Sejil.Logging;
 
-                return loggerConfiguration.Sink(
-                    new SejilSink(settings),
-                    restrictedToMinimumLevel);
-            }
-            catch (Exception ex)
-            {
-                SelfLog.WriteLine(ex.Message);
-                throw;
-            }
+internal static class LoggerConfigurationExtensions
+{
+    public static LoggerConfiguration Sejil(
+        this LoggerSinkConfiguration loggerConfiguration,
+        ISejilSettings settings,
+        LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
+    {
+        try
+        {
+            var sqliteDbFile = new FileInfo(settings.SqliteDbPath);
+            sqliteDbFile.Directory.Create();
+
+            return loggerConfiguration.Sink(
+                new SejilSink(settings),
+                restrictedToMinimumLevel);
+        }
+        catch (Exception ex)
+        {
+            SelfLog.WriteLine(ex.Message);
+            throw;
         }
     }
 }

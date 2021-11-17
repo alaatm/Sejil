@@ -7,75 +7,74 @@ using Microsoft.Data.Sqlite;
 using Sejil.Configuration.Internal;
 using Sejil.Models.Internal;
 
-namespace Sejil.Data.Internal
+namespace Sejil.Data.Internal;
+
+public sealed class SejilRepository : ISejilRepository
 {
-    public sealed class SejilRepository : ISejilRepository
+    private readonly ISejilSqlProvider _sql;
+    private readonly string _connectionString;
+    private readonly int _pageSize;
+
+    public SejilRepository(ISejilSqlProvider sql, ISejilSettings settings)
     {
-        private readonly ISejilSqlProvider _sql;
-        private readonly string _connectionString;
-        private readonly int _pageSize;
+        _sql = sql;
+        _connectionString = $"DataSource={settings.SqliteDbPath}";
+        _pageSize = settings.PageSize;
+    }
 
-        public SejilRepository(ISejilSqlProvider sql, ISejilSettings settings)
-        {
-            _sql = sql;
-            _connectionString = $"DataSource={settings.SqliteDbPath}";
-            _pageSize = settings.PageSize;
-        }
+    public async Task<bool> SaveQueryAsync(LogQuery logQuery)
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        await conn.OpenAsync();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = _sql.InsertLogQuerySql();
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.AddWithValue("@name", logQuery.Name);
+        cmd.Parameters.AddWithValue("@query", logQuery.Query);
+        return await cmd.ExecuteNonQueryAsync() > 0;
+    }
 
-        public async Task<bool> SaveQueryAsync(LogQuery logQuery)
-        {
-            using var conn = new SqliteConnection(_connectionString);
-            await conn.OpenAsync();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = _sql.InsertLogQuerySql();
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@name", logQuery.Name);
-            cmd.Parameters.AddWithValue("@query", logQuery.Query);
-            return await cmd.ExecuteNonQueryAsync() > 0;
-        }
+    public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        await conn.OpenAsync();
+        return conn.Query<LogQuery>(_sql.GetSavedQueriesSql());
+    }
 
-        public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
-        {
-            using var conn = new SqliteConnection(_connectionString);
-            await conn.OpenAsync();
-            return conn.Query<LogQuery>(_sql.GetSavedQueriesSql());
-        }
+    public async Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime? startingTimestamp, LogQueryFilter queryFilter)
+    {
+        var sql = _sql.GetPagedLogEntriesSql(page, _pageSize, startingTimestamp, queryFilter);
 
-        public async Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime? startingTimestamp, LogQueryFilter queryFilter)
-        {
-            var sql = _sql.GetPagedLogEntriesSql(page, _pageSize, startingTimestamp, queryFilter);
+        using var conn = new SqliteConnection(_connectionString);
+        await conn.OpenAsync();
+        var lookup = new Dictionary<string, LogEntry>();
 
-            using var conn = new SqliteConnection(_connectionString);
-            await conn.OpenAsync();
-            var lookup = new Dictionary<string, LogEntry>();
-
-            var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
+        var data = conn.Query<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
+            {
+                if (!lookup.TryGetValue(l.Id, out var logEntry))
                 {
-                    if (!lookup.TryGetValue(l.Id, out var logEntry))
-                    {
-                        lookup.Add(l.Id, logEntry = l);
-                    }
+                    lookup.Add(l.Id, logEntry = l);
+                }
 
-                    if (p != null)
-                    {
-                        logEntry.Properties.Add(p);
-                    }
-                    return logEntry;
+                if (p != null)
+                {
+                    logEntry.Properties.Add(p);
+                }
+                return logEntry;
 
-                }).ToList();
+            }).ToList();
 
-            return lookup.Values.AsEnumerable();
-        }
+        return lookup.Values.AsEnumerable();
+    }
 
-        public async Task<bool> DeleteQueryAsync(string queryName)
-        {
-            using var conn = new SqliteConnection(_connectionString);
-            await conn.OpenAsync();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = _sql.DeleteQuerySql();
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@name", queryName);
-            return await cmd.ExecuteNonQueryAsync() > 0;
-        }
+    public async Task<bool> DeleteQueryAsync(string queryName)
+    {
+        using var conn = new SqliteConnection(_connectionString);
+        await conn.OpenAsync();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = _sql.DeleteQuerySql();
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.AddWithValue("@name", queryName);
+        return await cmd.ExecuteNonQueryAsync() > 0;
     }
 }
