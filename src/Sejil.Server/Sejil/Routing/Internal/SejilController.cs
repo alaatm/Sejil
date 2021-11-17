@@ -15,77 +15,87 @@ public sealed class SejilController : ISejilController
 {
     private readonly ISejilRepository _repository;
     private readonly ISejilSettings _settings;
-    private readonly HttpContext _context;
+    private readonly IHttpContextAccessor _contextAcessor;
 
     public SejilController(IHttpContextAccessor contextAccessor, ISejilRepository repository, ISejilSettings settings)
-        => (_context, _repository, _settings) = (contextAccessor.HttpContext, repository, settings);
+        => (_contextAcessor, _repository, _settings) = (contextAccessor, repository, settings);
 
     public async Task GetIndexAsync()
     {
-        if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !_context.User.Identity.IsAuthenticated)
+        var context = _contextAcessor.HttpContext;
+
+        if (!string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && !context.User.Identity.IsAuthenticated)
         {
-            await _context.ChallengeAsync(_settings.AuthenticationScheme);
+            await context.ChallengeAsync(_settings.AuthenticationScheme);
         }
         else
         {
-            _context.Response.ContentType = "text/html";
-            await _context.Response.WriteAsync(_settings.SejilAppHtml);
+            context.Response.ContentType = "text/html";
+            await context.Response.WriteAsync(_settings.SejilAppHtml);
         }
     }
 
     public async Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter)
     {
+        var context = _contextAcessor.HttpContext;
+
         try
         {
             var events = await _repository.GetEventsPageAsync(page == 0 ? 1 : page, startingTs, queryFilter);
-            _context.Response.ContentType = "application/json";
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions.CamelCaseJson));
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(JsonSerializer.Serialize(events, ApplicationBuilderExtensions.CamelCaseJson));
         }
         catch (QueryEngineException ex)
         {
-            _context.Response.ContentType = "application/json";
-            _context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await _context.Response.WriteAsync(JsonSerializer.Serialize(new { error = ex.Message }, ApplicationBuilderExtensions.CamelCaseJson));
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync(JsonSerializer.Serialize(new { error = ex.Message }, ApplicationBuilderExtensions.CamelCaseJson));
         }
     }
 
     public async Task SaveQueryAsync(LogQuery logQuery) =>
-        _context.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
+        _contextAcessor.HttpContext.Response.StatusCode = await _repository.SaveQueryAsync(logQuery)
             ? StatusCodes.Status201Created
             : StatusCodes.Status500InternalServerError;
 
     public async Task GetQueriesAsync()
     {
+        var context = _contextAcessor.HttpContext;
+
         var logQueryList = await _repository.GetSavedQueriesAsync();
-        _context.Response.ContentType = "application/json";
-        await _context.Response.WriteAsync(JsonSerializer.Serialize(logQueryList, ApplicationBuilderExtensions.CamelCaseJson));
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(logQueryList, ApplicationBuilderExtensions.CamelCaseJson));
     }
 
     public async Task GetMinimumLogLevelAsync()
     {
+        var context = _contextAcessor.HttpContext;
+
         var response = new
         {
             MinimumLogLevel = _settings.LoggingLevelSwitch.MinimumLevel.ToString()
         };
-        _context.Response.ContentType = "application/json";
-        await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
     }
 
     public async Task GetUserNameAsync()
     {
+        var context = _contextAcessor.HttpContext;
+
         var response = new
         {
-            UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && _context.User.Identity.IsAuthenticated
-                ? _context.User.Identity.Name
+            UserName = !string.IsNullOrWhiteSpace(_settings.AuthenticationScheme) && context.User.Identity.IsAuthenticated
+                ? context.User.Identity.Name
                 : ""
         };
 
-        _context.Response.ContentType = "application/json";
-        await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
     }
 
     public void SetMinimumLogLevel(string minLogLevel) =>
-        _context.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
+        _contextAcessor.HttpContext.Response.StatusCode = _settings.TrySetMinimumLogLevel(minLogLevel)
             ? StatusCodes.Status200OK
             : StatusCodes.Status400BadRequest;
 
@@ -94,11 +104,13 @@ public sealed class SejilController : ISejilController
 
     public async Task GetTitleAsync()
     {
+        var context = _contextAcessor.HttpContext;
+
         var response = new
         {
             _settings.Title
         };
-        _context.Response.ContentType = "application/json";
-        await _context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, ApplicationBuilderExtensions.CamelCaseJson));
     }
 }
