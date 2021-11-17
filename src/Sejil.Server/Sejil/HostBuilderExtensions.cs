@@ -1,17 +1,17 @@
-﻿// Copyright (C) 2017 Alaa Masoud
+// Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sejil.Configuration.Internal;
+using Sejil.Data.Internal;
 using Sejil.Logging;
+using Sejil.Routing.Internal;
 using Serilog;
 using Serilog.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Sejil.Data.Internal;
-using Sejil.Routing.Internal;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serilog.Events;
 
 namespace Microsoft.AspNetCore.Hosting;

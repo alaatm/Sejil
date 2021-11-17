@@ -1,4 +1,4 @@
-﻿using Sejil.Models.Internal;
+using Sejil.Models.Internal;
 
 namespace Sejil.Test.Models;
 

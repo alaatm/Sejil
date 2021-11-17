@@ -1,24 +1,24 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using System.Net;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sejil.Configuration.Internal;
+using Sejil.Data.Internal;
 using Sejil.Models.Internal;
 using Sejil.Routing.Internal;
 using Serilog.Events;
-using Microsoft.AspNetCore.Builder;
-using Sejil.Data.Internal;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Text.Encodings.Web;
-using System.Security.Claims;
-using System.Net;
-using System.Text.Json;
 
 namespace Sejil.Test;
 

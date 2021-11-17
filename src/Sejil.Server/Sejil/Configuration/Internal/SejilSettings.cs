@@ -2,8 +2,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Reflection;
-using Serilog.Events;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace Sejil.Configuration.Internal;
 

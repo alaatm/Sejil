@@ -2,11 +2,11 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Data;
+using System.Diagnostics;
 using Microsoft.Data.Sqlite;
+using Sejil.Configuration.Internal;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
-using Sejil.Configuration.Internal;
-using System.Diagnostics;
 
 namespace Sejil.Logging.Sinks;
 

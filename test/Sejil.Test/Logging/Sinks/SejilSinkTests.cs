@@ -1,13 +1,13 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using Dapper;
 using Microsoft.Data.Sqlite;
 using Sejil.Configuration.Internal;
+using Sejil.Data.Internal;
 using Sejil.Logging.Sinks;
-using Dapper;
 using Serilog.Events;
 using Serilog.Parsing;
-using Sejil.Data.Internal;
 
 namespace Sejil.Test.Logging.Sinks;
 

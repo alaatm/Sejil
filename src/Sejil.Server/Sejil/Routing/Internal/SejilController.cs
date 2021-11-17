@@ -1,13 +1,13 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
-using Sejil.Models.Internal;
-using System.Text.Json;
 using Sejil.Data.Query.Internal;
+using Sejil.Models.Internal;
 
 namespace Sejil.Routing.Internal;
 

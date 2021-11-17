@@ -1,4 +1,4 @@
-﻿using Sejil.Data.Query.Internal;
+using Sejil.Data.Query.Internal;
 
 namespace Sejil.Test.Data.Query;
 

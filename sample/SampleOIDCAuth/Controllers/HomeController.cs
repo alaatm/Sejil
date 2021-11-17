@@ -4,8 +4,8 @@
 using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using sample.Models;
 using Microsoft.Extensions.Logging;
+using sample.Models;
 
 namespace sample.Controllers
 {

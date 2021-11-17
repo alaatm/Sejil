@@ -2,15 +2,15 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Sejil.Configuration.Internal;
-using Sejil.Routing.Internal;
-using Sejil.Models.Internal;
-using Serilog.Context;
 using Microsoft.AspNetCore.Routing;
-using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Sejil.Configuration.Internal;
+using Sejil.Models.Internal;
+using Sejil.Routing.Internal;
+using Serilog.Context;
 
 namespace Sejil;
 

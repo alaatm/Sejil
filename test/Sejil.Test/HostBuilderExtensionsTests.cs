@@ -2,15 +2,15 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sejil.Configuration.Internal;
-using Sejil.Routing.Internal;
-using Serilog.Events;
-using Microsoft.AspNetCore.Hosting.Server;
 using Sejil.Data.Internal;
-using Microsoft.Extensions.Hosting;
+using Sejil.Routing.Internal;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace Sejil.Test;
 
