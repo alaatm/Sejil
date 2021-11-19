@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Alaa Masoud
+-- Copyright (C) 2021 Alaa Masoud
 -- See the LICENSE file in the project root for more information.
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='log' and xtype='U')

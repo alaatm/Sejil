@@ -1,3 +1,6 @@
+// Copyright (C) 2021 Alaa Masoud
+// See the LICENSE file in the project root for more information.
+
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Sejil.Configuration;
