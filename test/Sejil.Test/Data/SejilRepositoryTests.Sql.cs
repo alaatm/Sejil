@@ -7,19 +7,6 @@ namespace Sejil.Test.Data;
 
 public partial class SejilRepositoryTests
 {
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(0)]
-    public void GetPagedLogEntriesSql_throws_when_page_arg_is_zero(int page)
-    {
-        // Arrange
-        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
-
-        // Act & assert
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => repository.GetPagedLogEntriesSql(page, 1, null, new LogQueryFilter()));
-        Assert.Equal($"Argument must be greater than zero. (Parameter 'page')", ex.Message);
-    }
-
     [Fact]
     public void GetPagedLogEntriesSql_returns_correct_sql_for_page()
     {
@@ -36,8 +23,8 @@ public partial class SejilRepositoryTests
 $@"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-
-
+    
+    
     ORDER BY timestamp DESC
     LIMIT {pageSize} OFFSET {(page - 1) * pageSize}
 ) l
@@ -60,8 +47,8 @@ ORDER BY l.timestamp DESC, p.name", sql);
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-
-
+    
+    
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -85,7 +72,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
-
+    
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -109,7 +96,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876' AND timestamp >= datetime('now', '-5 minute'))
-
+    
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -159,7 +146,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
-        AND (level = 'info')
+     AND (level = 'info')
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l
@@ -183,7 +170,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-
+    
     WHERE (id IN (SELECT logId FROM log_property GROUP BY logId HAVING SUM(name = 'p' AND value = 'v') > 0)) AND (level = 'info')
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
@@ -501,7 +488,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 @"SELECT l.*, p.* from 
 (
     SELECT * FROM log
-
+    
     WHERE (", "").Replace(
 @")
     ORDER BY timestamp DESC
@@ -516,7 +503,7 @@ ORDER BY l.timestamp DESC, p.name", "");
     SELECT * FROM log
     WHERE (", "").Replace(
 @")
-
+    
     ORDER BY timestamp DESC
     LIMIT 100 OFFSET 100
 ) l

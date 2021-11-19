@@ -1,8 +1,8 @@
-using Microsoft.Data.Sqlite;
 using System.Data.Common;
+using Microsoft.Data.Sqlite;
+using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
 using Sejil.Data.Query.Internal;
-using Sejil.Configuration.Internal;
 using Serilog.Events;
 
 namespace Sejil.Test.Data;

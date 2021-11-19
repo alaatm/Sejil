@@ -87,6 +87,19 @@ public partial class SejilRepositoryTests
         Assert.Single(queries);
     }
 
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public async Task GetEventsPageAsync_throws_when_page_arg_is_zero(int page)
+    {
+        // Arrange
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
+
+        // Act & assert
+        var ex = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => repository.GetEventsPageAsync(page, null, new LogQueryFilter()));
+        Assert.Equal($"Argument must be greater than zero. (Parameter 'page')", ex.Message);
+    }
+
     [Fact]
     public async Task GetEventsPageAsync_no_props_returns_events_page()
     {
