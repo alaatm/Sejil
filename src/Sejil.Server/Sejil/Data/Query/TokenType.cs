@@ -3,7 +3,7 @@
 
 namespace Sejil.Data.Query;
 
-internal enum TokenType
+public enum TokenType
 {
     Identifier,
     BuiltInIdentifier,

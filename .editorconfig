@@ -420,3 +420,5 @@ dotnet_naming_rule.parameters_rule.severity             = warning
 
 # CA2007: Do not directly await a Task - Not required for asp.net apps (which is what we target)
 dotnet_diagnostic.CA2007.severity = none
+# CA1720: Identifiers should not contain type names
+dotnet_diagnostic.CA1720.severity = none

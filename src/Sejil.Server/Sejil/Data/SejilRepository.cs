@@ -14,7 +14,7 @@ using Serilog.Events;
 
 namespace Sejil.Data;
 
-internal abstract class SejilRepository : ISejilRepository
+public abstract class SejilRepository : ISejilRepository
 {
     protected SejilSettings Settings { get; }
     private readonly string _createDatabaseSql;

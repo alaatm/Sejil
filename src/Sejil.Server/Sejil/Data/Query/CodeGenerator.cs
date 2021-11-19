@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sejil.Data.Query;
 
-internal abstract class CodeGenerator : Expr.IVisitor
+public abstract class CodeGenerator : Expr.IVisitor
 {
     private readonly StringBuilder _sql = new();
 

@@ -7,41 +7,82 @@ using Serilog.Events;
 
 namespace Sejil.Configuration;
 
-internal sealed class SejilSettings : ISejilSettings
+public sealed class SejilSettings : ISejilSettings
 {
-    internal SejilRepository SejilRepository { get; set; } = default!;
-    internal Type CodeGeneratorType { get; set; } = default!;
-
-    public string SejilAppHtml { get; private set; }
-    public string Url { get; private set; }
-    public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
-    public int PageSize { get; private set; }
-
-    /// <summary>
-    /// Gets or sets the title shown in the front end
-    /// </summary>
-    public string Title { get; set; } = "Sejil";
+    private int _pageSize = 100;
 
     /// <summary>
     /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
     /// </summary>
     public string? AuthenticationScheme { get; set; }
+    /// <summary>
+    /// Gets the logging level switch.
+    /// </summary>
+    public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
+    /// <summary>
+    /// Gets the Sejil front-end html.
+    /// </summary>
+    public string SejilAppHtml { get; private set; }
+    /// <summary>
+    /// Gets or sets the title shown in the front end
+    /// </summary>
+    public string Title { get; set; } = "Sejil";
+    /// <summary>
+    /// Gets the configured Sejil Url.
+    /// </summary>
+    public string Url { get; private set; }
+    /// <summary>
+    /// Gets or sets the sejil repository.
+    /// </summary>
+    /// <remarks>
+    /// This is meant to be used only by store providers.
+    /// </remarks>
+    public SejilRepository SejilRepository { get; set; } = default!;
+    /// <summary>
+    /// Gets or sets the sejil code generator clr type.
+    /// </summary>
+    /// <remarks>
+    /// This is meant to be used only by store providers.
+    /// </remarks>
+    public Type CodeGeneratorType { get; set; } = default!;
 
-    public SejilSettings(string uri, LogEventLevel minLogLevel, int pageSize = 100)
+    /// <summary>
+    /// Gets or sets the logs page size in the front-end grid, defaults to 100.
+    /// </summary>
+    public int PageSize
+    {
+        get => _pageSize;
+        set
+        {
+            if (_pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+            _pageSize = value;
+        }
+    }
+
+    public SejilSettings(string uri, LogEventLevel minLogLevel)
     {
         Url = uri.StartsWith("/", StringComparison.Ordinal)
             ? uri
             : $"/{uri}";
 
-        SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
+        SejilAppHtml = ResourceHelper.GetEmbeddedResource(typeof(SejilSettings).Assembly, "Sejil.index.html");
         LoggingLevelSwitch = new LoggingLevelSwitch
         {
             MinimumLevel = minLogLevel
         };
-
-        PageSize = pageSize;
     }
 
+    /// <summary>
+    /// Sets the minimum log level.
+    /// </summary>
+    /// <remarks>
+    /// This is not meant to be used by user-code.
+    /// </remarks>
+    /// <param name="minLogLevel">The min log level.</param>
+    /// <returns></returns>
     public bool TrySetMinimumLogLevel(string minLogLevel)
     {
         switch (minLogLevel.ToUpperInvariant())

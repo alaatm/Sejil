@@ -32,12 +32,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="index.html" />
-    <EmbeddedResource Include="db.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Sejil.Sqlite" />
-    <InternalsVisibleTo Include="Sejil.SqlServer" />
     <InternalsVisibleTo Include="Sejil.Test" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>

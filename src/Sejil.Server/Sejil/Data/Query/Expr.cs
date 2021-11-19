@@ -3,7 +3,7 @@
 
 namespace Sejil.Data.Query;
 
-internal abstract class Expr
+public abstract class Expr
 {
     public abstract void Accept(IVisitor visitor);
 
