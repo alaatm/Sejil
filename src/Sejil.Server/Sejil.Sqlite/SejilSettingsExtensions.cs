@@ -14,8 +14,6 @@ public static class SejilSettingsExtensions
 
     public static ISejilSettings UseSqlite(this ISejilSettings settings, string? name = null)
     {
-        var settingsInstance = (SejilSettings)settings;
-
         string sqliteDbPath;
 
         if (IsRunningInAzure())
@@ -32,8 +30,8 @@ public static class SejilSettingsExtensions
         var sqliteDbFile = new FileInfo(sqliteDbPath);
         sqliteDbFile.Directory!.Create();
 
-        settingsInstance.SejilRepository = new SqliteSejilRepository(settingsInstance, $"DataSource={sqliteDbPath}");
-        settingsInstance.CodeGeneratorType = typeof(SqliteCodeGenerator);
+        settings.SejilRepository = new SqliteSejilRepository(settings, $"DataSource={sqliteDbPath}");
+        settings.CodeGeneratorType = typeof(SqliteCodeGenerator);
 
         return settings;
     }

@@ -10,16 +10,24 @@ namespace Sejil.Sqlite.Data;
 
 internal sealed class SqliteSejilRepository : SejilRepository
 {
-    private readonly string _connectionString;
+    public SqliteSejilRepository(ISejilSettings settings, string connectionString)
+        : base(settings, connectionString)
+    {
+    }
 
-    public SqliteSejilRepository(SejilSettings settings, string connectionString)
-        : base(settings) => _connectionString = connectionString;
+    protected override void InitializeDatabase()
+    {
+        var initSql = ResourceHelper.GetEmbeddedResource(typeof(SqliteSejilRepository).Assembly, "Sejil.Sqlite.db.sql");
+
+        using var conn = new SqliteConnection(ConnectionString);
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = initSql;
+        cmd.ExecuteNonQuery();
+    }
 
     protected override DbConnection GetConnection()
-        => new SqliteConnection(_connectionString);
-
-    protected override string GetCreateDatabaseSqlResourceName()
-        => "Sejil.Sqlite.db.sql";
+        => new SqliteConnection(ConnectionString);
 
     protected override string GetPaginSql(int offset, int take)
         => $"LIMIT {take} OFFSET {offset}";

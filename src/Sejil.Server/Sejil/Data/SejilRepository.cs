@@ -16,29 +16,40 @@ namespace Sejil.Data;
 
 public abstract class SejilRepository : ISejilRepository
 {
-    protected SejilSettings Settings { get; }
-    private readonly string _createDatabaseSql;
+    private bool _dbInitialized;
 
-    public SejilRepository(SejilSettings settings)
+    protected ISejilSettings Settings { get; }
+    protected string ConnectionString { get; }
+
+    public SejilRepository(ISejilSettings settings, string connectionString)
     {
         Settings = settings;
-        _createDatabaseSql = ResourceHelper.GetEmbeddedResource(GetCreateDatabaseSqlResourceName());
-        InitializeDatabase();
+        ConnectionString = connectionString;
     }
 
-    protected abstract DbConnection GetConnection();
+    protected abstract void InitializeDatabase();
 
-    protected abstract string GetCreateDatabaseSqlResourceName();
+    protected abstract DbConnection GetConnection();
 
     protected abstract string GetPaginSql(int offset, int take);
 
     protected abstract string GetDateTimeOffsetSql(int value, string unit);
 
+    private DbConnection GetConnectionCore()
+    {
+        if (!_dbInitialized)
+        {
+            InitializeDatabase();
+            _dbInitialized = true;
+        }
+        return GetConnection();
+    }
+
     public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
     {
         const string Sql = "SELECT * FROM log_query";
 
-        using var conn = GetConnection();
+        using var conn = GetConnectionCore();
         await conn.OpenAsync();
         return await conn.QueryAsync<LogQuery>(Sql);
     }
@@ -47,7 +58,7 @@ public abstract class SejilRepository : ISejilRepository
     {
         const string Sql = "INSERT INTO log_query (name, query) VALUES (@name, @query)";
 
-        using var conn = GetConnection();
+        using var conn = GetConnectionCore();
         await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = Sql;
@@ -61,7 +72,7 @@ public abstract class SejilRepository : ISejilRepository
     {
         const string Sql = "DELETE FROM log_query WHERE name = @name";
 
-        using var conn = GetConnection();
+        using var conn = GetConnectionCore();
         await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = Sql;
@@ -79,7 +90,7 @@ public abstract class SejilRepository : ISejilRepository
 
         var sql = GetPagedLogEntriesSql(page, Settings.PageSize, startingTimestamp, queryFilter);
 
-        using var conn = GetConnection();
+        using var conn = GetConnectionCore();
         await conn.OpenAsync();
         var lookup = new Dictionary<string, LogEntry>();
 
@@ -103,7 +114,7 @@ public abstract class SejilRepository : ISejilRepository
 
     public async Task InsertEventsAsync(IEnumerable<LogEvent> events)
     {
-        using var conn = GetConnection();
+        using var conn = GetConnectionCore();
         await conn.OpenAsync();
         using var tran = conn.BeginTransaction();
         using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
@@ -234,15 +245,6 @@ ORDER BY l.timestamp DESC, p.name";
         }
 
         return "";
-    }
-
-    private void InitializeDatabase()
-    {
-        using var conn = GetConnection();
-        conn.Open();
-        using var cmd = conn.CreateCommand();
-        cmd.CommandText = _createDatabaseSql;
-        cmd.ExecuteNonQuery();
     }
 
     private static async Task<string> InsertLogEntryAsync(DbCommand cmd, LogEvent log)

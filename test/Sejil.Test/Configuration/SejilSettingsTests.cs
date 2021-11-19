@@ -15,7 +15,7 @@ public class SejilSettingsTests
         var settings = new SejilSettings("url", LogEventLevel.Debug);
 
         // Assert
-        Assert.Equal(ResourceHelper.GetEmbeddedResource("Sejil.index.html"), settings.SejilAppHtml);
+        Assert.Equal(ResourceHelper.GetEmbeddedResource(typeof(SejilSettings).Assembly, "Sejil.index.html"), settings.SejilAppHtml);
     }
 
     [Fact]

@@ -10,16 +10,24 @@ namespace Sejil.SqlServer.Data;
 
 internal sealed class SqlServerSejilRepository : SejilRepository
 {
-    private readonly string _connectionString;
+    public SqlServerSejilRepository(ISejilSettings settings, string connectionString)
+        : base(settings, connectionString)
+    {
+    }
 
-    public SqlServerSejilRepository(SejilSettings settings, string connectionString)
-        : base(settings) => _connectionString = connectionString;
+    protected override void InitializeDatabase()
+    {
+        var initSql = ResourceHelper.GetEmbeddedResource(typeof(SqlServerSejilRepository).Assembly, "Sejil.SqlServer.db.sql");
+
+        using var conn = new SqlConnection(ConnectionString);
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = initSql;
+        cmd.ExecuteNonQuery();
+    }
 
     protected override DbConnection GetConnection()
-        => new SqlConnection(_connectionString);
-
-    protected override string GetCreateDatabaseSqlResourceName()
-        => "Sejil.SqlServer.db.sql";
+        => new SqlConnection(ConnectionString);
 
     protected override string GetPaginSql(int offset, int take)
         => $"OFFSET {offset} ROWS FETCH NEXT {take} ROWS ONLY";

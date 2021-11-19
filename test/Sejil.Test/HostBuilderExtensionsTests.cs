@@ -1,17 +1,15 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System.Data.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sejil.Configuration;
 using Sejil.Data;
-using Sejil.Data.Query;
 using Sejil.Routing;
+using Sejil.Test.Data;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -152,54 +150,4 @@ public class HostBuilderExtensionsTests
 
         public void Emit(LogEvent logEvent) => Writes.Add(logEvent);
     }
-}
-
-static class SetjilSettingsExtensions
-{
-    public static void UseMockStore(this ISejilSettings settings)
-    {
-        var settingsInstance = (SejilSettings)settings;
-
-        settingsInstance.SejilRepository = new TestRepository(settingsInstance);
-        settingsInstance.CodeGeneratorType = typeof(TestCodeGenerator);
-    }
-
-    class TestSink : ILogEventSink
-    {
-        public List<LogEvent> Writes { get; set; } = new List<LogEvent>();
-
-        public void Emit(LogEvent logEvent) => Writes.Add(logEvent);
-    }
-
-    class TestCodeGenerator : CodeGenerator
-    {
-        protected override string NumericCastSql => throw new NotImplementedException();
-
-        protected override string PropertyFilterNegateSql => throw new NotImplementedException();
-
-        protected override string PropertyFilterSql => throw new NotImplementedException();
-    }
-    class TestRepository : SejilRepository
-    {
-        private readonly string _dbName = Guid.NewGuid().ToString();
-
-        public TestRepository(SejilSettings settings) : base(settings)
-        {
-        }
-
-        protected override DbConnection GetConnection() => new SqliteConnection($"DataSource={_dbName};Mode=Memory;Cache=Shared");
-        protected override string GetCreateDatabaseSqlResourceName() => "Sejil.db.sql";
-        protected override string GetDateTimeOffsetSql(int value, string unit) => throw new NotImplementedException();
-        protected override string GetPaginSql(int offset, int take) => throw new NotImplementedException();
-    }
-    //class TestSqlProvider : SejilSqlProvider
-    //{
-    //    public TestSqlProvider(SejilSettings settings) : base(settings)
-    //    {
-    //    }
-
-    //    protected override string GetCreateDatabaseSqlResourceName() => throw new NotImplementedException();
-    //    protected override string GetDateTimeOffsetSql(int value, string unit) => throw new NotImplementedException();
-    //    protected override string GetPaginSql(int offset, int take) => throw new NotImplementedException();
-    //}
 }
