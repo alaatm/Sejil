@@ -8,7 +8,7 @@ namespace Sejil.Data.Query.Internal;
 
 internal static class QueryEngine
 {
-    public static string Translate(string filter)
+    public static string Translate(string filter, ICodeGenerator codeGenerator)
     {
         // If enclosed in quotes then treat as a search string
         if (filter[0] == '"' && filter[^1] == '"')
@@ -29,6 +29,6 @@ internal static class QueryEngine
         var scanner = new Scanner(filter);
         var tokens = scanner.Scan();
 
-        return new CodeGenerator().Generate(new Parser(tokens).Parse());
+        return codeGenerator.Generate(new Parser(tokens).Parse());
     }
 }

@@ -280,6 +280,7 @@ public class ApplicationBuilderExtensionsTests
         var builder = new WebHostBuilder()
             .Configure(app =>
             {
+#if NETCOREAPP3_1
                 // Workaround for https://github.com/dotnet/aspnetcore/issues/18463
                 // so that ContentLength gets properly set for the test server.
                 app.Use(async (context, next) =>
@@ -291,7 +292,7 @@ public class ApplicationBuilderExtensionsTests
                     context.Request.Body.Seek(0, SeekOrigin.Begin);
                     await next.Invoke();
                 });
-
+#endif
                 app.UseSejil();
             })
             .ConfigureServices(services =>
@@ -322,6 +323,7 @@ public class ApplicationBuilderExtensionsTests
                 {
                     services.AddAuthentication(TestAuthDefaults.AuthenticationScheme).AddAlwaysNotAuthenticated();
                 }
+
                 services.AddRouting();
 
                 var settings = new SejilSettings(url, LogEventLevel.Debug)
@@ -331,9 +333,8 @@ public class ApplicationBuilderExtensionsTests
 
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<ISejilSettings>(settings);
-                services.AddScoped<ISejilRepository, SejilRepository>();
-                services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                 services.AddScoped<ISejilController, SejilController>();
+                services.AddSingleton(Mock.Of<ISejilRepository>());
             });
 
         return new TestServer(builder);

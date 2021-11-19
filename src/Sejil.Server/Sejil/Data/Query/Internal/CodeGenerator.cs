@@ -6,12 +6,16 @@ using System.Text;
 
 namespace Sejil.Data.Query.Internal;
 
-internal sealed class CodeGenerator : Expr.IVisitor
+internal abstract class CodeGenerator : Expr.IVisitor, ICodeGenerator
 {
     private readonly StringBuilder _sql = new();
 
     private string _template = string.Empty;
     private bool _insidePropBlock;
+
+    protected abstract string NumericCastSql { get; }
+    protected abstract string PropertyFilterNegateSql { get; }
+    protected abstract string PropertyFilterSql { get; }
 
     public string Generate(Expr expr)
     {
@@ -82,14 +86,20 @@ internal sealed class CodeGenerator : Expr.IVisitor
     {
         var valueCol = ((Expr.Literal)expr.Right).Value switch
         {
-            decimal => "CAST(value AS NUMERIC)",
+            decimal => NumericCastSql,
             _ => "value",
         };
 
-        _template = expr.HasAllProperty()
-            ? expr.Operator.IsExluding()
-                ? $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) = 0"
-                : $"SUM(name = '|PNAME|' AND {valueCol} |OP| |PVAL|) > 0"
-            : "|PNAME| |OP| |PVAL|";
+        if (expr.HasAllProperty())
+        {
+            _template = expr.Operator.IsExluding()
+                ? PropertyFilterNegateSql
+                : PropertyFilterSql;
+            _template = _template.Replace("|VALCOL|", valueCol, StringComparison.Ordinal);
+        }
+        else
+        {
+            _template = "|PNAME| |OP| |PVAL|";
+        }
     }
 }

@@ -8,9 +8,8 @@ namespace Sejil.Configuration.Internal;
 public interface ISejilSettings
 {
     string SejilAppHtml { get; }
-    Uri Url { get; }
+    string Url { get; }
     LoggingLevelSwitch LoggingLevelSwitch { get; }
-    string SqliteDbPath { get; }
     int PageSize { get; }
     bool TrySetMinimumLogLevel(string minLogLevel);
 

@@ -8,13 +8,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sejil.Configuration.Internal;
 using Sejil.Data.Internal;
-using Sejil.Logging;
+using Sejil.Logging.Sinks;
 using Sejil.Routing.Internal;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace Microsoft.AspNetCore.Hosting;
+namespace Sejil;
 
 public static partial class IHostBuilderExtensions
 {
@@ -40,6 +40,10 @@ public static partial class IHostBuilderExtensions
     ///     });
     /// </code>
     /// </param>
+    /// <param name="setupAction">
+    /// Provide additional configuration for Sejil. You can specify the logs' store via a call to either
+    /// <code>UseSqlite(string)</code> or <code>UseSqlServer(string)</code>.
+    /// </param>
     /// <returns>The host builder.</returns>
     public static IHostBuilder UseSejil(
         this IHostBuilder builder,
@@ -63,8 +67,14 @@ public static partial class IHostBuilderExtensions
         Action<LoggerSinkConfiguration>? sinks = null,
         Action<ISejilSettings>? setupAction = null)
     {
-        var settings = new SejilSettings(uri, MapSerilogLogLevel(minLogLevel));
+        var settings = new SejilSettings(uri.OriginalString, MapSerilogLogLevel(minLogLevel));
         setupAction?.Invoke(settings);
+
+        if (settings.SejilRepository is null ||
+            settings.CodeGeneratorType is null)
+        {
+            throw new InvalidOperationException("You must set the log store via a call to UseSqlite(string) or UseSqlServer(string).");
+        }
 
         return builder
             .UseSerilog((context, cfg) =>
@@ -73,16 +83,15 @@ public static partial class IHostBuilderExtensions
                     .Enrich.FromLogContext()
                     .ReadFrom.Configuration(context.Configuration)
                     .MinimumLevel.ControlledBy(settings.LoggingLevelSwitch)
-                    .WriteTo.Sejil(settings);
+                    .WriteTo.Sink(new SejilSink(settings.SejilRepository));
                 sinks?.Invoke(cfg.WriteTo);
             }, writeToProviders: writeToProviders)
             .ConfigureServices((_, services) =>
             {
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<ISejilSettings>(settings);
-                services.AddScoped<ISejilRepository, SejilRepository>();
-                services.AddScoped<ISejilSqlProvider, SejilSqlProvider>();
                 services.AddScoped<ISejilController, SejilController>();
+                services.AddSingleton<ISejilRepository>(settings.SejilRepository);
             });
     }
 

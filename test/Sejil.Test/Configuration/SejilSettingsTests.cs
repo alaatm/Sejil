@@ -25,7 +25,7 @@ public class SejilSettingsTests
         var settings = new SejilSettings("url", LogEventLevel.Debug);
 
         // Assert
-        Assert.Equal("/url", settings.Url.OriginalString);
+        Assert.Equal("/url", settings.Url);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class SejilSettingsTests
         var settings = new SejilSettings("/url", LogEventLevel.Debug);
 
         // Assert
-        Assert.Equal("/url", settings.Url.OriginalString);
+        Assert.Equal("/url", settings.Url);
     }
 
     [Fact]
@@ -49,15 +49,15 @@ public class SejilSettingsTests
         Assert.Equal(initalLogLevel, settings.LoggingLevelSwitch.MinimumLevel);
     }
 
-    [Fact]
-    public void Ctor_sets_default_db_name()
-    {
-        // Arrange & act
-        var settings = new SejilSettings("", LogEventLevel.Debug);
+    //[Fact]
+    //public void Ctor_sets_default_db_name()
+    //{
+    //    // Arrange & act
+    //    var settings = new SejilSettings("", LogEventLevel.Debug);
 
-        // Assert
-        Assert.Matches(@"^Sejil-[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}\.sqlite$", Path.GetFileName(settings.SqliteDbPath));
-    }
+    //    // Assert
+    //    Assert.Matches(@"^Sejil-[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}\.sqlite$", Path.GetFileName(settings.SqliteDbPath));
+    //}
 
     [Fact]
     public void Ctor_sets_default_settings()

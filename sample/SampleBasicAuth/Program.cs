@@ -5,6 +5,7 @@ using System;
 using Bazinga.AspNetCore.Authentication.Basic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Sejil;
 
 namespace Sample
 {

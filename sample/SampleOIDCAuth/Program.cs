@@ -5,6 +5,7 @@ using System;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Sejil;
 
 namespace Sample
 {

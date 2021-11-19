@@ -5,7 +5,7 @@ using Sejil.Models.Internal;
 
 namespace Sejil.Routing.Internal;
 
-public interface ISejilController
+internal interface ISejilController
 {
     Task GetIndexAsync();
     Task GetEventsAsync(int page, DateTime? startingTs, LogQueryFilter queryFilter);

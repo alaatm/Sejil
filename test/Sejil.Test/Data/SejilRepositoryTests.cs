@@ -1,24 +1,19 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.Data.Sqlite;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
 using Sejil.Models.Internal;
+using Serilog.Events;
+using Serilog.Parsing;
 
 namespace Sejil.Test.Data;
 
-public class SejilRepositoryTests
+public partial class SejilRepositoryTests
 {
     [Fact]
     public async Task SaveQueryAsync_saves_query()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        InitializeDatabse(db);
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
 
         var logQuery = new LogQuery
         {
@@ -43,11 +38,7 @@ public class SejilRepositoryTests
     public async Task GetSavedQueriesAsync_returns_saved_queries()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        InitializeDatabse(db);
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
         await repository.SaveQueryAsync(new LogQuery { Name = "Test1", Query = "q1" });
         await repository.SaveQueryAsync(new LogQuery { Name = "Test2", Query = "q2" });
 
@@ -68,11 +59,7 @@ public class SejilRepositoryTests
     public async Task DeleteQueryAsync_deletes_specified_query()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        InitializeDatabse(db);
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
         await repository.SaveQueryAsync(new LogQuery { Name = "Test1", Query = "q1" });
 
         // Act
@@ -88,11 +75,7 @@ public class SejilRepositoryTests
     public async Task DeleteQueryAsync_returns_false_when_specified_query_does_not_exist()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        InitializeDatabse(db);
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
         await repository.SaveQueryAsync(new LogQuery { Name = "Test1", Query = "q1" });
 
         // Act
@@ -108,24 +91,15 @@ public class SejilRepositoryTests
     public async Task GetEventsPageAsync_no_props_returns_events_page()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        settingsMoq.SetupGet(p => p.PageSize).Returns(3);
-        InitializeDatabse(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
-
-        using (var conn = new SqliteConnection($"DataSource={db}"))
+        var events = new List<LogEvent>();
+        for (var i = 0; i < 10; i++)
         {
-            conn.Open();
-            for (var i = 0; i < 10; i++)
-            {
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = $@"INSERT INTO log (id, message, messageTemplate, level, timestamp) 
-                        VALUES ('{Guid.NewGuid()}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))";
-                cmd.ExecuteNonQuery();
-            }
+            var msgTemplate = new MessageTemplate(new[] { new TextToken($"{i}", 0) });
+            events.Add(new LogEvent(DateTime.UtcNow.AddHours(i), LogEventLevel.Information, null, msgTemplate, Enumerable.Empty<LogEventProperty>()));
         }
+
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings(3));
+        await repository.InsertEventsAsync(events);
 
         // Act
         var logs = await repository.GetEventsPageAsync(2, null, new LogQueryFilter());
@@ -144,50 +118,30 @@ public class SejilRepositoryTests
     public async Task GetEventsPageAsync_returns_events_page()
     {
         // Arrange
-        var db = Guid.NewGuid().ToString();
-        var settingsMoq = new Mock<ISejilSettings>();
-        settingsMoq.SetupGet(p => p.SqliteDbPath).Returns(db);
-        settingsMoq.SetupGet(p => p.PageSize).Returns(3);
-        InitializeDatabse(db);
-        var repository = new SejilRepository(new SejilSqlProvider(settingsMoq.Object), settingsMoq.Object);
-
-        using (var conn = new SqliteConnection($"DataSource={db}"))
+        var events = new List<LogEvent>();
+        for (var i = 0; i < 10; i++)
         {
-            conn.Open();
-            for (var i = 0; i < 10; i++)
+            var msgTemplate = new MessageTemplate(new[] { new PropertyToken("p1", "{p1}"), new PropertyToken("p2", "{p2}"), });
+            var properties = new List<LogEventProperty>
             {
-                var id = Guid.NewGuid().ToString();
-                var cmd = new SqliteCommand($@"INSERT INTO log (id, message, messageTemplate, level, timestamp) 
-                        VALUES ('{id}', '{i}', '{i}', 'info', datetime(CURRENT_TIMESTAMP,'+{i} Hour'))", conn);
-                cmd.ExecuteNonQuery();
-
-                for (var j = 0; j < 2; j++)
-                {
-                    cmd.CommandText = $@"INSERT INTO log_property (logId, name, value) VALUES 
-                            ('{id}', 'n', '{i}_{j}')";
-                    cmd.ExecuteNonQuery();
-                }
-            }
+                new LogEventProperty("p1", new ScalarValue($"{i}_0")),
+                new LogEventProperty("p2", new ScalarValue($"{i}_1")),
+            };
+            events.Add(new LogEvent(DateTime.UtcNow.AddHours(i), LogEventLevel.Information, null, msgTemplate, properties));
         }
+
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings(3));
+        await repository.InsertEventsAsync(events);
 
         // Act
         var logs = await repository.GetEventsPageAsync(4, null, new LogQueryFilter());
 
         // Assert
-        Assert.Single(logs);
-        Assert.Equal("0", logs.ElementAt(0).Message);
-        Assert.NotNull(logs.ElementAt(0).Properties);
-        Assert.Equal(2, logs.ElementAt(0).Properties.Count);
-        Assert.Equal("0_0", logs.ElementAt(0).Properties.ElementAt(0).Value);
-        Assert.Equal("0_1", logs.ElementAt(0).Properties.ElementAt(1).Value);
-    }
-
-    private static void InitializeDatabse(string path)
-    {
-        using var conn = new SqliteConnection($"DataSource={path}");
-        conn.Open();
-        var sql = ResourceHelper.GetEmbeddedResource("Sejil.db.sql");
-        var cmd = new SqliteCommand(sql, conn);
-        cmd.ExecuteNonQuery();
+        var log = Assert.Single(logs);
+        Assert.Equal("\"0_0\"\"0_1\"", log.Message);
+        Assert.NotNull(log.Properties);
+        Assert.Equal(2, log.Properties.Count);
+        Assert.Equal("0_0", log.Properties[0].Value);
+        Assert.Equal("0_1", log.Properties[1].Value);
     }
 }
