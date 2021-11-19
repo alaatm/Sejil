@@ -13,7 +13,11 @@ namespace Sample
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSejil(setupAction: cfg => cfg.Title = "Logs")
+                .UseSejil(setupAction: cfg =>
+                {
+                    cfg.Title = "Logs";
+                    cfg.UseSqlite();
+                })
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }

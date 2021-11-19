@@ -19,7 +19,11 @@ namespace Sample
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSejil(setupAction: cfg => cfg.AuthenticationScheme = BasicAuthenticationDefaults.AuthenticationScheme)
+                .UseSejil(setupAction: cfg =>
+                {
+                    cfg.AuthenticationScheme = BasicAuthenticationDefaults.AuthenticationScheme;
+                    cfg.UseSqlite();
+                })
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
     }
 }

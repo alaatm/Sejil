@@ -8,7 +8,11 @@ builder.Services.AddRazorPages();
 builder.Host.UseSejil(
     minLogLevel: LogLevel.Information,
     writeToProviders: true,
-    setupAction: cfg => cfg.Title = "My App Logs");
+    setupAction: cfg =>
+    {
+        cfg.Title = "My App Logs";
+        cfg.UseSqlite();
+    });
 //////////////////
 
 var app = builder.Build();
