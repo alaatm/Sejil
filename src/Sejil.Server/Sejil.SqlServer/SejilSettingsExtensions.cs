@@ -1,8 +1,8 @@
 using System.Data;
 using Dapper;
-using Sejil.Configuration.Internal;
-using Sejil.SqlServer.Data.Internal;
-using Sejil.SqlServer.Data.Query.Internal;
+using Sejil.Configuration;
+using Sejil.SqlServer.Data;
+using Sejil.SqlServer.Data.Query;
 
 namespace Sejil;
 

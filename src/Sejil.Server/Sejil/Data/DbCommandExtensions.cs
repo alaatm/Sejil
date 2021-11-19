@@ -1,7 +1,7 @@
 using System.Data;
 using System.Data.Common;
 
-namespace Sejil.Data.Internal;
+namespace Sejil.Data;
 
 internal static class DbCommandExtensions
 {

@@ -1,6 +1,6 @@
-using Sejil.Data.Query.Internal;
+using Sejil.Data.Query;
 
-namespace Sejil.SqlServer.Data.Query.Internal;
+namespace Sejil.SqlServer.Data.Query;
 
 internal sealed class SqlServerCodeGenerator : CodeGenerator
 {

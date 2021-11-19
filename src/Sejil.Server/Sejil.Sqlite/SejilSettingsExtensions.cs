@@ -1,7 +1,7 @@
 using System.Reflection;
-using Sejil.Configuration.Internal;
-using Sejil.Sqlite.Data.Internal;
-using Sejil.Sqlite.Data.Query.Internal;
+using Sejil.Configuration;
+using Sejil.Sqlite.Data;
+using Sejil.Sqlite.Data.Query;
 
 namespace Sejil;
 

@@ -14,10 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
-using Sejil.Models.Internal;
-using Sejil.Routing.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
+using Sejil.Models;
+using Sejil.Routing;
 using Serilog.Events;
 
 namespace Sejil.Test;

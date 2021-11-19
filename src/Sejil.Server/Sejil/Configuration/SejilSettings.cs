@@ -1,11 +1,11 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using Sejil.Data.Internal;
+using Sejil.Data;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Sejil.Configuration.Internal;
+namespace Sejil.Configuration;
 
 internal sealed class SejilSettings : ISejilSettings
 {

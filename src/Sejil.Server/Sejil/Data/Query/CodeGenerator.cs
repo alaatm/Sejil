@@ -4,9 +4,9 @@
 using System.Globalization;
 using System.Text;
 
-namespace Sejil.Data.Query.Internal;
+namespace Sejil.Data.Query;
 
-internal abstract class CodeGenerator : Expr.IVisitor, ICodeGenerator
+internal abstract class CodeGenerator : Expr.IVisitor
 {
     private readonly StringBuilder _sql = new();
 

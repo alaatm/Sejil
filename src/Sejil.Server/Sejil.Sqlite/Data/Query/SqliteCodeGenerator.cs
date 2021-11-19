@@ -1,6 +1,6 @@
-using Sejil.Data.Query.Internal;
+using Sejil.Data.Query;
 
-namespace Sejil.Sqlite.Data.Query.Internal;
+namespace Sejil.Sqlite.Data.Query;
 
 internal sealed class SqliteCodeGenerator : CodeGenerator
 {

@@ -4,12 +4,12 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
-using Sejil.Data.Query.Internal;
-using Sejil.Models.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
+using Sejil.Data.Query;
+using Sejil.Models;
 
-namespace Sejil.Routing.Internal;
+namespace Sejil.Routing;
 
 internal sealed class SejilController : ISejilController
 {

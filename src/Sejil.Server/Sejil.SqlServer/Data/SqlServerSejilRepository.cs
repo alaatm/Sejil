@@ -1,9 +1,9 @@
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
 
-namespace Sejil.SqlServer.Data.Internal;
+namespace Sejil.SqlServer.Data;
 
 internal sealed class SqlServerSejilRepository : SejilRepository
 {

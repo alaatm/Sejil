@@ -8,10 +8,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
-using Sejil.Data.Query.Internal;
-using Sejil.Routing.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
+using Sejil.Data.Query;
+using Sejil.Routing;
 using Serilog.Core;
 using Serilog.Events;
 

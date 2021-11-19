@@ -4,7 +4,7 @@
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Sejil.Data.Query.Internal;
+namespace Sejil.Data.Query;
 
 internal sealed class Scanner
 {

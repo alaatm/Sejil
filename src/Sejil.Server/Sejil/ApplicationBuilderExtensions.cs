@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Sejil.Configuration.Internal;
-using Sejil.Models.Internal;
-using Sejil.Routing.Internal;
+using Sejil.Configuration;
+using Sejil.Models;
+using Sejil.Routing;
 using Serilog.Context;
 
 namespace Sejil;

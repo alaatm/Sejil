@@ -7,12 +7,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Dapper;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Query.Internal;
-using Sejil.Models.Internal;
+using Sejil.Configuration;
+using Sejil.Data.Query;
+using Sejil.Models;
 using Serilog.Events;
 
-namespace Sejil.Data.Internal;
+namespace Sejil.Data;
 
 internal abstract class SejilRepository : ISejilRepository
 {

@@ -3,7 +3,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace Sejil.Models.Internal;
+namespace Sejil.Models;
 
 public sealed class LogEntry
 {

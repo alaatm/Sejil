@@ -1,9 +1,9 @@
 using System.Data.Common;
 using Microsoft.Data.Sqlite;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
 
-namespace Sejil.Sqlite.Data.Internal;
+namespace Sejil.Sqlite.Data;
 
 internal sealed class SqliteSejilRepository : SejilRepository
 {

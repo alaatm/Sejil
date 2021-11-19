@@ -4,11 +4,11 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using Sejil.Configuration.Internal;
-using Sejil.Data.Internal;
-using Sejil.Data.Query.Internal;
-using Sejil.Models.Internal;
-using Sejil.Routing.Internal;
+using Sejil.Configuration;
+using Sejil.Data;
+using Sejil.Data.Query;
+using Sejil.Models;
+using Sejil.Routing;
 using Serilog.Core;
 using Serilog.Events;
 

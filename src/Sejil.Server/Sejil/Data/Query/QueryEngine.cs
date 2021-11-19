@@ -4,11 +4,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Sejil.Data.Query.Internal;
+namespace Sejil.Data.Query;
 
 internal static class QueryEngine
 {
-    public static string Translate(string filter, ICodeGenerator codeGenerator)
+    public static string Translate(string filter, CodeGenerator codeGenerator)
     {
         // If enclosed in quotes then treat as a search string
         if (filter[0] == '"' && filter[^1] == '"')

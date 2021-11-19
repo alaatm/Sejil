@@ -1,7 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-namespace Sejil.Models.Internal;
+namespace Sejil.Models;
 
 public sealed class LogQueryFilter
 {

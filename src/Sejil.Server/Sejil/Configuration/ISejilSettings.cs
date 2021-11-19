@@ -3,7 +3,7 @@
 
 using Serilog.Core;
 
-namespace Sejil.Configuration.Internal;
+namespace Sejil.Configuration;
 
 public interface ISejilSettings
 {
