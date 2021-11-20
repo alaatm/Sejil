@@ -157,4 +157,105 @@ public partial class SejilRepositoryTests
         Assert.Equal("0_0", log.Properties[0].Value);
         Assert.Equal("0_1", log.Properties[1].Value);
     }
+
+    [Fact]
+    public async Task InsertEventsAsync_inserts_events_to_database()
+    {
+        // Arrange
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
+
+        // Hello, {name}. Your # is {number}
+        var tokens = new List<MessageTemplateToken>
+        {
+            new TextToken("Hello, ", 0),
+            new PropertyToken("name", "{name}"),
+            new TextToken(". Your # is ", 13),
+            new PropertyToken("number", "{number}"),
+        };
+
+        var properties = new List<LogEventProperty>
+        {
+            new LogEventProperty("name", new ScalarValue("world")),
+            new LogEventProperty("number", new ScalarValue(null))
+        };
+
+        var messageTemplate = new MessageTemplate(tokens);
+
+        var timestamp1 = new DateTime(2017, 8, 3, 11, 44, 15, 542, DateTimeKind.Local);
+        var timestamp2 = new DateTime(2017, 9, 3, 11, 44, 15, 542, DateTimeKind.Local);
+
+        var events = new List<LogEvent>
+        {
+            new LogEvent(timestamp1, LogEventLevel.Information, null, messageTemplate, properties),
+            new LogEvent(timestamp2, LogEventLevel.Debug, new Exception("error"), messageTemplate, properties),
+        };
+
+        // Act
+        await repository.InsertEventsAsync(events);
+
+        // Assert
+        var logEvents = await repository.GetEventsPageAsync(1, null, new LogQueryFilter());
+        Assert.Equal(2, logEvents.Count());
+
+        var logEvent1 = logEvents.FirstOrDefault(p => p.Level == "Information");
+        Assert.Equal("Hello, \"world\". Your # is null", logEvent1.Message);
+        Assert.Equal("Hello, {name}. Your # is {number}", logEvent1.MessageTemplate);
+        Assert.Equal("Information", logEvent1.Level);
+        Assert.Equal(timestamp1, logEvent1.Timestamp);
+        Assert.Null(logEvent1.Exception);
+        Assert.Equal(2, logEvent1.Properties.Count);
+        Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(0).LogId);
+        Assert.Equal("name", logEvent1.Properties.ElementAt(0).Name);
+        Assert.Equal("world", logEvent1.Properties.ElementAt(0).Value);
+        Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(1).LogId);
+        Assert.Equal("number", logEvent1.Properties.ElementAt(1).Name);
+        Assert.Equal("null", logEvent1.Properties.ElementAt(1).Value);
+
+        var logEvent2 = logEvents.FirstOrDefault(p => p.Level == "Debug");
+        Assert.Equal("Hello, \"world\". Your # is null", logEvent2.Message);
+        Assert.Equal("Hello, {name}. Your # is {number}", logEvent2.MessageTemplate);
+        Assert.Equal("Debug", logEvent2.Level);
+        Assert.Equal(timestamp2, logEvent2.Timestamp);
+        Assert.Equal("System.Exception: error", logEvent2.Exception);
+        Assert.Equal(2, logEvent2.Properties.Count);
+        Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(0).LogId);
+        Assert.Equal("name", logEvent2.Properties.ElementAt(0).Name);
+        Assert.Equal("world", logEvent2.Properties.ElementAt(0).Value);
+        Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(1).LogId);
+        Assert.Equal("number", logEvent2.Properties.ElementAt(1).Name);
+        Assert.Equal("null", logEvent2.Properties.ElementAt(1).Value);
+    }
+
+    [Theory]
+    [InlineData("RequestPath")]
+    [InlineData("Path")]
+    public async Task InsertEventsAsync_ignores_events_with_sejil_url_in_RequestPath_or_Path_properties(string propertyName)
+    {
+        // Arrange
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
+
+        var tokens = new List<MessageTemplateToken>
+        {
+            new PropertyToken(propertyName, "{" + propertyName + "}"),
+        };
+
+        var properties = new List<LogEventProperty>
+        {
+            new LogEventProperty(propertyName, new ScalarValue("/sejil/events")),
+        };
+
+        var messageTemplate = new MessageTemplate(tokens);
+
+        var events = new List<LogEvent>
+        {
+            new LogEvent(DateTime.Now, LogEventLevel.Information, null, messageTemplate, properties),
+        };
+
+        // Act
+        await repository.InsertEventsAsync(events);
+
+        // Assert
+        var logEvents = await repository.GetEventsPageAsync(1, null, new LogQueryFilter());
+        Assert.Empty(logEvents);
+    }
 }

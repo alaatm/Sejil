@@ -11,9 +11,9 @@ internal class SejilSink : PeriodicBatchingSink
 {
     private const int DefaultBatchSizeLimit = 50;
     private static readonly TimeSpan _defaultBatchEmitPeriod = TimeSpan.FromSeconds(5);
-    private readonly SejilRepository _repository;
+    private readonly ISejilRepository _repository;
 
-    public SejilSink(SejilRepository repository) : base(DefaultBatchSizeLimit, _defaultBatchEmitPeriod)
+    public SejilSink(ISejilRepository repository) : base(DefaultBatchSizeLimit, _defaultBatchEmitPeriod)
         => _repository = repository;
 
     protected override async Task EmitBatchAsync(IEnumerable<LogEvent> events)

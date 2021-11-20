@@ -23,8 +23,8 @@ public abstract class SejilRepository : ISejilRepository
 
     public SejilRepository(ISejilSettings settings, string connectionString)
     {
-        Settings = settings;
-        ConnectionString = connectionString;
+        Settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
     }
 
     protected abstract void InitializeDatabase();
@@ -255,7 +255,7 @@ ORDER BY l.timestamp DESC, p.name";
         cmd.Parameters["@message"].Value = log.MessageTemplate.Render(log.Properties);
         cmd.Parameters["@messageTemplate"].Value = log.MessageTemplate.Text;
         cmd.Parameters["@level"].Value = log.Level.ToString();
-        cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime().DateTime;
+        cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
         cmd.Parameters["@exception"].Value = log.Exception?.Demystify().ToString() ?? (object)DBNull.Value;
 
         await cmd.ExecuteNonQueryAsync();

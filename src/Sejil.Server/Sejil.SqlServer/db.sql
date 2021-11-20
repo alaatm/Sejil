@@ -7,7 +7,7 @@ IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='log' and xtype='U')
 		[message]         NVARCHAR(MAX)    NOT NULL,
 		[messageTemplate] NVARCHAR(MAX)    NOT NULL,
 		[level]           VARCHAR(64)      NOT NULL,
-		[timestamp]       DATETIME         NOT NULL,
+		[timestamp]       DATETIMEOFFSET   NOT NULL,
 		[exception]       NVARCHAR(MAX)    NULL,
 
 		INDEX IX_log_level_idx NONCLUSTERED ([level]),
