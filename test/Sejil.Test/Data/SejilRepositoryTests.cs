@@ -201,7 +201,7 @@ public partial class SejilRepositoryTests
         Assert.Equal("Hello, \"world\". Your # is null", logEvent1.Message);
         Assert.Equal("Hello, {name}. Your # is {number}", logEvent1.MessageTemplate);
         Assert.Equal("Information", logEvent1.Level);
-        Assert.Equal(timestamp1, logEvent1.Timestamp);
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(timestamp1), logEvent1.Timestamp);
         Assert.Null(logEvent1.Exception);
         Assert.Equal(2, logEvent1.Properties.Count);
         Assert.Equal(logEvent1.Id, logEvent1.Properties.ElementAt(0).LogId);
@@ -215,7 +215,7 @@ public partial class SejilRepositoryTests
         Assert.Equal("Hello, \"world\". Your # is null", logEvent2.Message);
         Assert.Equal("Hello, {name}. Your # is {number}", logEvent2.MessageTemplate);
         Assert.Equal("Debug", logEvent2.Level);
-        Assert.Equal(timestamp2, logEvent2.Timestamp);
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(timestamp2), logEvent2.Timestamp);
         Assert.Equal("System.Exception: error", logEvent2.Exception);
         Assert.Equal(2, logEvent2.Properties.Count);
         Assert.Equal(logEvent2.Id, logEvent2.Properties.ElementAt(0).LogId);

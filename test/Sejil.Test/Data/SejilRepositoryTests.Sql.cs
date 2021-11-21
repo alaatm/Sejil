@@ -233,7 +233,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
         var sql = repository.GetPagedLogEntriesSql(2, 100, null, new LogQueryFilter { DateRangeFilter = new List<DateTime> { d1, d2 } });
 
         // Assert
-        Assert.Equal("timestamp >= '2017-08-01' and timestamp < '2017-08-10'", GetInnerPredicate_ts(sql));
+        Assert.Equal("timestamp >= '2017-08-01 00:00:00.000' and timestamp < '2017-08-10 00:00:00.000'", GetInnerPredicate_ts(sql));
     }
 
     public static IEnumerable<object[]> GetPagedLogEntriesSql_TestData()

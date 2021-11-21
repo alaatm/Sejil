@@ -241,7 +241,7 @@ ORDER BY l.timestamp DESC, p.name";
         }
         else if (queryFilter.DateRangeFilter != null)
         {
-            return $"timestamp >= '{queryFilter.DateRangeFilter[0]:yyyy-MM-dd}' and timestamp < '{queryFilter.DateRangeFilter[1]:yyyy-MM-dd}'";
+            return $"timestamp >= '{queryFilter.DateRangeFilter[0]:yyyy-MM-dd HH:mm:ss.fff}' and timestamp < '{queryFilter.DateRangeFilter[1]:yyyy-MM-dd HH:mm:ss.fff}'";
         }
 
         return "";
@@ -255,7 +255,7 @@ ORDER BY l.timestamp DESC, p.name";
         cmd.Parameters["@message"].Value = log.MessageTemplate.Render(log.Properties);
         cmd.Parameters["@messageTemplate"].Value = log.MessageTemplate.Text;
         cmd.Parameters["@level"].Value = log.Level.ToString();
-        cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime();
+        cmd.Parameters["@timestamp"].Value = log.Timestamp.ToUniversalTime().DateTime;
         cmd.Parameters["@exception"].Value = log.Exception?.Demystify().ToString() ?? (object)DBNull.Value;
 
         await cmd.ExecuteNonQueryAsync();
