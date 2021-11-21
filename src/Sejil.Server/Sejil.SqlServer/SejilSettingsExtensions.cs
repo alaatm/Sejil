@@ -15,8 +15,8 @@ public static class SejilSettingsExtensions
     {
         _ = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
-        settings.SejilRepository = new SqlServerSejilRepository(settings, connectionString);
         settings.CodeGeneratorType = typeof(SqlServerCodeGenerator);
+        settings.SejilRepository = new SqlServerSejilRepository(settings, connectionString);
 
         SqlMapper.AddTypeHandler(new GuidStringHandler());
         SqlMapper.AddTypeHandler(new StringGuidHandler());

@@ -16,6 +16,7 @@ namespace Sejil.Data;
 
 public abstract class SejilRepository : ISejilRepository
 {
+    private readonly CodeGenerator _codeGenerator;
     private bool _dbInitialized;
 
     protected ISejilSettings Settings { get; }
@@ -25,6 +26,7 @@ public abstract class SejilRepository : ISejilRepository
     {
         Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+        _codeGenerator = (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!;
     }
 
     protected abstract void InitializeDatabase();
@@ -189,8 +191,8 @@ ORDER BY l.timestamp DESC, p.name";
             string.IsNullOrWhiteSpace(queryFilter.QueryText)
                 ? ""
                 : timestampWhereClause.Length > 0
-                    ? $"AND ({QueryEngine.Translate(queryFilter.QueryText, (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!)})"
-                    : $"WHERE ({QueryEngine.Translate(queryFilter.QueryText, (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!)})";
+                    ? $"AND ({QueryEngine.Translate(queryFilter.QueryText, _codeGenerator)})"
+                    : $"WHERE ({QueryEngine.Translate(queryFilter.QueryText, _codeGenerator)})";
 
         string FiltersWhereClause() =>
             string.IsNullOrWhiteSpace(queryFilter.LevelFilter) && (!queryFilter.ExceptionsOnly)

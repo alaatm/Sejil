@@ -30,8 +30,8 @@ public static class SejilSettingsExtensions
         var sqliteDbFile = new FileInfo(sqliteDbPath);
         sqliteDbFile.Directory!.Create();
 
-        settings.SejilRepository = new SqliteSejilRepository(settings, $"DataSource={sqliteDbPath}");
         settings.CodeGeneratorType = typeof(SqliteCodeGenerator);
+        settings.SejilRepository = new SqliteSejilRepository(settings, $"DataSource={sqliteDbPath}");
 
         return settings;
     }

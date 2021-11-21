@@ -11,8 +11,8 @@ public static class Mocks
 {
     public static void UseMockStore(this ISejilSettings settings)
     {
-        settings.SejilRepository = new SejilRepositoryMoq(settings);
         settings.CodeGeneratorType = typeof(CodeGeneratorMoq);
+        settings.SejilRepository = new SejilRepositoryMoq(settings);
     }
 
     public static ISejilSettings GetTestSettings(int pageSize = 100) => new SejilSettings("/sejil", LogEventLevel.Information)
