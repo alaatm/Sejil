@@ -204,7 +204,7 @@ Task("Release")
         return;
     }
 
-    var csproj = File("./src/Sejil.Server/Sejil.csproj").Path.FullPath;
+    var csproj = File("./src/Sejil.Server/Directory.Build.props").Path.FullPath;
 
     var version = XDocument.Load(csproj).Root
         .Element("PropertyGroup")
