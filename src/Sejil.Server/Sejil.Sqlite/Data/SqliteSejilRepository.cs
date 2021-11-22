@@ -10,6 +10,12 @@ namespace Sejil.Sqlite.Data;
 
 internal sealed class SqliteSejilRepository : SejilRepository
 {
+    protected override string LogTableName { get; } = "log";
+
+    protected override string LogPropertyTableName { get; } = "log_property";
+
+    protected override string LogQueryTableName { get; } = "log_query";
+
     public SqliteSejilRepository(ISejilSettings settings, string connectionString)
         : base(settings, connectionString)
     {

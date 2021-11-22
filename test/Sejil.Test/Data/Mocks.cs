@@ -24,6 +24,10 @@ public static class Mocks
 
 public class SejilRepositoryMoq : SejilRepository
 {
+    protected override string LogTableName { get; } = "log";
+    protected override string LogPropertyTableName { get; } = "log_property";
+    protected override string LogQueryTableName { get; } = "log_query";
+
     public SejilRepositoryMoq(ISejilSettings settings) : base(settings, $"DataSource={Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())}") { }
     protected override void InitializeDatabase()
     {
@@ -40,6 +44,7 @@ public class SejilRepositoryMoq : SejilRepository
 
 public class CodeGeneratorMoq : CodeGenerator
 {
+    protected override string LogPropertyTableName { get; } = "log_property";
     protected override string NumericCastSql { get; } = "CAST(value AS NUMERIC)";
     protected override string PropertyFilterNegateSql { get; } = "SUM(name = '|PNAME|' AND |VALCOL| |OP| |PVAL|) = 0";
     protected override string PropertyFilterSql { get; } = "SUM(name = '|PNAME|' AND |VALCOL| |OP| |PVAL|) > 0";

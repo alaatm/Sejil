@@ -2,9 +2,14 @@
 -- See the LICENSE file in the project root for more information.
 
 IF NOT EXISTS (SELECT *
-FROM sysobjects
-WHERE name='log' and xtype='U')
-	CREATE TABLE [log]
+FROM INFORMATION_SCHEMA.SCHEMATA
+WHERE SCHEMA_NAME='sejil')
+	EXEC('CREATE SCHEMA [sejil] AUTHORIZATION [dbo]');
+
+IF NOT EXISTS (SELECT *
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='sejil' AND TABLE_NAME='log')
+	CREATE TABLE [sejil].[log]
 (
     [id] uniqueidentifier NOT NULL PRIMARY KEY,
     [message] NVARCHAR(MAX) NOT NULL,
@@ -17,21 +22,21 @@ WHERE name='log' and xtype='U')
 );
 
 IF NOT EXISTS (SELECT *
-FROM sysobjects
-WHERE name='log_property' and xtype='U')
-	CREATE TABLE [log_property]
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='sejil' AND TABLE_NAME='log_property')
+	CREATE TABLE [sejil].[log_property]
 (
     [id] INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
     [logId] uniqueidentifier NOT NULL,
     [name] NVARCHAR(MAX) NOT NULL,
     [value] NVARCHAR(MAX) NULL,
-    FOREIGN KEY([logId]) REFERENCES log([id])
+    FOREIGN KEY([logId]) REFERENCES [sejil].[log]([id])
 );
 
 IF NOT EXISTS (SELECT *
-FROM sysobjects
-WHERE name='log_query' and xtype='U')
-	CREATE TABLE [log_query]
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='sejil' AND TABLE_NAME='log_query')
+	CREATE TABLE [sejil].[log_query]
 (
     [id] INTEGER NOT NULL IDENTITY(1,1) PRIMARY KEY,
     [name] NVARCHAR(MAX) NOT NULL,

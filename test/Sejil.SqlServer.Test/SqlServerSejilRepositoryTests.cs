@@ -38,9 +38,9 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
     public void Dispose()
     {
         using var conn = new SqlConnection(ConnStr);
-        conn.Execute("DELETE log_property");
-        conn.Execute("DELETE log");
-        conn.Execute("DELETE log_query");
+        conn.Execute("DELETE [sejil].[log_property]");
+        conn.Execute("DELETE [sejil].[log]");
+        conn.Execute("DELETE [sejil].[log_query]");
     }
 
     private static bool DbExists()

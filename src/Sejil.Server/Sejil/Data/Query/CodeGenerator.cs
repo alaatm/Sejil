@@ -13,6 +13,7 @@ public abstract class CodeGenerator : Expr.IVisitor
     private string _template = string.Empty;
     private bool _insidePropBlock;
 
+    protected abstract string LogPropertyTableName { get; }
     protected abstract string NumericCastSql { get; }
     protected abstract string PropertyFilterNegateSql { get; }
     protected abstract string PropertyFilterSql { get; }
@@ -58,9 +59,11 @@ public abstract class CodeGenerator : Expr.IVisitor
         _sql.Append(_template);
     }
 
-    public void Visit(Expr.Variable expr) => _template = _template.Replace("|PNAME|", expr.Token.Text, StringComparison.Ordinal);
+    public void Visit(Expr.Variable expr)
+        => _template = _template.Replace("|PNAME|", expr.Token.Text, StringComparison.Ordinal);
 
-    public void Visit(Expr.Literal expr) => _template = _template.Replace("|PVAL|", expr.Value.ToString(), StringComparison.Ordinal);
+    public void Visit(Expr.Literal expr)
+        => _template = _template.Replace("|PVAL|", expr.Value.ToString(), StringComparison.Ordinal);
 
     private void CheckOpenPropertyScope(Expr expr)
     {
@@ -68,7 +71,10 @@ public abstract class CodeGenerator : Expr.IVisitor
 
         if (isProp && !_insidePropBlock)
         {
-            _sql.Append("id IN (SELECT logId FROM log_property GROUP BY logId HAVING ");
+            _sql.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "id IN (SELECT logId FROM {0} GROUP BY logId HAVING ",
+                LogPropertyTableName);
             _insidePropBlock = true;
         }
     }

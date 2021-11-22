@@ -10,6 +10,12 @@ namespace Sejil.SqlServer.Data;
 
 internal sealed class SqlServerSejilRepository : SejilRepository
 {
+    protected override string LogTableName { get; } = "[sejil].[log]";
+
+    protected override string LogPropertyTableName { get; } = "[sejil].[log_property]";
+
+    protected override string LogQueryTableName { get; } = "[sejil].[log_query]";
+
     public SqlServerSejilRepository(ISejilSettings settings, string connectionString)
         : base(settings, connectionString)
     {

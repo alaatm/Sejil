@@ -29,6 +29,12 @@ public abstract class SejilRepository : ISejilRepository
         _codeGenerator = (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!;
     }
 
+    protected abstract string LogTableName { get; }
+
+    protected abstract string LogPropertyTableName { get; }
+
+    protected abstract string LogQueryTableName { get; }
+
     protected abstract void InitializeDatabase();
 
     protected abstract DbConnection GetConnection();
@@ -49,21 +55,21 @@ public abstract class SejilRepository : ISejilRepository
 
     public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
     {
-        const string Sql = "SELECT * FROM log_query";
+        const string Sql = "SELECT * FROM {0}";
 
         using var conn = GetConnectionCore();
         await conn.OpenAsync();
-        return await conn.QueryAsync<LogQuery>(Sql);
+        return await conn.QueryAsync<LogQuery>(string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName));
     }
 
     public async Task<bool> SaveQueryAsync(LogQuery logQuery)
     {
-        const string Sql = "INSERT INTO log_query (name, query) VALUES (@name, @query)";
+        const string Sql = "INSERT INTO {0} (name, query) VALUES (@name, @query)";
 
         using var conn = GetConnectionCore();
         await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql;
+        cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName);
         cmd.CommandType = CommandType.Text;
         cmd.AddParameterWithValue("@name", logQuery.Name);
         cmd.AddParameterWithValue("@query", logQuery.Query);
@@ -72,12 +78,12 @@ public abstract class SejilRepository : ISejilRepository
 
     public async Task<bool> DeleteQueryAsync(string queryName)
     {
-        const string Sql = "DELETE FROM log_query WHERE name = @name";
+        const string Sql = "DELETE FROM {0} WHERE name = @name";
 
         using var conn = GetConnectionCore();
         await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql;
+        cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName);
         cmd.CommandType = CommandType.Text;
         cmd.AddParameterWithValue("@name", queryName);
         return await cmd.ExecuteNonQueryAsync() > 0;
@@ -146,17 +152,18 @@ public abstract class SejilRepository : ISejilRepository
         var timestampWhereClause = TimestampWhereClause();
         var queryWhereClause = QueryWhereClause();
 
-        return
+        return string.Format(CultureInfo.InvariantCulture,
 $@"SELECT l.*, p.* from 
 (
-    SELECT * FROM log
+    SELECT * FROM {{0}}
     {timestampWhereClause}
     {queryWhereClause}{FiltersWhereClause()}
     ORDER BY timestamp DESC
     {GetPaginSql((page - 1) * pageSize, pageSize)}
 ) l
-LEFT JOIN log_property p ON l.id = p.logId
-ORDER BY l.timestamp DESC, p.name";
+LEFT JOIN {{1}} p ON l.id = p.logId
+ORDER BY l.timestamp DESC, p.name",
+        LogTableName, LogPropertyTableName);
 
         string TimestampWhereClause()
         {
@@ -272,13 +279,13 @@ ORDER BY l.timestamp DESC, p.name";
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private static DbCommand CreateLogEntryInsertCommand(DbConnection conn, DbTransaction tran)
+    private DbCommand CreateLogEntryInsertCommand(DbConnection conn, DbTransaction tran)
     {
-        const string Sql = "INSERT INTO log (id, message, messageTemplate, level, timestamp, exception)" +
+        const string Sql = "INSERT INTO {0} (id, message, messageTemplate, level, timestamp, exception)" +
             "VALUES (@id, @message, @messageTemplate, @level, @timestamp, @exception);";
 
         var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql;
+        cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogTableName);
         cmd.CommandType = CommandType.Text;
         cmd.Transaction = tran;
 
@@ -292,13 +299,13 @@ ORDER BY l.timestamp DESC, p.name";
         return cmd;
     }
 
-    private static DbCommand CreateLogEntryPropertyInsertCommand(DbConnection conn, DbTransaction tran)
+    private DbCommand CreateLogEntryPropertyInsertCommand(DbConnection conn, DbTransaction tran)
     {
-        const string Sql = "INSERT INTO log_property (logId, name, value)" +
+        const string Sql = "INSERT INTO {0} (logId, name, value)" +
             "VALUES (@logId, @name, @value);";
 
         var cmd = conn.CreateCommand();
-        cmd.CommandText = Sql;
+        cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogPropertyTableName);
         cmd.CommandType = CommandType.Text;
         cmd.Transaction = tran;
 
