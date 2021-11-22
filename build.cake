@@ -48,7 +48,7 @@ Task("Clean")
     CleanDirectories("./src/**/obj");
     CleanDirectory(packDir);
     CleanDirectory(coverageDir);
-    if (FileExists(lcovFile)) DeleteFile(lcovFile);    
+    if (FileExists(lcovFile)) DeleteFile(lcovFile);
 });
 
 Task("ClientBuild")
@@ -68,7 +68,7 @@ Task("CopyEmbeddedHtml")
 	.Does(() =>
 {
     if (target.ToUpper() == "COVER") { return; }
-    
+
 	var clientBuildDir = clientDir.Path.Combine("build");
     var htmlPath = clientBuildDir.Combine("index.html").FullPath;
 	var html = IOFile.ReadAllText(htmlPath);
@@ -99,7 +99,7 @@ Task("CopyEmbeddedHtml")
     {
         html = html.Replace(kvp.Key, kvp.Value);
     }
-	
+
 	IOFile.WriteAllText("./src/Sejil.Server/Sejil/index.html", html);
 });
 
@@ -126,20 +126,20 @@ Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    DotNetCoreTest(".", new DotNetCoreTestSettings 
-    { 
+    DotNetCoreTest(".", new DotNetCoreTestSettings
+    {
         NoRestore = true,
         NoBuild = true,
         Configuration = configuration,
     });
 });
 
-Task("Pack")	
+Task("Pack")
 	.IsDependentOn("Test")
 	.Does(() =>
 {
-	DotNetCorePack(".", new DotNetCorePackSettings 
-	{ 
+	DotNetCorePack(".", new DotNetCorePackSettings
+	{
 		Configuration = configuration,
 		OutputDirectory = packDir,
         NoRestore = true,
@@ -151,8 +151,8 @@ Task("Cover")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    var testSettings = new DotNetCoreTestSettings 
-    { 
+    var testSettings = new DotNetCoreTestSettings
+    {
         NoRestore = true,
         NoBuild = true,
         Configuration = configuration,
