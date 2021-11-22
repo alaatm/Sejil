@@ -15,7 +15,7 @@ public sealed class DbFixture : IDisposable
 
     public static readonly string ConnStr = IsCi
         ? Environment.GetEnvironmentVariable("SqlServerConnStr")
-        : "Server=.;Database=SejilTestDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+        : "Server=.;Database=SejilTestDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
     public DbFixture()
     {
