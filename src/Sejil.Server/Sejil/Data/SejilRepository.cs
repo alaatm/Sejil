@@ -16,7 +16,6 @@ namespace Sejil.Data;
 
 public abstract class SejilRepository : ISejilRepository
 {
-    private readonly CodeGenerator _codeGenerator;
     private bool _dbInitialized;
 
     protected ISejilSettings Settings { get; }
@@ -26,7 +25,6 @@ public abstract class SejilRepository : ISejilRepository
     {
         Settings = settings ?? throw new ArgumentNullException(nameof(settings));
         ConnectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-        _codeGenerator = (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!;
     }
 
     protected abstract string LogTableName { get; }
@@ -153,7 +151,7 @@ public abstract class SejilRepository : ISejilRepository
         var queryWhereClause = QueryWhereClause();
 
         return string.Format(CultureInfo.InvariantCulture,
-$@"SELECT l.*, p.* from 
+$@"SELECT l.*, p.* from
 (
     SELECT * FROM {{0}}
     {timestampWhereClause}
@@ -198,8 +196,8 @@ ORDER BY l.timestamp DESC, p.name",
             string.IsNullOrWhiteSpace(queryFilter.QueryText)
                 ? ""
                 : timestampWhereClause.Length > 0
-                    ? $"AND ({QueryEngine.Translate(queryFilter.QueryText, _codeGenerator)})"
-                    : $"WHERE ({QueryEngine.Translate(queryFilter.QueryText, _codeGenerator)})";
+                    ? $"AND ({QueryEngine.Translate(queryFilter.QueryText, CreateCodeGenerator())})"
+                    : $"WHERE ({QueryEngine.Translate(queryFilter.QueryText, CreateCodeGenerator())})";
 
         string FiltersWhereClause() =>
             string.IsNullOrWhiteSpace(queryFilter.LevelFilter) && (!queryFilter.ExceptionsOnly)
@@ -207,6 +205,9 @@ ORDER BY l.timestamp DESC, p.name",
                 : timestampWhereClause.Length > 0 || queryWhereClause.Length > 0
                     ? $" AND ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})"
                     : $"WHERE ({BuildFilterWhereClause(queryFilter.LevelFilter, queryFilter.ExceptionsOnly)})";
+
+        CodeGenerator CreateCodeGenerator()
+            => (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!;
     }
 
     private static string BuildFilterWhereClause(string? levelFilter, bool exceptionsOnly)

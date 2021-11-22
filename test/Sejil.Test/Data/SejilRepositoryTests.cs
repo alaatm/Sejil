@@ -3,6 +3,7 @@
 
 using Sejil.Data;
 using Sejil.Models;
+using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
 
@@ -274,5 +275,27 @@ public partial class SejilRepositoryTests
         // Assert
         var logEvents = await repository.GetEventsPageAsync(1, null, new LogQueryFilter());
         Assert.Empty(logEvents);
+    }
+
+    [Fact]
+    public async Task Multiple_queries_no_conflict()
+    {
+        // Arrange
+        var repository = new SejilRepositoryMoq(Mocks.GetTestSettings());
+        await repository.InsertEventsAsync(new[]
+        {
+            BuildLogEvent(DateTime.UtcNow, LogEventLevel.Verbose, null, "Verbose"),
+        });
+        await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "@level='Verbose'" });
+
+        // Act & assert no exception is thrown
+        Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "@level='Verbose'" }));
+    }
+
+    private static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
+    {
+        var logger = new LoggerConfiguration().CreateLogger();
+        logger.BindMessageTemplate(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);
+        return new LogEvent(timestamp, level, ex, parsedTemplate, boundProperties);
     }
 }
