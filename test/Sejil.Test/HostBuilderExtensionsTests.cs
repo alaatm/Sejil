@@ -17,6 +17,17 @@ namespace Sejil.Test;
 
 public class HostBuilderExtensionsTests
 {
+    [Fact]
+    public void UseSejil_throws_when_store_is_not_set()
+    {
+        // Arrange
+        var hostBuilder = new HostBuilder();
+
+        // Act & assert
+        var ex = Assert.Throws<InvalidOperationException>(() => hostBuilder.UseSejil());
+        Assert.Equal("You must set the log store via a call to UseSqlite(string) or UseSqlServer(string).", ex.Message);
+    }
+
     [Theory]
     [InlineData(LogLevel.Trace, LogEventLevel.Verbose)]
     [InlineData(LogLevel.Debug, LogEventLevel.Debug)]

@@ -49,16 +49,6 @@ public class SejilSettingsTests
         Assert.Equal(initalLogLevel, settings.LoggingLevelSwitch.MinimumLevel);
     }
 
-    //[Fact]
-    //public void Ctor_sets_default_db_name()
-    //{
-    //    // Arrange & act
-    //    var settings = new SejilSettings("", LogEventLevel.Debug);
-
-    //    // Assert
-    //    Assert.Matches(@"^Sejil-[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}\.sqlite$", Path.GetFileName(settings.SqliteDbPath));
-    //}
-
     [Fact]
     public void Ctor_sets_default_settings()
     {
@@ -67,6 +57,18 @@ public class SejilSettingsTests
 
         // Assert
         Assert.Equal(100, settings.PageSize);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void SetPage_throws_when_out_of_range(int pageSize)
+    {
+        // Arrange
+        var settings = new SejilSettings("", LogEventLevel.Debug);
+
+        // Act & assert
+        Assert.Throws<ArgumentOutOfRangeException>(() => settings.PageSize = pageSize);
     }
 
     [Theory]

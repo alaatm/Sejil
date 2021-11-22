@@ -1,6 +1,7 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
+using Sejil.Data;
 using Sejil.Models;
 using Serilog.Events;
 using Serilog.Parsing;
@@ -9,6 +10,22 @@ namespace Sejil.Test.Data;
 
 public partial class SejilRepositoryTests
 {
+    [Fact]
+    public void Ctor_throws_when_null_settings()
+    {
+        var ex = Assert.ThrowsAny<Exception>(() => new Mock<SejilRepository>(null, "").Object);
+        var ane = Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("settings", ane.ParamName);
+    }
+
+    [Fact]
+    public void Ctor_throws_when_null_connectionString()
+    {
+        var ex = Assert.ThrowsAny<Exception>(() => new Mock<SejilRepository>(Mocks.GetTestSettings(), null).Object);
+        var ane = Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("connectionString", ane.ParamName);
+    }
+
     [Fact]
     public async Task SaveQueryAsync_saves_query()
     {

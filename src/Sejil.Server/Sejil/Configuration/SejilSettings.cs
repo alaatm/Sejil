@@ -54,7 +54,7 @@ public sealed class SejilSettings : ISejilSettings
         get => _pageSize;
         set
         {
-            if (_pageSize <= 0)
+            if (value <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }

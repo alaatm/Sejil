@@ -15,16 +15,17 @@ public static class SejilSettingsExtensions
     public static ISejilSettings UseSqlite(this ISejilSettings settings, string? name = null)
     {
         string sqliteDbPath;
+        name ??= UUID;
 
         if (IsRunningInAzure())
         {
-            sqliteDbPath = Path.Combine(Path.GetFullPath("/home"), $"Sejil-{name ?? UUID}.sqlite");
+            sqliteDbPath = Path.Combine(Path.GetFullPath("/home"), $"Sejil-{name}.sqlite");
         }
         else
         {
             var localAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var appName = Assembly.GetEntryAssembly()!.GetName().Name!;
-            sqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{name ?? UUID}.sqlite");
+            sqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{name}.sqlite");
         }
 
         var sqliteDbFile = new FileInfo(sqliteDbPath);

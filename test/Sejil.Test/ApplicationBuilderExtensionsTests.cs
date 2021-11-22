@@ -27,6 +27,16 @@ public class ApplicationBuilderExtensionsTests
     private static readonly JsonSerializerOptions _camelCaseJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     [Fact]
+    public void UseSejil_throws_when_null_appBuilder()
+    {
+        // Arrange
+        IApplicationBuilder app = null;
+
+        // Act & assert
+        Assert.Throws<ArgumentNullException>("app", () => app.UseSejil());
+    }
+
+    [Fact]
     public async Task HttpGet_root_url_calls_controller_GetIndexAsync_method()
     {
         // Arrange

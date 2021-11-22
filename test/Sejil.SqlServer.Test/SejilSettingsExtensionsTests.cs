@@ -7,6 +7,16 @@ namespace Sejil.SqlServer.Test;
 public class SejilSettingsExtensionsTests
 {
     [Fact]
+    public void UseSqlServer_throws_when_null_connectionString()
+    {
+        // Arrange
+        var settings = new SejilSettings("/sejil", default);
+
+        // Act & assert
+        Assert.Throws<ArgumentNullException>("connectionString", () => settings.UseSqlServer(null));
+    }
+
+    [Fact]
     public void UseSqlServer_sets_sqlServer_repository()
     {
         // Arrange

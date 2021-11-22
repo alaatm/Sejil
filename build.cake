@@ -7,6 +7,7 @@
 using System.Xml.Linq;
 using AngleSharp.Html.Parser;
 using IOFile = System.IO.File;
+using IOPath = System.IO.Path;
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -22,6 +23,7 @@ var packDir = Directory(".nupkg");
 var coverageDir = Directory(".coverage");
 var lcovFile = "./lcov.info";
 
+var tstProjects = GetSubDirectories("./test").Select(p => IOPath.Combine(p.FullPath, IOPath.GetFileName(p.FullPath)) + ".csproj").ToList();
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
@@ -156,17 +158,27 @@ Task("Cover")
         NoRestore = true,
         NoBuild = true,
         Configuration = configuration,
+        Framework = "net6.0",
     };
 
-    var coverletSettings = new CoverletSettings
+    var mergeWith = File(coverageDir.Path + $"/{DateTime.UtcNow.Ticks}.json");
+
+    foreach (var prj in tstProjects)
     {
-        CollectCoverage = true,
-        CoverletOutputFormat = CoverletOutputFormat.lcov | CoverletOutputFormat.opencover,
-        CoverletOutputDirectory = coverageDir,
-        CoverletOutputName = $"{DateTime.UtcNow.Ticks}",
-    };
+        var outputName = IOPath.GetFileNameWithoutExtension(prj).Replace(".Test", "").Replace(".","");
 
-    DotNetCoreTest(".", testSettings, coverletSettings);
+        var coverletSettings = new CoverletSettings
+        {
+            CollectCoverage = true,
+            CoverletOutputFormat = CoverletOutputFormat.lcov | CoverletOutputFormat.opencover | CoverletOutputFormat.json,
+            CoverletOutputDirectory = coverageDir,
+            CoverletOutputName = outputName,
+            MergeWithFile = mergeWith,
+        };
+
+        DotNetCoreTest(prj, testSettings, coverletSettings);
+        IOFile.Copy(File(coverageDir.Path + $"/{outputName}.net6.0.json"), mergeWith.Path.FullPath, true);
+    }
 
     // Copy lcov file to root for code coverage highlight in vscode
     var lcov = GetFiles(coverageDir.Path + "/*.info").First();

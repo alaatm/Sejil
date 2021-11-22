@@ -18,13 +18,12 @@ public static class SejilSettingsExtensions
         settings.CodeGeneratorType = typeof(SqlServerCodeGenerator);
         settings.SejilRepository = new SqlServerSejilRepository(settings, connectionString);
 
-        SqlMapper.AddTypeHandler(new GuidStringHandler());
-        SqlMapper.AddTypeHandler(new StringGuidHandler());
+        SqlMapper.AddTypeHandler(new StringHandler());
 
         return settings;
     }
 
-    private class StringGuidHandler : SqlMapper.TypeHandler<string>
+    private class StringHandler : SqlMapper.TypeHandler<string>
     {
         public override void SetValue(IDbDataParameter parameter, string value)
             => parameter.Value = value;
@@ -32,14 +31,5 @@ public static class SejilSettingsExtensions
         public override string Parse(object value) => value is string s
             ? s
             : value?.ToString() ?? "";
-    }
-
-    private class GuidStringHandler : SqlMapper.TypeHandler<Guid>
-    {
-        public override void SetValue(IDbDataParameter parameter, Guid guid)
-            => parameter.Value = guid.ToString();
-
-        public override Guid Parse(object value)
-            => new((string)value);
     }
 }
