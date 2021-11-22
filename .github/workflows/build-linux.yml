@@ -1,0 +1,52 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_config: [Debug, Release]
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+          - 1433/tcp
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: g0d4mm!tSQLServer
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: setup .net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.x"
+
+      - name: setup .net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: setup .net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: restore cake tool
+        run: dotnet tool restore
+        env:
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+          DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+      - name: run build script
+        run: dotnet cake --configuration ${{ matrix.build_config }}
+        env:
+          ConnStr: Server=tcp:127.0.0.1,${{ job.services.sqlserver.ports[1433] }};Database=SejilTestDb;User Id=sa;Password=g0d4mm!tSQLServer;TrustServerCertificate=True;

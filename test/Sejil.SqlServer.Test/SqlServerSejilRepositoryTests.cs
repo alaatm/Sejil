@@ -16,7 +16,7 @@ public sealed class DbFixture : IDisposable
     public static readonly bool IsCi = Environment.GetEnvironmentVariable("CI") == "true";
 
     public static readonly string ConnStr = IsCi
-        ? Environment.GetEnvironmentVariable("SqlServerConnStr")
+        ? Environment.GetEnvironmentVariable("ConnStr")
         : "Server=.;Database=SejilTestDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
     internal SqlServerSejilRepository Repository { get; }
