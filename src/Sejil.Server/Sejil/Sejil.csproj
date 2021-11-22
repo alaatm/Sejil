@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Microsoft.Data.Sqlite v6.0 which uses sqlite-pcl-raw 2.06 causes 'the type initializer threw an exception' -->
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.12" />
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
