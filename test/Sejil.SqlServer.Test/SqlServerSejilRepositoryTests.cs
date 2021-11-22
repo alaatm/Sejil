@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Sejil.Configuration;
@@ -11,14 +12,22 @@ namespace Sejil.SqlServer.Test;
 
 public sealed class DbFixture : IDisposable
 {
+    public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     public static readonly bool IsCi = Environment.GetEnvironmentVariable("CI") == "true";
 
     public static readonly string ConnStr = IsCi
         ? Environment.GetEnvironmentVariable("SqlServerConnStr")
         : "Server=.;Database=SejilTestDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
+    internal SqlServerSejilRepository Repository { get; }
+
     public DbFixture()
     {
+        if (IsCi && IsWindows)
+        {
+            return;
+        }
+
         var mdf = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SejilTestDbData.mdf");
         if (!DbExists())
         {
@@ -33,14 +42,26 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
             conn.Open();
             conn.Execute(sql);
         }
+
+        var settings = new SejilSettings("/sejil", LogEventLevel.Verbose);
+        settings.UseSqlServer(ConnStr);
+        Repository = (SqlServerSejilRepository)settings.SejilRepository;
+
+        DeleteData();
+        Seed();
     }
 
-    public void Dispose()
+    private void Seed()
+        => Repository.InsertEventsAsync(GetTestEvents()).GetAwaiter().GetResult();
+
+    public void Dispose() => DeleteData();
+
+    private static void DeleteData()
     {
         using var conn = new SqlConnection(ConnStr);
-        conn.Execute("DELETE [sejil].[log_property]");
-        conn.Execute("DELETE [sejil].[log]");
-        conn.Execute("DELETE [sejil].[log_query]");
+        conn.Execute($"DELETE [sejil].[log_property]");
+        conn.Execute($"DELETE [sejil].[log]");
+        conn.Execute($"DELETE [sejil].[log_query]");
     }
 
     private static bool DbExists()
@@ -50,75 +71,6 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
         using var conn = new SqlConnection(ConnStr.Replace("SejilTestDb", "master"));
         conn.Open();
         return (int)conn.ExecuteScalar(Sql) == 1;
-    }
-}
-
-public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
-{
-    public SqlServerSejilRepositoryTests(DbFixture _) { }
-
-    [Fact]
-    public async Task AllTests()
-    {
-        // Arrange
-        var settings = new SejilSettings("/sejil", LogEventLevel.Verbose);
-        settings.UseSqlServer(DbFixture.ConnStr);
-        var repository = (SqlServerSejilRepository)settings.SejilRepository;
-
-        await repository.InsertEventsAsync(GetTestEvents());
-
-        await repository.SaveQueryAsync(new LogQuery { Name = "TestName", Query = "TestQuery" });
-        var savedQuery = Assert.Single(await repository.GetSavedQueriesAsync());
-        Assert.Equal("TestName", savedQuery.Name);
-        Assert.Equal("TestQuery", savedQuery.Query);
-
-        await AssertFiltersByLevel(repository);
-        await AssertFiltersByExceptionOnly(repository);
-        await AssertFiltersByDate(repository);
-        await AssertFiltersByDateRange(repository);
-        await AssertFiltersByQuery(repository);
-    }
-
-    private static async Task AssertFiltersByLevel(SqlServerSejilRepository repository)
-    {
-        var e = Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { LevelFilter = "Debug" }));
-        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 11, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
-        Assert.Equal("Debug", e.Level);
-        Assert.Equal("Object is \"{ Id = 5, Name = Test Object }\"", e.Message);
-        Assert.Null(e.Exception);
-    }
-
-    private static async Task AssertFiltersByDate(SqlServerSejilRepository repository)
-        => Assert.Empty(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { DateFilter = "5m" }));
-
-    private static async Task AssertFiltersByDateRange(SqlServerSejilRepository repository)
-    {
-        var start = TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 0, 0, DateTimeKind.Local));
-        var end = TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 10, 0, DateTimeKind.Local));
-
-        var e = Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { DateRangeFilter = new List<DateTime> { start, end } }));
-        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
-        Assert.Equal("Warning", e.Level);
-        Assert.Equal("This is a warning with value: null", e.Message);
-        Assert.Null(e.Exception);
-    }
-
-    private static async Task AssertFiltersByExceptionOnly(SqlServerSejilRepository repository)
-    {
-        var e = Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { ExceptionsOnly = true }));
-        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 13, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
-        Assert.Equal("Error", e.Level);
-        Assert.Equal("This is an exception", e.Message);
-        Assert.Equal("System.Exception: Test exception", e.Exception);
-    }
-
-    private static async Task AssertFiltersByQuery(SqlServerSejilRepository repository)
-    {
-        var e = Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "name = 'test name'" }));
-        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 10, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
-        Assert.Equal("Information", e.Level);
-        Assert.Equal("Name is \"Test name\" and Value is \"Test value\"", e.Message);
-        Assert.Null(e.Exception);
     }
 
     private static IEnumerable<LogEvent> GetTestEvents() => new[]
@@ -134,5 +86,87 @@ public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
         var logger = new LoggerConfiguration().CreateLogger();
         logger.BindMessageTemplate(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);
         return new LogEvent(timestamp, level, ex, parsedTemplate, boundProperties);
+    }
+}
+
+public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
+{
+    private readonly SqlServerSejilRepository _repository;
+
+    public SqlServerSejilRepositoryTests(DbFixture db)
+        => _repository = db.Repository;
+
+    [SkippableFact]
+    public async Task Can_save_load_delete_queries()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        var queryName = "TestName";
+
+        await _repository.SaveQueryAsync(new LogQuery { Name = queryName, Query = "TestQuery" });
+        var savedQuery = Assert.Single(await _repository.GetSavedQueriesAsync());
+        Assert.Equal(queryName, savedQuery.Name);
+        Assert.Equal("TestQuery", savedQuery.Query);
+
+        await _repository.DeleteQueryAsync(queryName);
+        Assert.Empty(await _repository.GetSavedQueriesAsync());
+    }
+
+    [SkippableFact]
+    public async Task Can_filter_by_level()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        var e = Assert.Single(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { LevelFilter = "Debug" }));
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 11, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
+        Assert.Equal("Debug", e.Level);
+        Assert.Equal("Object is \"{ Id = 5, Name = Test Object }\"", e.Message);
+        Assert.Null(e.Exception);
+    }
+
+    [SkippableFact]
+    public async Task Can_filter_by_date()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+        Assert.Empty(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { DateFilter = "5m" }));
+    }
+
+    [SkippableFact]
+    public async Task Can_filter_by_dateRange()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        var start = TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 0, 0, DateTimeKind.Local));
+        var end = TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 10, 0, DateTimeKind.Local));
+
+        var e = Assert.Single(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { DateRangeFilter = new List<DateTime> { start, end } }));
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 12, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
+        Assert.Equal("Warning", e.Level);
+        Assert.Equal("This is a warning with value: null", e.Message);
+        Assert.Null(e.Exception);
+    }
+
+    [SkippableFact]
+    public async Task Can_filters_by_exceptionOnly()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        var e = Assert.Single(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { ExceptionsOnly = true }));
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 13, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
+        Assert.Equal("Error", e.Level);
+        Assert.Equal("This is an exception", e.Message);
+        Assert.Equal("System.Exception: Test exception", e.Exception);
+    }
+
+    [SkippableFact]
+    public async Task Can_filter_by_query()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        var e = Assert.Single(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "name = 'test name'" }));
+        Assert.Equal(TimeZoneInfo.ConvertTimeToUtc(new DateTime(2017, 8, 3, 10, 5, 5, 5, DateTimeKind.Local)), e.Timestamp);
+        Assert.Equal("Information", e.Level);
+        Assert.Equal("Name is \"Test name\" and Value is \"Test value\"", e.Message);
+        Assert.Null(e.Exception);
     }
 }
