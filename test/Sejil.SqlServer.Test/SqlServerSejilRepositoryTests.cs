@@ -59,9 +59,9 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
     private static void DeleteData()
     {
         using var conn = new SqlConnection(ConnStr);
-        conn.Execute($"DELETE [sejil].[log_property]");
-        conn.Execute($"DELETE [sejil].[log]");
-        conn.Execute($"DELETE [sejil].[log_query]");
+        conn.Execute(
+@"IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES)
+EXEC('DELETE [sejil].[log_property];DELETE [sejil].[log];DELETE [sejil].[log_query];')");
     }
 
     private static bool DbExists()
@@ -81,7 +81,7 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
         BuildLogEvent(new DateTime(2017, 8, 3, 13, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Error, new Exception("Test exception"), "This is an exception"),
     };
 
-    private static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
+    public static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
     {
         var logger = new LoggerConfiguration().CreateLogger();
         logger.BindMessageTemplate(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);
@@ -168,5 +168,53 @@ public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
         Assert.Equal("Information", e.Level);
         Assert.Equal("Name is \"Test name\" and Value is \"Test value\"", e.Message);
         Assert.Null(e.Exception);
+    }
+
+    [SkippableFact]
+    public async Task CleanupAsync_test()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        // Arrange
+        var settings = (ISejilSettings)typeof(SqlServerSejilRepository)
+            .GetProperty("Settings", BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(_repository);
+
+        settings
+            .AddRetentionPolicy(TimeSpan.FromHours(5), LogEventLevel.Verbose, LogEventLevel.Debug)
+            .AddRetentionPolicy(TimeSpan.FromDays(10), LogEventLevel.Information)
+            .AddRetentionPolicy(TimeSpan.FromDays(75));
+
+        var now = DateTime.UtcNow;
+        await _repository.InsertEventsAsync(new[]
+        {
+            DbFixture.BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Verbose, null, "Verbose #{Num}", 1),
+            DbFixture.BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Debug, null, "Debug #{Num}", 1),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Verbose, null, "Verbose #{Num}", 2),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Debug, null, "Debug #{Num}", 2),
+
+            DbFixture.BuildLogEvent(now.AddDays(-10.1), LogEventLevel.Information, null, "Information #{Num}", 1),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Information, null, "Information #{Num}", 2),
+
+            DbFixture.BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Warning, null, "Warning #{Num}", 1),
+            DbFixture.BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Error, null, "Error #{Num}", 1),
+            DbFixture.BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Fatal, null, "Fatal #{Num}", 1),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Warning, null, "Warning #{Num}", 2),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Error, null, "Error #{Num}", 2),
+            DbFixture.BuildLogEvent(now, LogEventLevel.Fatal, null, "Fatal #{Num}", 2),
+        });
+
+        // Act
+        Assert.Equal(6, (await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" })).Count());
+        await _repository.CleanupAsync();
+
+        // Assert
+        Assert.Empty(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" }));
+        Assert.Equal(6, (await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=2" })).Count());
+
+        //// Cleanup
+        //using var conn = new SqlConnection(DbFixture.ConnStr);
+        //await conn.OpenAsync();
+        //await conn.ExecuteAsync("DELETE FROM [sejil].[log] WHERE message like '%#2'");
     }
 }
