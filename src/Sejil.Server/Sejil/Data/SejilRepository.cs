@@ -209,9 +209,6 @@ ORDER BY l.timestamp DESC, p.name",
 
     public async Task CleanupAsync()
     {
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
-
         const string Sql = "DELETE FROM {0} WHERE timestamp < '{1:yyyy-MM-dd HH:mm:ss.fff}'{2}";
 
         foreach (var rp in Settings.RetentionPolicies)
@@ -235,7 +232,11 @@ ORDER BY l.timestamp DESC, p.name",
             }
 
             var sql = string.Format(CultureInfo.InvariantCulture, Sql, LogTableName, DateTime.UtcNow.AddMinutes(-rp.Age.TotalMinutes), logsFilter);
-            await conn.ExecuteAsync(sql);
+
+            using var conn = await GetConnectionAsync();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = sql;
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 
