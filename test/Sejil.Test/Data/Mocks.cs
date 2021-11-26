@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS log_property(
 	logId   TEXT    NOT NULL,
 	name    TEXT    NOT NULL    COLLATE NOCASE,
 	value   TEXT    NULL        COLLATE NOCASE,
-	FOREIGN KEY(logId) REFERENCES log(id)
+	FOREIGN KEY(logId) REFERENCES log(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS log_property_logId_idx	ON log_property(logId);

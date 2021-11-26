@@ -20,7 +20,7 @@ public partial class SejilRepositoryTests
 
         // Assert
         Assert.Equal(
-$@"SELECT l.*, p.* from 
+$@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     
@@ -44,7 +44,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     
@@ -68,7 +68,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
@@ -92,7 +92,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876' AND timestamp >= datetime('now', '-5 minute'))
@@ -117,7 +117,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
@@ -142,7 +142,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     WHERE (timestamp <= '2017-08-03 14:56:33.876')
@@ -167,7 +167,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
 
         // Assert
         Assert.Equal(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     
@@ -485,7 +485,7 @@ ORDER BY l.timestamp DESC, p.name", sql);
     }
 
     private static string GetInnerPredicate(string sql) => sql.Replace(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     
@@ -498,7 +498,7 @@ LEFT JOIN log_property p ON l.id = p.logId
 ORDER BY l.timestamp DESC, p.name", "");
 
     private static string GetInnerPredicate_ts(string sql) => sql.Replace(
-@"SELECT l.*, p.* from 
+@"SELECT l.*, p.* from
 (
     SELECT * FROM log
     WHERE (", "").Replace(

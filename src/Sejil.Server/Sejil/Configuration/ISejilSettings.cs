@@ -3,6 +3,7 @@
 
 using Sejil.Data;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace Sejil.Configuration;
 
@@ -17,10 +18,18 @@ public interface ISejilSettings
     /// </summary>
     LoggingLevelSwitch LoggingLevelSwitch { get; }
     /// <summary>
+    /// The invoke duration in minutes for the cleanup background task.
+    /// </summary>
+    int MinimumSchedulerTimerInMinutes { get; }
+    /// <summary>
     /// Gets or sets the logs page size in the front-end grid.
     /// Defaults to 100.
     /// </summary>
     int PageSize { get; set; }
+    /// <summary>
+    /// The list of configured retention policies
+    /// </summary>
+    IReadOnlyList<RetentionPolicy> RetentionPolicies { get; }
     /// <summary>
     /// Gets the Sejil front-end html.
     /// </summary>
@@ -47,6 +56,15 @@ public interface ISejilSettings
     /// This is meant to be used only by store providers.
     /// </remarks>
     public Type CodeGeneratorType { get; set; }
+    /// <summary>
+    /// Adds a new retention policy.
+    /// </summary>
+    /// <param name="age">The log event age at which it should be deleted.</param>
+    /// <param name="logLevels">
+    /// The list of log levels to match to trigger event deletion. Leave empty to matches all log levels.
+    /// </param>
+    /// <returns></returns>
+    ISejilSettings AddRetentionPolicy(TimeSpan age, params LogEventLevel[] logLevels);
     /// <summary>
     /// Sets the minimum log level.
     /// </summary>

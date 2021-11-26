@@ -10,7 +10,7 @@ using Serilog.Events;
 
 namespace Sejil.SqlServer.Test;
 
-public sealed class DbFixture : IDisposable
+public sealed class DbFixture
 {
     public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     public static readonly bool IsCi = Environment.GetEnvironmentVariable("CI") == "true";
@@ -46,22 +46,6 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
         var settings = new SejilSettings("/sejil", LogEventLevel.Verbose);
         settings.UseSqlServer(ConnStr);
         Repository = (SqlServerSejilRepository)settings.SejilRepository;
-
-        DeleteData();
-        Seed();
-    }
-
-    private void Seed()
-        => Repository.InsertEventsAsync(GetTestEvents()).GetAwaiter().GetResult();
-
-    public void Dispose() => DeleteData();
-
-    private static void DeleteData()
-    {
-        using var conn = new SqlConnection(ConnStr);
-        conn.Execute($"DELETE [sejil].[log_property]");
-        conn.Execute($"DELETE [sejil].[log]");
-        conn.Execute($"DELETE [sejil].[log_query]");
     }
 
     private static bool DbExists()
@@ -72,21 +56,6 @@ SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
         conn.Open();
         return (int)conn.ExecuteScalar(Sql) == 1;
     }
-
-    private static IEnumerable<LogEvent> GetTestEvents() => new[]
-    {
-        BuildLogEvent(new DateTime(2017, 8, 3, 10, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Information, null, "Name is {Name} and Value is {Value}", "Test name", "Test value"),
-        BuildLogEvent(new DateTime(2017, 8, 3, 11, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Debug, null, "Object is {Object}", new { Id = 5, Name = "Test Object" }),
-        BuildLogEvent(new DateTime(2017, 8, 3, 12, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Warning, null, "This is a warning with value: {Value}", (string)null),
-        BuildLogEvent(new DateTime(2017, 8, 3, 13, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Error, new Exception("Test exception"), "This is an exception"),
-    };
-
-    private static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
-    {
-        var logger = new LoggerConfiguration().CreateLogger();
-        logger.BindMessageTemplate(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);
-        return new LogEvent(timestamp, level, ex, parsedTemplate, boundProperties);
-    }
 }
 
 public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
@@ -94,7 +63,10 @@ public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
     private readonly SqlServerSejilRepository _repository;
 
     public SqlServerSejilRepositoryTests(DbFixture db)
-        => _repository = db.Repository;
+    {
+        _repository = db.Repository;
+        Seed();
+    }
 
     [SkippableFact]
     public async Task Can_save_load_delete_queries()
@@ -168,5 +140,72 @@ public class SqlServerSejilRepositoryTests : IClassFixture<DbFixture>
         Assert.Equal("Information", e.Level);
         Assert.Equal("Name is \"Test name\" and Value is \"Test value\"", e.Message);
         Assert.Null(e.Exception);
+    }
+
+    [SkippableFact]
+    public async Task CleanupAsync_test()
+    {
+        Skip.If(DbFixture.IsCi && DbFixture.IsWindows);
+
+        // Arrange
+        var settings = (ISejilSettings)typeof(SqlServerSejilRepository)
+            .GetProperty("Settings", BindingFlags.Instance | BindingFlags.NonPublic)
+            .GetValue(_repository);
+
+        settings
+            .AddRetentionPolicy(TimeSpan.FromHours(5), LogEventLevel.Verbose, LogEventLevel.Debug)
+            .AddRetentionPolicy(TimeSpan.FromDays(10), LogEventLevel.Information)
+            .AddRetentionPolicy(TimeSpan.FromDays(75));
+
+        var now = DateTime.UtcNow;
+        await _repository.InsertEventsAsync(new[]
+        {
+            BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Verbose, null, "Verbose #{Num}", 1),
+            BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Debug, null, "Debug #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Verbose, null, "Verbose #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Debug, null, "Debug #{Num}", 2),
+
+            BuildLogEvent(now.AddDays(-10.1), LogEventLevel.Information, null, "Information #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Information, null, "Information #{Num}", 2),
+
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Warning, null, "Warning #{Num}", 1),
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Error, null, "Error #{Num}", 1),
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Fatal, null, "Fatal #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Warning, null, "Warning #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Error, null, "Error #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Fatal, null, "Fatal #{Num}", 2),
+        });
+
+        // Act
+        Assert.Equal(6, (await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" })).Count());
+        await _repository.CleanupAsync();
+
+        // Assert
+        Assert.Empty(await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" }));
+        Assert.Equal(6, (await _repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=2" })).Count());
+    }
+
+    private void Seed()
+    {
+        using var conn = new SqlConnection(DbFixture.ConnStr);
+        conn.Execute(
+@"IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES)
+EXEC('DELETE [sejil].[log_property];DELETE [sejil].[log];DELETE [sejil].[log_query];')");
+        _repository.InsertEventsAsync(GetTestEvents()).GetAwaiter().GetResult();
+    }
+
+    private static IEnumerable<LogEvent> GetTestEvents() => new[]
+    {
+        BuildLogEvent(new DateTime(2017, 8, 3, 10, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Information, null, "Name is {Name} and Value is {Value}", "Test name", "Test value"),
+        BuildLogEvent(new DateTime(2017, 8, 3, 11, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Debug, null, "Object is {Object}", new { Id = 5, Name = "Test Object" }),
+        BuildLogEvent(new DateTime(2017, 8, 3, 12, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Warning, null, "This is a warning with value: {Value}", (string)null),
+        BuildLogEvent(new DateTime(2017, 8, 3, 13, 5, 5, 5, DateTimeKind.Local), LogEventLevel.Error, new Exception("Test exception"), "This is an exception"),
+    };
+
+    public static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
+    {
+        var logger = new LoggerConfiguration().CreateLogger();
+        logger.BindMessageTemplate(messageTemplate, propertyValues, out var parsedTemplate, out var boundProperties);
+        return new LogEvent(timestamp, level, ex, parsedTemplate, boundProperties);
     }
 }

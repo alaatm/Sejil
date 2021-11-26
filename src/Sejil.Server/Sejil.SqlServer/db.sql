@@ -30,7 +30,7 @@ WHERE TABLE_SCHEMA='sejil' AND TABLE_NAME='log_property')
     [logId] uniqueidentifier NOT NULL,
     [name] NVARCHAR(MAX) NOT NULL,
     [value] NVARCHAR(MAX) NULL,
-    FOREIGN KEY([logId]) REFERENCES [sejil].[log]([id])
+    FOREIGN KEY([logId]) REFERENCES [sejil].[log]([id]) ON DELETE CASCADE
 );
 
 IF NOT EXISTS (SELECT *

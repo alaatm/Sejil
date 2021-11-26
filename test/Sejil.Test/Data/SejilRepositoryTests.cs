@@ -292,6 +292,44 @@ public partial class SejilRepositoryTests
         Assert.Single(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "@level='Verbose'" }));
     }
 
+    [Fact]
+    public async Task CleanupAsync_test()
+    {
+        // Arrange
+        var settings = Mocks.GetTestSettings()
+            .AddRetentionPolicy(TimeSpan.FromHours(5), LogEventLevel.Verbose, LogEventLevel.Debug)
+            .AddRetentionPolicy(TimeSpan.FromDays(10), LogEventLevel.Information)
+            .AddRetentionPolicy(TimeSpan.FromDays(75));
+        var repository = new SejilRepositoryMoq(settings);
+
+        var now = DateTime.UtcNow;
+        await repository.InsertEventsAsync(new[]
+        {
+            BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Verbose, null, "Verbose #{Num}", 1),
+            BuildLogEvent(now.AddHours(-5.1), LogEventLevel.Debug, null, "Debug #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Verbose, null, "Verbose #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Debug, null, "Debug #{Num}", 2),
+
+            BuildLogEvent(now.AddDays(-10.1), LogEventLevel.Information, null, "Information #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Information, null, "Information #{Num}", 2),
+
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Warning, null, "Warning #{Num}", 1),
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Error, null, "Error #{Num}", 1),
+            BuildLogEvent(now.AddDays(-75.1), LogEventLevel.Fatal, null, "Fatal #{Num}", 1),
+            BuildLogEvent(now, LogEventLevel.Warning, null, "Warning #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Error, null, "Error #{Num}", 2),
+            BuildLogEvent(now, LogEventLevel.Fatal, null, "Fatal #{Num}", 2),
+        });
+
+        // Act
+        Assert.Equal(6, (await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" })).Count());
+        await repository.CleanupAsync();
+
+        // Assert
+        Assert.Empty(await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=1" }));
+        Assert.Equal(6, (await repository.GetEventsPageAsync(1, null, new LogQueryFilter { QueryText = "Num=2" })).Count());
+    }
+
     private static LogEvent BuildLogEvent(DateTime timestamp, LogEventLevel level, Exception ex, string messageTemplate, params object[] propertyValues)
     {
         var logger = new LoggerConfiguration().CreateLogger();

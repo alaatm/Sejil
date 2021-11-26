@@ -101,4 +101,37 @@ public class SejilSettingsTests
             Assert.Equal(initialLogLevel, settings.LoggingLevelSwitch.MinimumLevel);
         }
     }
+
+    [Fact]
+    public void MinimumSchedulerTimerInMinutes_returns_min_scheduler_timer_in_minutes()
+    {
+        // Arrange
+        var settings = new SejilSettings("", default)
+            .AddRetentionPolicy(TimeSpan.FromHours(12), LogEventLevel.Debug)
+            .AddRetentionPolicy(TimeSpan.FromHours(50), LogEventLevel.Information)
+            .AddRetentionPolicy(TimeSpan.FromHours(45.25), LogEventLevel.Warning)
+            .AddRetentionPolicy(TimeSpan.FromDays(5), LogEventLevel.Error)
+            .AddRetentionPolicy(TimeSpan.FromDays(30), LogEventLevel.Fatal);
+
+        // Act
+        var result = settings.MinimumSchedulerTimerInMinutes;
+
+        // Assert
+        Assert.Equal(15, result);
+    }
+
+    [Fact]
+    public void MinimumSchedulerTimerInMinutes_returns_min_scheduler_timer_in_minutes2()
+    {
+        // Arrange
+        var settings = new SejilSettings("", default)
+            .AddRetentionPolicy(TimeSpan.FromMinutes(2), LogEventLevel.Debug)
+            .AddRetentionPolicy(TimeSpan.FromMinutes(3), LogEventLevel.Information);
+
+        // Act
+        var result = settings.MinimumSchedulerTimerInMinutes;
+
+        // Assert
+        Assert.Equal(1, result);
+    }
 }
