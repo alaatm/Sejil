@@ -6,20 +6,22 @@ namespace Sejil.Background;
 
 internal sealed class EventsCleanupService : IHostedService, IDisposable
 {
-    private readonly SejilRepository _repository;
+    private readonly ISejilRepository _repository;
     private readonly int _invokeDuration;
     private Timer _timer = null!;
 
     public EventsCleanupService(ISejilSettings settings)
     {
         _repository = settings.SejilRepository;
-        _invokeDuration = settings.MinimumSchedulerTimerInMinutes;
+        _invokeDuration = SchedulingHelper.GetTimerDuration(settings.RetentionPolicies);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(_invokeDuration));
+        _timer = new Timer(Callback, null, TimeSpan.Zero, TimeSpan.FromMinutes(_invokeDuration));
         return Task.CompletedTask;
+
+        void Callback(object? _) => _ = _repository.CleanupAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -27,8 +29,6 @@ internal sealed class EventsCleanupService : IHostedService, IDisposable
         _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
-
-    private void DoWork(object? _) => _ = _repository.CleanupAsync();
 
     public void Dispose() => _timer?.Dispose();
 }

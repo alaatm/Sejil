@@ -6,11 +6,12 @@ using Serilog.Events;
 
 namespace Sejil.Data;
 
-internal interface ISejilRepository
+public interface ISejilRepository
 {
     Task<IEnumerable<LogQuery>> GetSavedQueriesAsync();
     Task<bool> SaveQueryAsync(LogQuery logQuery);
     Task<bool> DeleteQueryAsync(string queryName);
     Task InsertEventsAsync(IEnumerable<LogEvent> events);
     Task<IEnumerable<LogEntry>> GetEventsPageAsync(int page, DateTime? startingTimestamp, LogQueryFilter queryFilter);
+    Task CleanupAsync();
 }

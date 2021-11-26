@@ -18,10 +18,6 @@ public interface ISejilSettings
     /// </summary>
     LoggingLevelSwitch LoggingLevelSwitch { get; }
     /// <summary>
-    /// The invoke duration in minutes for the cleanup background task.
-    /// </summary>
-    int MinimumSchedulerTimerInMinutes { get; }
-    /// <summary>
     /// Gets or sets the logs page size in the front-end grid.
     /// Defaults to 100.
     /// </summary>
@@ -48,7 +44,7 @@ public interface ISejilSettings
     /// <remarks>
     /// This is meant to be used only by store providers.
     /// </remarks>
-    public SejilRepository SejilRepository { get; set; }
+    public ISejilRepository SejilRepository { get; set; }
     /// <summary>
     /// Gets or sets the sejil code generator clr type.
     /// </summary>

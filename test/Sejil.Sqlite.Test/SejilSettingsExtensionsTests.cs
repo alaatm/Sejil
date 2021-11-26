@@ -25,7 +25,7 @@ public class SejilSettingsExtensionsTests
         settings.UseSqlite();
 
         // Assert
-        var actualConnStr = ReadConnStr(settings.SejilRepository);
+        var actualConnStr = ReadConnStr((SejilRepository)settings.SejilRepository);
         Assert.Equal(expectedConnStr, actualConnStr);
     }
 
@@ -45,7 +45,7 @@ public class SejilSettingsExtensionsTests
         settings.UseSqlite(dbName);
 
         // Assert
-        var actualConnStr = ReadConnStr(settings.SejilRepository);
+        var actualConnStr = ReadConnStr((SejilRepository)settings.SejilRepository);
         Assert.Equal(expectedConnStr, actualConnStr);
     }
 

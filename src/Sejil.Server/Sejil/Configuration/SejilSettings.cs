@@ -1,7 +1,6 @@
 // Copyright (C) 2017 Alaa Masoud
 // See the LICENSE file in the project root for more information.
 
-using System.Diagnostics;
 using Sejil.Data;
 using Serilog.Core;
 using Serilog.Events;
@@ -12,38 +11,6 @@ public sealed class SejilSettings : ISejilSettings
 {
     private readonly List<RetentionPolicy> _retentionPolicies = new();
     private int _pageSize = 100;
-
-    /// <summary>
-    /// The invoke duration in minutes for the cleanup background task.
-    /// </summary>
-    public int MinimumSchedulerTimerInMinutes
-    {
-        get
-        {
-            if (!_retentionPolicies.Any())
-            {
-                return -1;
-            }
-
-            var pfs = new Dictionary<int, List<int>>();
-            foreach (var m in _retentionPolicies.Select(p => (int)p.Age.TotalMinutes))
-            {
-                foreach (var kvp in GetPrimeFactors(m))
-                {
-                    if (!pfs.ContainsKey(kvp.Key))
-                    {
-                        pfs[kvp.Key] = new List<int>();
-                    }
-                    pfs[kvp.Key].Add(kvp.Value);
-                }
-            }
-
-            return pfs
-                .Where(p => p.Value.Count == _retentionPolicies.Count)
-                .ToDictionary(p => p.Key, p => p.Value.Min())
-                .Aggregate(1, (result, kvp) => result * (int)Math.Pow(kvp.Key, kvp.Value));
-        }
-    }
 
     /// <summary>
     /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
@@ -75,7 +42,7 @@ public sealed class SejilSettings : ISejilSettings
     /// <remarks>
     /// This is meant to be used only by store providers.
     /// </remarks>
-    public SejilRepository SejilRepository { get; set; } = default!;
+    public ISejilRepository SejilRepository { get; set; } = default!;
     /// <summary>
     /// Gets or sets the sejil code generator clr type.
     /// </summary>
@@ -188,41 +155,5 @@ public sealed class SejilSettings : ISejilSettings
             default:
                 return false;
         }
-    }
-
-    private static Dictionary<int, int> GetPrimeFactors(int num)
-    {
-        Debug.Assert(num >= 2);
-
-        var result = new List<int>();
-
-        while (num % 2 == 0)
-        {
-            result.Add(2);
-            num /= 2;
-        }
-
-        var factor = 3;
-        while (factor * factor <= num)
-        {
-            if (num % factor == 0)
-            {
-                result.Add(factor);
-                num /= factor;
-            }
-            else
-            {
-                factor += 2;
-            }
-        }
-
-        if (num > 1)
-        {
-            result.Add(num);
-        }
-
-        return result
-            .GroupBy(p => p)
-            .ToDictionary(g => g.Key, g => g.Count());
     }
 }
