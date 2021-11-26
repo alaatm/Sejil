@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Sejil.Background;
 using Sejil.Configuration;
 using Sejil.Data;
 using Sejil.Logging.Sinks;
@@ -90,8 +91,13 @@ public static partial class IHostBuilderExtensions
             {
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<ISejilSettings>(settings);
-                services.AddScoped<ISejilController, SejilController>();
                 services.AddSingleton<ISejilRepository>(settings.SejilRepository);
+                services.AddScoped<ISejilController, SejilController>();
+
+                if (settings.RetentionPolicies.Any())
+                {
+                    services.AddHostedService<EventsCleanupService>();
+                }
             });
     }
 

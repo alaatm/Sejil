@@ -210,6 +210,38 @@ ORDER BY l.timestamp DESC, p.name",
             => (CodeGenerator)Activator.CreateInstance(Settings.CodeGeneratorType)!;
     }
 
+    public async Task CleanupAsync()
+    {
+        using var conn = GetConnectionCore();
+        await conn.OpenAsync();
+
+        const string Sql = "DELETE FROM {0} WHERE timestamp < '{1:yyyy-MM-dd HH:mm:ss.fff}'{2}";
+
+        foreach (var rp in Settings.RetentionPolicies)
+        {
+            var logsFilter = "";
+            var levels = rp.LogLevels.ToArray();
+
+            if (levels.Length > 0)
+            {
+                var sb = new StringBuilder(" AND level in (");
+                for (var i = 0; i < levels.Length; i++)
+                {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "'{0}'", levels[i]);
+                    if (i < levels.Length - 1)
+                    {
+                        sb.Append(',');
+                    }
+                }
+                sb.Append(')');
+                logsFilter = sb.ToString();
+            }
+
+            var sql = string.Format(CultureInfo.InvariantCulture, Sql, LogTableName, DateTime.UtcNow.AddMinutes(-rp.Age.TotalMinutes), logsFilter);
+            await conn.ExecuteAsync(sql);
+        }
+    }
+
     private static string BuildFilterWhereClause(string? levelFilter, bool exceptionsOnly)
     {
         var sp = new StringBuilder();
