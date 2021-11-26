@@ -21,15 +21,15 @@ internal sealed class SqliteSejilRepository : SejilRepository
     {
     }
 
-    protected override void InitializeDatabase()
+    protected override async Task InitializeDatabaseAsync()
     {
         var initSql = ResourceHelper.GetEmbeddedResource(typeof(SqliteSejilRepository).Assembly, "Sejil.Sqlite.db.sql");
 
         using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = initSql;
-        cmd.ExecuteNonQuery();
+        await cmd.ExecuteNonQueryAsync();
     }
 
     protected override DbConnection GetConnection()

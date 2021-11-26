@@ -21,15 +21,15 @@ internal sealed class SqlServerSejilRepository : SejilRepository
     {
     }
 
-    protected override void InitializeDatabase()
+    protected override async Task InitializeDatabaseAsync()
     {
         var initSql = ResourceHelper.GetEmbeddedResource(typeof(SqlServerSejilRepository).Assembly, "Sejil.SqlServer.db.sql");
 
         using var conn = new SqlConnection(ConnectionString);
-        conn.Open();
+        await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = initSql;
-        cmd.ExecuteNonQuery();
+        await cmd.ExecuteNonQueryAsync();
     }
 
     protected override DbConnection GetConnection()

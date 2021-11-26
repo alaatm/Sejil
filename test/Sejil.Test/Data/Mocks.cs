@@ -29,13 +29,13 @@ public class SejilRepositoryMoq : SejilRepository
     protected override string LogQueryTableName { get; } = "log_query";
 
     public SejilRepositoryMoq(ISejilSettings settings) : base(settings, $"DataSource={Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())}") { }
-    protected override void InitializeDatabase()
+    protected override async Task InitializeDatabaseAsync()
     {
         using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = TestDb.GetSqliteInitSql();
-        cmd.ExecuteNonQuery();
+        await cmd.ExecuteNonQueryAsync();
     }
     protected override DbConnection GetConnection() => new SqliteConnection(ConnectionString);
     protected override string GetPaginSql(int offset, int take) => $"LIMIT {take} OFFSET {offset}";

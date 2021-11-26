@@ -32,8 +32,8 @@ public sealed class DbFixture : IDisposable
         if (!DbExists())
         {
             var sql =
-$@"CREATE DATABASE SejilTestDb ON PRIMARY 
-(NAME = SejilTestDb_Data, FILENAME = '{mdf}', 
+$@"CREATE DATABASE SejilTestDb ON PRIMARY
+(NAME = SejilTestDb_Data, FILENAME = '{mdf}',
 SIZE = 1MB, MAXSIZE = 2MB, FILEGROWTH = 10%)";
 
             var connStr = ConnStr.Replace("SejilTestDb", "master");

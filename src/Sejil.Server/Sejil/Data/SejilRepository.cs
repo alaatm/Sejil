@@ -33,7 +33,7 @@ public abstract class SejilRepository : ISejilRepository
 
     protected abstract string LogQueryTableName { get; }
 
-    protected abstract void InitializeDatabase();
+    protected abstract Task InitializeDatabaseAsync();
 
     protected abstract DbConnection GetConnection();
 
@@ -41,22 +41,23 @@ public abstract class SejilRepository : ISejilRepository
 
     protected abstract string GetDateTimeOffsetSql(int value, string unit);
 
-    private DbConnection GetConnectionCore()
+    private async Task<DbConnection> GetConnectionAsync()
     {
         if (!_dbInitialized)
         {
-            InitializeDatabase();
             _dbInitialized = true;
+            await InitializeDatabaseAsync();
         }
-        return GetConnection();
+        var conn = GetConnection();
+        await conn.OpenAsync();
+        return conn;
     }
 
     public async Task<IEnumerable<LogQuery>> GetSavedQueriesAsync()
     {
         const string Sql = "SELECT * FROM {0}";
 
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
+        using var conn = await GetConnectionAsync();
         return await conn.QueryAsync<LogQuery>(string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName));
     }
 
@@ -64,8 +65,7 @@ public abstract class SejilRepository : ISejilRepository
     {
         const string Sql = "INSERT INTO {0} (name, query) VALUES (@name, @query)";
 
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
+        using var conn = await GetConnectionAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName);
         cmd.CommandType = CommandType.Text;
@@ -78,8 +78,7 @@ public abstract class SejilRepository : ISejilRepository
     {
         const string Sql = "DELETE FROM {0} WHERE name = @name";
 
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
+        using var conn = await GetConnectionAsync();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = string.Format(CultureInfo.InvariantCulture, Sql, LogQueryTableName);
         cmd.CommandType = CommandType.Text;
@@ -96,8 +95,7 @@ public abstract class SejilRepository : ISejilRepository
 
         var sql = GetPagedLogEntriesSql(page, Settings.PageSize, startingTimestamp, queryFilter);
 
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
+        using var conn = await GetConnectionAsync();
         var lookup = new Dictionary<string, LogEntry>();
 
         await conn.QueryAsync<LogEntry, LogEntryProperty, LogEntry>(sql, (l, p) =>
@@ -111,8 +109,8 @@ public abstract class SejilRepository : ISejilRepository
             {
                 logEntry.Properties.Add(p);
             }
-            return logEntry;
 
+            return logEntry;
         });
 
         return lookup.Values;
@@ -120,8 +118,7 @@ public abstract class SejilRepository : ISejilRepository
 
     public async Task InsertEventsAsync(IEnumerable<LogEvent> events)
     {
-        using var conn = GetConnectionCore();
-        await conn.OpenAsync();
+        using var conn = await GetConnectionAsync();
         using var tran = conn.BeginTransaction();
         using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
         using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
