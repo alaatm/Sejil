@@ -119,7 +119,7 @@ public abstract class SejilRepository : ISejilRepository
     public async Task InsertEventsAsync(IEnumerable<LogEvent> events)
     {
         using var conn = await GetConnectionAsync();
-        using var tran = conn.BeginTransaction();
+        using var tran = await conn.BeginTransactionAsync();
         using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
         using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
         {
