@@ -120,25 +120,25 @@ public abstract class SejilRepository : ISejilRepository
     {
         using var conn = await GetConnectionAsync();
         using var tran = await conn.BeginTransactionAsync();
-        using (var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran))
-        using (var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran))
-        {
-            foreach (var logEvent in events)
-            {
-                // Do not log events that were generated from browsing Sejil URL.
-                if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
-                    p.Value.ToString().Contains(Settings.Url, StringComparison.Ordinal)))
-                {
-                    continue;
-                }
+        using var cmdLogEntry = CreateLogEntryInsertCommand(conn, tran);
+        using var cmdLogEntryProperty = CreateLogEntryPropertyInsertCommand(conn, tran);
 
-                var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
-                foreach (var property in logEvent.Properties)
-                {
-                    await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
-                }
+        foreach (var logEvent in events)
+        {
+            // Do not log events that were generated from browsing Sejil URL.
+            if (logEvent.Properties.Any(p => (p.Key == "RequestPath" || p.Key == "Path") &&
+                p.Value.ToString().Contains(Settings.Url, StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
+            var logId = await InsertLogEntryAsync(cmdLogEntry, logEvent);
+            foreach (var property in logEvent.Properties)
+            {
+                await InsertLogEntryPropertyAsync(cmdLogEntryProperty, logId, property);
             }
         }
+
         await tran.CommitAsync();
     }
 
