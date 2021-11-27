@@ -209,32 +209,35 @@ ORDER BY l.timestamp DESC, p.name",
 
     public async Task CleanupAsync()
     {
-        const string Sql = "DELETE FROM {0} WHERE timestamp < '{1:yyyy-MM-dd HH:mm:ss.fff}'{2}";
+        const string Sql = "DELETE FROM {0} WHERE timestamp < @age";
+        const string SqlWithLevels = "DELETE FROM {0} WHERE timestamp < @age AND level in ({1})";
+
+        using var conn = await GetConnectionAsync();
+        using var cmd = conn.CreateCommand();
 
         foreach (var rp in Settings.RetentionPolicies)
         {
-            var logsFilter = "";
+            cmd.Parameters.Clear();
+            cmd.AddParameterWithValue("@age", DateTime.UtcNow.AddMinutes(-rp.Age.TotalMinutes));
+
+            string? sql;
             var levels = rp.LogLevels.ToArray();
 
             if (levels.Length > 0)
             {
-                var sb = new StringBuilder(" AND level in (");
+                var paramNames = new string[levels.Length];
                 for (var i = 0; i < levels.Length; i++)
                 {
-                    sb.AppendFormat(CultureInfo.InvariantCulture, "'{0}'", levels[i]);
-                    if (i < levels.Length - 1)
-                    {
-                        sb.Append(',');
-                    }
+                    paramNames[i] = $"@level{i}";
+                    cmd.AddParameterWithValue(paramNames[i], levels[i].ToString());
                 }
-                sb.Append(')');
-                logsFilter = sb.ToString();
+                sql = string.Format(CultureInfo.InvariantCulture, SqlWithLevels, LogTableName, string.Join(',', paramNames));
+            }
+            else
+            {
+                sql = string.Format(CultureInfo.InvariantCulture, Sql, LogTableName);
             }
 
-            var sql = string.Format(CultureInfo.InvariantCulture, Sql, LogTableName, DateTime.UtcNow.AddMinutes(-rp.Age.TotalMinutes), logsFilter);
-
-            using var conn = await GetConnectionAsync();
-            using var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
             await cmd.ExecuteNonQueryAsync();
         }
