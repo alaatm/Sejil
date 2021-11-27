@@ -71,10 +71,36 @@ public class HostBuilderExtensionsTests
         var settings = scope.ServiceProvider.GetRequiredService<ISejilSettings>();
         var repository = scope.ServiceProvider.GetRequiredService<ISejilRepository>();
         var controller = scope.ServiceProvider.GetRequiredService<ISejilController>();
+        var cleanupService = scope.ServiceProvider.GetService<IHostedService>();
 
         Assert.NotNull(settings);
         Assert.NotNull(repository);
         Assert.NotNull(controller);
+        Assert.Null(cleanupService);
+    }
+
+    [Fact]
+    public void UseSejil_registers_cleanupService_when_retention_settings_are_set()
+    {
+        // Arrange
+        var hostBuilder = new HostBuilder()
+            .ConfigureServices(services =>
+                services.AddSingleton(Mock.Of<IServer>()));
+
+        // Act
+        hostBuilder.UseSejil(setupAction: cfg =>
+        {
+            cfg.UseMockStore();
+            cfg.AddRetentionPolicy(TimeSpan.FromMinutes(2), LogEventLevel.Information);
+        });
+
+        // Assert
+        var webhost = hostBuilder.Build();
+
+        using var scope = webhost.Services.CreateScope();
+        var cleanupService = scope.ServiceProvider.GetRequiredService<IHostedService>();
+
+        Assert.NotNull(cleanupService);
     }
 
     [Fact]

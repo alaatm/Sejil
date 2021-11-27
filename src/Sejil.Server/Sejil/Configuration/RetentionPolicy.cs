@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Serilog.Events;
 
 namespace Sejil.Configuration;
@@ -15,6 +16,8 @@ public class RetentionPolicy
 
     internal RetentionPolicy(TimeSpan age, IEnumerable<LogEventLevel> logLevels)
     {
+        Debug.Assert(logLevels is not null);
+
         if (age < TimeSpan.FromMinutes(2))
         {
             throw new InvalidOperationException("The lowest possible age is 2 minutes.");

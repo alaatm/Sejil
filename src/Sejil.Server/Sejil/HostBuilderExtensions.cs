@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sejil.Background;
 using Sejil.Configuration;
-using Sejil.Data;
 using Sejil.Logging.Sinks;
 using Sejil.Routing;
 using Serilog;
@@ -91,7 +90,7 @@ public static partial class IHostBuilderExtensions
             {
                 services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddSingleton<ISejilSettings>(settings);
-                services.AddSingleton<ISejilRepository>(settings.SejilRepository);
+                services.AddSingleton(settings.SejilRepository);
                 services.AddScoped<ISejilController, SejilController>();
 
                 if (settings.RetentionPolicies.Any())

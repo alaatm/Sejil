@@ -8,7 +8,7 @@ namespace Sejil.Test.Background;
 public class EventsCleanupServiceTests
 {
     [Fact]
-    public async Task Service_fires_up_cleanup_task()
+    public async Task StartAsync_starts_timer()
     {
         // Arrange
         var cleanupCalled = false;

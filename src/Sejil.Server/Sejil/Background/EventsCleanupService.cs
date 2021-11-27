@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Sejil.Configuration;
 using Sejil.Data;
@@ -18,6 +19,7 @@ internal sealed class EventsCleanupService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        Debug.Assert(_invokeDuration >= 2);
         _timer = new Timer(Callback, null, TimeSpan.Zero, TimeSpan.FromMinutes(_invokeDuration));
         return Task.CompletedTask;
 

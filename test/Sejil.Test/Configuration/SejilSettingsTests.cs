@@ -71,6 +71,58 @@ public class SejilSettingsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => settings.PageSize = pageSize);
     }
 
+    [Fact]
+    public void AddRetentionPolicy_throws_when_setting_multiple_policies_for_same_logLevel()
+    {
+        // Arrange
+        var settings = new SejilSettings("", LogEventLevel.Debug);
+        settings.AddRetentionPolicy(TimeSpan.FromMinutes(2), LogEventLevel.Information);
+
+        // Act & assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            settings.AddRetentionPolicy(TimeSpan.FromMinutes(2), LogEventLevel.Information));
+        Assert.Equal("A retention policy for log level 'Information' has already been defined.", ex.Message);
+    }
+
+    [Fact]
+    public void AddRetentionPolicy_throws_when_setting_multiple_policies_for_all_levels()
+    {
+        // Arrange
+        var settings = new SejilSettings("", LogEventLevel.Debug);
+        settings.AddRetentionPolicy(TimeSpan.FromMinutes(2));
+
+        // Act & assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            settings.AddRetentionPolicy(TimeSpan.FromMinutes(2)));
+        Assert.Equal("A retention policy that matches all levels has already been defined.", ex.Message);
+    }
+
+    [Fact]
+    public void AddRetentionPolicy_throws_when_generic_policies_have_lower_age_than_specific()
+    {
+        // Arrange
+        var settings = new SejilSettings("", LogEventLevel.Debug);
+        settings.AddRetentionPolicy(TimeSpan.FromMinutes(5), LogEventLevel.Information);
+
+        // Act & assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            settings.AddRetentionPolicy(TimeSpan.FromMinutes(2)));
+        Assert.Equal("A non-constrained retention policy may not have a lower age than a constraint retention policy.", ex.Message);
+    }
+
+    [Fact]
+    public void AddRetentionPolicy_throws_when_specific_policies_have_higher_age_than_generic()
+    {
+        // Arrange
+        var settings = new SejilSettings("", LogEventLevel.Debug);
+        settings.AddRetentionPolicy(TimeSpan.FromMinutes(2));
+
+        // Act & assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            settings.AddRetentionPolicy(TimeSpan.FromMinutes(5), LogEventLevel.Information));
+        Assert.Equal("A constrained retention policy may not have a higher age than a non-constraint retention policy.", ex.Message);
+    }
+
     [Theory]
     [InlineData("Trace", LogEventLevel.Verbose, true)]
     [InlineData("verbose", LogEventLevel.Verbose, true)]
