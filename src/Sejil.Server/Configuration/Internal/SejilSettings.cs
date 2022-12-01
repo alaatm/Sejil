@@ -30,6 +30,8 @@ namespace Sejil.Configuration.Internal
         /// </summary>
         public string AuthenticationScheme { get; set; }
 
+        private string DbFileName => $"Sejil-{UUID}.sqlite";
+
         public SejilSettings(string uri, LogEventLevel minLogLevel)
         {
             SejilAppHtml = ResourceHelper.GetEmbeddedResource("Sejil.index.html");
@@ -43,17 +45,22 @@ namespace Sejil.Configuration.Internal
             {
                 // If running in azure, we won't use local app folder as its temporary and will frequently be deleted.
                 // Use home folder instead.
-                SqliteDbPath = Path.Combine(Path.GetFullPath("/home"), $"Sejil-{UUID}.sqlite");
+                SqliteDbPath = Path.Combine(Path.GetFullPath("/home"), DbFileName);
             }
             else
             {
                 var localAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var appName = Assembly.GetEntryAssembly().GetName().Name;
-                SqliteDbPath = Path.Combine(localAppFolder, appName, $"Sejil-{UUID}.sqlite");
+                SqliteDbPath = Path.Combine(localAppFolder, appName, DbFileName);
             }
 
             NonPropertyColumns = new[] { "message", "messageTemplate", "level", "timestamp", "exception" };
             PageSize = 100;
+        }
+
+        public void SetSqliteDbDirectory(string directoryPath)
+        {
+            SqliteDbPath = Path.Combine(directoryPath, DbFileName);
         }
 
         public bool TrySetMinimumLogLevel(string minLogLevel)

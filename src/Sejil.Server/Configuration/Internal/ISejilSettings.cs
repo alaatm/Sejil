@@ -24,5 +24,11 @@ namespace Sejil.Configuration.Internal
         /// Gets or sets the authentication scheme, used for the index page. Leave empty for no authentication.
         /// </summary>
         string AuthenticationScheme { get; set; }
+
+        /// <summary>
+        /// Set the directory the sqlite log db is placed in
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        void SetSqliteDbDirectory(string directoryPath);
     }
 }

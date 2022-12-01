@@ -73,6 +73,18 @@ namespace Sejil.Test.Configuration
             Assert.Equal(100, settings.PageSize);
         }
 
+        [Fact]
+        public void SetSqliteDbDirectory_ensure_SqliteDbPath_is_changed()
+        {
+            // Arrange & act
+            var settings = new SejilSettings("", LogEventLevel.Debug);
+
+            settings.SetSqliteDbDirectory(@"C:\Temp");
+
+            // Assert
+            Assert.Matches(@"^C:\\Temp\\Sejil-[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}\.sqlite$", settings.SqliteDbPath);
+        }
+
         [Theory]
         [InlineData("Trace", LogEventLevel.Verbose, true)]
         [InlineData("verbose", LogEventLevel.Verbose, true)]
