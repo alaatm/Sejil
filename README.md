@@ -1,6 +1,6 @@
 > [!WARNING]
 > **Project Status: Archived / Unmaintained**
-> This repository is no longer actively maintained. If you are looking for a modern, active alternative inspired by Sejil, please check out **[gordon-matt/LogVue](https://github.com/gordon-matt/LogVue)** — a log viewer built as a Razor Class Library.
+> This repository is no longer actively maintained. If you are looking for a modern, active alternative inspired by Sejil, please check out **[gordon-matt/LogVue](https://github.com/gordon-matt/LogVue)**
 
 ---
 
